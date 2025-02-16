@@ -1,0 +1,31 @@
+This project is already using a firebase project and a cloudinary service for media uploads
+so you can just follow these steps to run the app:
+- npm run install
+- npm run start 
+
+
+* if you want to integrate your own firebase and cloudinary account then follow these steps
+
+Firebase Setup
+- go to https://console.firebase.google.com and create a new project
+- create a new web app
+- copy and replace the firebaseConfigs in config/firebase.ts file
+- go to Authentication-> Sign-in Method, enable Email/password Provider (turn off the Email link if enabled by default)
+- go to Firestore Database, create database, choose location and then choose Test/Production mode and create database.
+
+Cloudinary Setup
+- go to https://cloudinary.com and create an account
+- find the cloudName in settings->API KEYS or in settings->Product Environments
+- copy the cloudName and replace it in CLOUDINARY_CLOUD_NAME in constants/index.ts file.
+- go to settings-> Uplaod Presets and Add Upload Preset (give it a name, chnage signing mode to Unsigned and save it)
+- copy the upload preset name and replace it in CLOUDINARY_UPLOAD_PRESET in constants/index.ts file.
+
+thats it, now install the dependencies and run the project
+- npm run install
+- npm run start
+
+Enjoy 😉
+
+Visit https://codewithnomi.com to get more cool projects 🔥 
+
+follow me on X (twitter): https://x.com/codewithnomi_

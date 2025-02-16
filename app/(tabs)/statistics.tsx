@@ -15,7 +15,7 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Loading from "@/components/Loading";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { scale, verticalScale } from "@/utils/styling";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import * as Icons from "phosphor-react-native";
 import { useAuth } from "@/contexts/authContext";
 import {

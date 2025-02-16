@@ -40,8 +40,8 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: emailRef.current,
-          password: passwordRef.current
+          email: "dineshbali45@gmail.com",
+          password: "gamer"
         }),
       });
 

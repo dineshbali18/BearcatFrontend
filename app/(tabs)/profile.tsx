@@ -9,7 +9,7 @@ import {
 import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { Image } from "expo-image";
 import { useAuth } from "@/contexts/authContext";
@@ -18,12 +18,15 @@ import * as Icons from "phosphor-react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { accountOptionType } from "@/types";
-import { signOut } from "firebase/auth";
-import { auth } from "@/config/firebase";
+// Removed Firebase imports
+// import { signOut } from "firebase/auth";
+// import { auth } from "@/config/firebase";
 import { getProfileImage } from "@/services/imageService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
-  const { user } = useAuth();
+  // Assume that useAuth now provides a custom logout function
+  const { user} = useAuth();
   const router = useRouter();
 
   const accountOptions: accountOptionType[] = [
@@ -39,18 +42,6 @@ const Profile = () => {
       routeName: "/(modals)/profileModal",
       bgColor: "#6366f1",
     },
-    // {
-    //   title: "Exepnse Categories",
-    //   icon: (
-    //     <Icons.SquaresFour
-    //       size={verticalScale(26)}
-    //       color={colors.white}
-    //       weight="fill"
-    //     />
-    //   ),
-    //   routeName: "/(modals)/categoryModal",
-    //   bgColor: "#10b981",
-    // },
     {
       title: "Settings",
       icon: (
@@ -60,7 +51,6 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      // routeName: "/(modals)/categoryModal",
       bgColor: "#059669",
     },
     {
@@ -72,7 +62,6 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      // routeName: "/(modals)/categoryModal",
       bgColor: colors.neutral600,
     },
     {
@@ -84,20 +73,20 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      // routeName: "/(modals)/categories",
       bgColor: "#e11d48",
     },
   ];
 
   const handleLogout = async () => {
-    await signOut(auth);
+    // Custom logout logic instead of Firebase's signOut
+    await AsyncStorage.clear();
   };
 
   const showLogoutAlert = () => {
     Alert.alert("Confirm", "Are you sure you want to logout?", [
       {
         text: "Cancel",
-        onPress: () => console.log("Cancel delete"),
+        onPress: () => console.log("Cancel logout"),
         style: "cancel",
       },
       {
@@ -109,17 +98,19 @@ const Profile = () => {
   };
 
   const handlePress = async (item: accountOptionType) => {
-    if (item?.title == "Logout") {
+    if (item?.title === "Logout") {
       showLogoutAlert();
+    } else if (item?.routeName) {
+      router.push(item.routeName);
     }
-    if (item?.routeName) router.push(item?.routeName);
   };
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <Header title={"Profile"} />
+        <Header title="Profile" />
         <View style={styles.userInfo}>
-          {/* avatar */}
+          {/* Avatar */}
           <View>
             <Image
               style={styles.avatar}
@@ -127,17 +118,11 @@ const Profile = () => {
               contentFit="cover"
               transition={100}
             />
-            {/* <TouchableOpacity style={styles.editIcon}>
-              <Icons.Pencil
-                size={verticalScale(20)}
-                color={colors.neutral800}
-              />
-            </TouchableOpacity> */}
           </View>
 
-          {/* name, email */}
+          {/* Name and email */}
           <View style={styles.nameContainer}>
-            <Typo size={24} fontWeight={"600"} color={colors.neutral100}>
+            <Typo size={24} fontWeight="600" color={colors.neutral100}>
               {user?.name || " "}
             </Typo>
             <Typo size={15} color={colors.neutral400}>
@@ -146,42 +131,37 @@ const Profile = () => {
           </View>
         </View>
 
-        {/* account options */}
+        {/* Account options */}
         <View style={styles.accountOptions}>
-          {accountOptions.map((item, index) => {
-            return (
-              <Animated.View
-                key={index.toString()}
-                entering={FadeInDown.delay(index * 50)
-                  .springify()
-                  .damping(14)}
-                style={styles.listItem}
+          {accountOptions.map((item, index) => (
+            <Animated.View
+              key={index.toString()}
+              entering={FadeInDown.delay(index * 50)
+                .springify()
+                .damping(14)}
+              style={styles.listItem}
+            >
+              <TouchableOpacity
+                style={styles.flexRow}
+                onPress={() => handlePress(item)}
               >
-                <TouchableOpacity
-                  style={styles.flexRow}
-                  onPress={() => handlePress(item)}
+                {/* Icon */}
+                <View
+                  style={[styles.listIcon, { backgroundColor: item.bgColor }]}
                 >
-                  {/* icon */}
-                  <View
-                    style={[
-                      styles.listIcon,
-                      { backgroundColor: item?.bgColor },
-                    ]}
-                  >
-                    {item.icon && item.icon}
-                  </View>
-                  <Typo size={16} style={{ flex: 1 }} fontWeight={"500"}>
-                    {item.title}
-                  </Typo>
-                  <Icons.CaretRight
-                    size={verticalScale(20)}
-                    weight="bold"
-                    color={colors.white}
-                  />
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
+                  {item.icon}
+                </View>
+                <Typo size={16} style={{ flex: 1 }} fontWeight="500">
+                  {item.title}
+                </Typo>
+                <Icons.CaretRight
+                  size={verticalScale(20)}
+                  weight="bold"
+                  color={colors.white}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          ))}
         </View>
       </View>
     </ScreenWrapper>
@@ -210,8 +190,6 @@ const styles = StyleSheet.create({
     height: verticalScale(135),
     width: verticalScale(135),
     borderRadius: 200,
-    // overflow: "hidden",
-    // position: "relative",
   },
   editIcon: {
     position: "absolute",

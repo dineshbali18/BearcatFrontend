@@ -1,51 +1,41 @@
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { scale, verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Button from "@/components/Button";
 import * as Icons from "phosphor-react-native";
-import { useFocusEffect, useRouter } from "expo-router";
-import Header from "@/components/Header";
+import { useRouter } from "expo-router";
+import Header from "@/components/Header1";
 import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
-import { orderBy, where } from "firebase/firestore";
 import { useAuth } from "@/contexts/authContext";
 import Loading from "@/components/Loading";
 import WalletListItem from "@/components/WalletListItem";
+
 const Wallet = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const {
-    data: wallets,
-    loading,
-    error,
-  } = useFetchData<WalletType>("wallets", [
-    where("uid", "==", user?.uid),
-    orderBy("created", "desc"),
-  ]);
+
+  // Fetch wallets without Firebase-specific queries.
+  // Ensure your hook now handles filtering on your backend (if needed) using user?.uid.
+  const { data: wallets, loading, error } = useFetchData<WalletType>("wallets");
 
   const getTotalBalance = () =>
     wallets.reduce((total, item) => {
-      total = total + (item?.amount || 0);
+      total += item?.amount || 0;
       return total;
     }, 0);
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
       <View style={styles.container}>
-        {/* balance view */}
+        {/* Balance view */}
         <View style={styles.balanceView}>
           <View style={{ alignItems: "center" }}>
-            <Typo size={45} fontWeight={"500"}>
-              ${getTotalBalance()?.toFixed(2)}
+            <Typo size={45} fontWeight="500">
+              ${getTotalBalance().toFixed(2)}
             </Typo>
             <Typo size={16} color={colors.neutral300}>
               Total balance
@@ -53,16 +43,14 @@ const Wallet = () => {
           </View>
         </View>
 
-        {/* wallets */}
+        {/* Wallets */}
         <View style={styles.wallets}>
-          {/* header */}
+          {/* Header */}
           <View style={styles.flexRow}>
-            <Typo size={20} fontWeight={"500"}>
+            <Typo size={20} fontWeight="500">
               My Wallets
             </Typo>
-            <TouchableOpacity
-              onPress={() => router.push("/(modals)/walletModal")}
-            >
+            <TouchableOpacity onPress={() => router.push("/(modals)/walletModal")}>
               <Icons.PlusCircle
                 weight="fill"
                 color={colors.primary}
@@ -71,7 +59,7 @@ const Wallet = () => {
             </TouchableOpacity>
           </View>
 
-          {/* wallets data */}
+          {/* Wallets data */}
           {loading && <Loading />}
           <FlatList
             data={wallets}
@@ -79,7 +67,6 @@ const Wallet = () => {
               <WalletListItem item={item} router={router} index={index} />
             )}
             contentContainerStyle={styles.listStyle}
-            // keyExtractor={(item) => item.id}
           />
         </View>
       </View>
@@ -110,7 +97,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.neutral900,
     borderTopRightRadius: radius._30,
-
     borderTopLeftRadius: radius._30,
     padding: spacingX._20,
     paddingTop: spacingX._25,

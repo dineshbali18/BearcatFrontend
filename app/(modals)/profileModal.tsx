@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import ModalWrapper from "@/components/ModalWrapper";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import Typo from "@/components/Typo";
 import Input from "@/components/Input";
 import { useAuth } from "@/contexts/authContext";

@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import ModalWrapper from "@/components/ModalWrapper";
 import Typo from "@/components/Typo";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Button from "@/components/Button";
 import Input from "@/components/Input";

@@ -1,37 +1,73 @@
-import { StyleSheet, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { HeaderProps } from "@/types";
-import Typo from "./Typo";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Colors from "@/constants/Colors";
 
-const Header = ({ title = "", leftIcon, style }: HeaderProps) => {
+const Header = () => {
   return (
-    <View style={[styles.container, style && style]}>
-      {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-      {title && (
-        <Typo
-          size={22}
-          fontWeight={"600"}
-          style={{
-            textAlign: "center",
-            width: leftIcon ? "82%" : "100%",
-          }}
+    <SafeAreaView style={styles.container}>
+      <View
+        style={styles.wrapper}
+      >
+        <View style={styles.userInfoWrapper}>
+          <View style={styles.userTxtWrapper}>
+            <Text style={[styles.userText, { fontSize: 12 }]}>Hi, Dinesh</Text>
+            <Text style={[styles.userText, { fontSize: 16 }]}>
+              Your <Text style={styles.boldText}>Budget</Text>
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => {}}
+          style={styles.btnWrapper}
         >
-          {title}
-        </Typo>
-      )}
-    </View>
+          <Text style={styles.btnText}>
+            My Transactions
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default Header;
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    alignItems: "center",
-    flexDirection: "row",
+  container: { 
+    flex: 1, 
+    backgroundColor: Colors.black, 
   },
-  leftIcon: {
-    alignSelf: "flex-start",
+  wrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    height: 70,
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  userInfoWrapper: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+  },
+  userTxtWrapper: {
+    marginTop:-40,
+    marginLeft:-20,
+  },
+  userText: {
+    color: Colors.white,
+  },
+  boldText: {
+    fontWeight:'700',
+  },
+  btnWrapper: {
+    borderColor: "#666",
+    borderWidth: 1,
+    padding: 8,
+    borderRadius: 10,
+    marginTop: -20,
+  },
+  btnText: { 
+    color: Colors.white, 
+    fontSize: 12,
+    marginTop: -20,
   },
 });

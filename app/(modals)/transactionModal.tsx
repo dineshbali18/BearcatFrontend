@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import ModalWrapper from "@/components/ModalWrapper";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import BackButton from "@/components/BackButton";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";

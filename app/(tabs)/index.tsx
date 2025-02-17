@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import Header from "@/components/Header";
 import { PieChart } from "react-native-gifted-charts";
 import ExpenseBlock from "@/components/ExpenseBlock";
+import ExpenseCard from "@/components/ExpenseCard"
 import IncomeBlock from "@/components/IncomeBlock";
 import SpendingBlock from "@/components/SpendingBlock";
 import ExpenseList from "@/data/expenses.json";
@@ -44,54 +45,8 @@ const Page = () => {
           <View>
             <Header/>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <View style={{ gap: 10 }}>
-              <Text style={{ color: Colors.white, fontSize: 16 }}>
-                My <Text style={{ fontWeight: 700 }}>Expenses</Text>
-              </Text>
-              <Text
-                style={{ color: Colors.white, fontSize: 36, fontWeight: 700 }}
-              >
-                $1475.<Text style={{ fontSize: 22, fontWeight: 400 }}>00</Text>
-              </Text>
-            </View>
-            <View style={{paddingVertical:20,alignItems:'center'}}>
-              <PieChart
-                data={pieData}
-                donut
-                showGradient
-                sectionAutoFocus
-                focusOnPress
-                semiCircle
-                radius={70}
-                innerRadius={55}
-                innerCircleColor={Colors.black}
-                centerLabelComponent={() => {
-                  return (
-                    <View
-                      style={{ justifyContent: "center", alignItems: "center" }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          color: "white",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        47%
-                      </Text>
-                    </View>
-                  );
-                }}
-              />
-            </View>
-          </View>
+          
+          <ExpenseCard />
 
           <ExpenseBlock expenseList={ExpenseList} />
 

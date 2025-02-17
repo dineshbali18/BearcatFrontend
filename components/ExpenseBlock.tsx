@@ -28,8 +28,6 @@ const ExpenseBlock = ({ expenseList }: { expenseList: ExpenseType[] }) => {
       );
     }
 
-    let amount = item.amount.split(".");
-
     return (
       <View
         style={[
@@ -59,7 +57,7 @@ const ExpenseBlock = ({ expenseList }: { expenseList: ExpenseType[] }) => {
         >
           {item.name}
         </Text>
-        <Text
+        {/* <Text
           style={[
             styles.expenseBlockTxt2,
             {
@@ -74,7 +72,7 @@ const ExpenseBlock = ({ expenseList }: { expenseList: ExpenseType[] }) => {
         >
           ${amount[0]}.
           <Text style={styles.expenseBlockTxt2Span}>{amount[1]}</Text>
-        </Text>
+        </Text> */}
         <View style={styles.expenseBlock3View}>
           <Text
             style={[

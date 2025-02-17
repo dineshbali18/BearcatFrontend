@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 import { SpendingType } from "@/types";
 import Colors from "@/constants/Colors";
@@ -13,8 +13,6 @@ import {
 } from "@/constants/Icons";
 
 const SpendingBlock = ({ spendingList }: { spendingList: SpendingType[] }) => {
-  let icon = <DollarIcon width={22} height={22} color={Colors.white} />;
-
   return (
     <View style={styles.spendingSectionWrapper}>
       <Text style={styles.sectionTitle}>
@@ -22,25 +20,30 @@ const SpendingBlock = ({ spendingList }: { spendingList: SpendingType[] }) => {
       </Text>
 
       {spendingList.map((item) => {
-        if (item.name == "AirBnB Rent") {
-          icon = <AirbnbIcon width={22} height={22} color={Colors.white} />;
-        } else if (item.name == "Netflix") {
-          icon = <NetflixIcon width={22} height={22} color={Colors.white} />;
-        } else if (item.name == "Spotify") {
-          icon = <SpotifyIcon width={22} height={22} color={Colors.white} />;
-        } else if (item.name == "Amazon") {
-          icon = <AmazonIcon width={22} height={22} color={Colors.white} />;
-        } else if (item.name == "Figma") {
-          icon = <FigmaIcon width={22} height={22} color={Colors.white} />;
-        } else if (item.name == "Online Shopping") {
-          icon = (
-            <ShoopingCartIcon width={22} height={22} color={Colors.white} />
-          );
+        let iconSource = DollarIcon;
+        if (item.name === "AirBnB Rent") {
+          iconSource = AirbnbIcon;
+        } else if (item.name === "Netflix") {
+          iconSource = NetflixIcon;
+        } else if (item.name === "Spotify") {
+          iconSource = SpotifyIcon;
+        } else if (item.name === "Amazon") {
+          iconSource = AmazonIcon;
+        } else if (item.name === "Figma") {
+          iconSource = FigmaIcon;
+        } else if (item.name === "Online Shopping") {
+          iconSource = ShoopingCartIcon;
         }
 
         return (
           <View style={styles.spendingWrapper} key={item.id}>
-            <View style={styles.iconWrapper}>{icon}</View>
+            <View style={styles.iconWrapper}>
+              <Image
+                source={iconSource}
+                style={{ width: 22, height: 22, tintColor: Colors.white }}
+                resizeMode="contain"
+              />
+            </View>
             <View style={styles.textWrapper}>
               <View style={{ gap: 5 }}>
                 <Text style={styles.itemName}>{item.name}</Text>

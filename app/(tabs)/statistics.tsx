@@ -34,11 +34,11 @@ const barData = [
     spacing: scale(4),
     labelWidth: scale(30),
     frontColor: colors.primary,
-    // topLabelComponent: () => (
-    //   <Typo size={10} style={{ marginBottom: 4 }} fontWeight={"bold"}>
-    //     50
-    //   </Typo>
-    // ),
+    topLabelComponent: () => (
+      <Typo size={10} style={{ marginBottom: 4 }} fontWeight={"bold"}>
+        50
+      </Typo>
+    ),
   },
   {
     value: 20,

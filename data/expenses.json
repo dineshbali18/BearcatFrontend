@@ -1,26 +1,15 @@
 [
  {
   "id": "1",
-  "name": "Housing",
-  "amount": "955.75",
-  "percentage": "61"
+  "name": "Saving Goals"
  },
  {
   "id": "2",
-  "name": "Food",
-  "amount": "300.55",
-  "percentage": "19"
+  "name": "Budgets"
  },
  {
   "id": "3",
-  "name": "Saving",
-  "amount": "200.95",
-  "percentage": "13"
+  "name": "Expenses"
  },
- {
-  "id": "4",
-  "name": "Miscleneous",
-  "amount": "70.95",
-  "percentage": "5"
- }
+
 ]

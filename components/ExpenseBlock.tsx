@@ -10,13 +10,19 @@ import {
 import { ExpenseType } from "@/types";
 import Colors from "@/constants/Colors";
 import ExpenseScreen from "./ExpenseCard";
+import BudgetScreen from "./BudgetCard";
+import SavingScreen from "./SavingGoalCard";
 import IncomeBlock from "@/components/IncomeBlock";
 import SpendingBlock from "@/components/SpendingBlock";
 import incomeList from "@/data/income.json";
 import spendingList from "@/data/spending.json";
+import UserBudgets from "@/components/UserBudgets"
+import UserSavingGoals from "@/components/UserSavingGoals"
 
-// Example detail component for "Expenses"
+// Correctly referencing the components
 const ExpensesComponent = () => <ExpenseScreen />;
+const SavingGoalComponent = () => <SavingScreen />;
+const BudgetComponent = () => <BudgetScreen />;
 
 interface ExpenseBlockProps {
   expenseList: ExpenseType[];
@@ -25,16 +31,23 @@ interface ExpenseBlockProps {
 const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
 
-  // Debugging logs
-  console.log("Current selectedComponent:", selectedComponent);
+  const [selectedScreen, setSelectedScreen] = useState("")
 
   const handleItemPress = (name: string) => {
     console.log("Tapped on:", name);
-    
+
     if (name === "Expenses") {
       setSelectedComponent(<ExpensesComponent />);
+      setSelectedScreen("Expenses")
+    } else if (name === "Saving Goal") {
+      setSelectedComponent(<SavingGoalComponent />);
+      setSelectedScreen("Saving Goal")
+    } else if (name === "Budgets") {
+      setSelectedComponent(<BudgetComponent />);
+      setSelectedScreen("Budgets")
     } else {
-      setSelectedComponent(null); // Ensure it's set to null
+      setSelectedScreen("")
+      setSelectedComponent(null);
     }
   };
 
@@ -88,32 +101,42 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
   };
 
   return (
-    <View style={{ paddingVertical: 20 }}>
-      {/* Expenses should scroll horizontally */}
-      <View style={styles.horizontalListContainer}>
-        <FlatList
-          data={expenseList}
-          renderItem={renderItem}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id.toString()}
-        />
-      </View>
-      {/* Selected component will show below other components */}
+    <View style={styles.container}>
+      {/* Horizontal scrolling expense items */}
+      <FlatList
+        data={expenseList}
+        renderItem={renderItem}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id.toString()}
+        style={styles.horizontalListContainer}
+      />
+
+      {/* Display the selected component */}
       {selectedComponent !== null && (
-        <>
         <View style={styles.detailWrapper}>{selectedComponent}</View>
-        <View style={styles.verticalComponents}>
+      )}
+      
+      {/* Vertical stacking of IncomeBlock and SpendingBlock */}
+      {selectedComponent !== null && selectedScreen === "Expenses"?
+      <View style={styles.verticalComponents}>
         <IncomeBlock incomeList={incomeList} />
         <SpendingBlock spendingList={spendingList} />
-      </View>
-      </>
-      )}
+      </View>:<></>
+      }
 
-      {/* These components should be stacked vertically below */}
-      
+      {selectedComponent !== null && selectedScreen === "Budgets"?
+      <View style={styles.verticalComponents}>
+        <UserBudgets incomeList={incomeList} />
+      </View>:<></>
+      }
 
-      
+      {selectedComponent !== null && selectedScreen === "Saving Goal"?
+      <View style={styles.verticalComponents}>
+        <UserSavingGoals incomeList={incomeList} />
+        {/* <SpendingBlock spendingList={spendingList} /> */}
+      </View>:<></>
+      }
     </View>
   );
 };
@@ -121,8 +144,11 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 export default ExpenseBlock;
 
 const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 20,
+  },
   horizontalListContainer: {
-    marginBottom: 10, // Adds spacing between horizontal list and vertical components
+    marginBottom: 10,
   },
   expenseBlock: {
     backgroundColor: Colors.tintColor,
@@ -142,11 +168,11 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 10,
   },
-  verticalComponents: {
-    flexDirection: "column",
-    gap: 10, // Ensures vertical spacing between IncomeBlock and SpendingBlock
-  },
   detailWrapper: {
     marginTop: 20,
+  },
+  verticalComponents: {
+    flexDirection: "column",
+    gap: 10,
   },
 });

@@ -91,7 +91,7 @@ const ExpensesSection = () => {
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
           <Text style={styles.expenseHeaderText}>
-            My <Text style={{ fontWeight: "700" }}>Expenses</Text>
+            My <Text style={{ fontWeight: "700" }}>Saving Goals</Text>
           </Text>
           <Text style={styles.expenseAmountText}>
             ${totalExpense.split(".")[0]}.

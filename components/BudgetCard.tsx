@@ -1,154 +1,223 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { ExpenseType } from "@/types";
 import { PieChart } from "react-native-gifted-charts";
+import ManageSavingGoals from "./ManageSavingGoals"; // Import CRUD component
 
-const ExpensesSection = () => {
-  // Default expense list data
-  const expenseList: ExpenseType[] = [
-    { id: "1", name: "Food", amount: "250.00", percentage: "30" },
-    { id: "2", name: "Electronics", amount: "500.00", percentage: "35" },
-    { id: "3", name: "Clothing", amount: "725.00", percentage: "35" },
-  ];
+// Dummy expenses data for each goal id
+const expensesData: { [key: string]: { id: string; description: string; amount: number }[] } = {
+  "1": [
+    { id: "e1", description: "Fuel", amount: 50 },
+    { id: "e2", description: "Maintenance", amount: 150 },
+  ],
+  "2": [
+    { id: "e3", description: "Hotel", amount: 200 },
+    { id: "e4", description: "Flight", amount: 300 },
+  ],
+  "3": [
+    { id: "e5", description: "Medical", amount: 100 },
+    { id: "e6", description: "Groceries", amount: 80 },
+  ],
+};
 
-  // Default PieChart data
+const BudgetCard = () => {
+  const [savings, setSavings] = useState<ExpenseType[]>([
+    { id: "1", name: "Car Fund", amount: "2500.00", totalAmount: "5000.00", percentage: "50" },
+    { id: "2", name: "Vacation", amount: "1500.00", totalAmount: "3000.00", percentage: "50" },
+    { id: "3", name: "Emergency Fund", amount: "1000.00", totalAmount: "2000.00", percentage: "50" },
+  ]);
+
+  const [isManageModalVisible, setManageModalVisible] = useState(false);
+  const [expandedGoal, setExpandedGoal] = useState<ExpenseType | null>(null);
+
+  const completedGoals = savings.filter((goal) => parseInt(goal.percentage) === 100);
+  const currentGoals = savings.filter((goal) => parseInt(goal.percentage) < 100);
+
+  const totalSavings = savings.reduce((acc, goal) => acc + parseFloat(goal.amount), 0).toFixed(2);
+  const goalAmount = 10000; // Example goal
+  const percentage = ((parseFloat(totalSavings) / goalAmount) * 100).toFixed(0);
+
   const pieData: any[] = [
-    { value: 30, color: Colors.blue },
-    { value: 35, color: Colors.white },
-    { value: 35, color: Colors.tintColor },
+    { value: 50, color: Colors.blue },
+    { value: 30, color: Colors.white },
+    { value: 20, color: Colors.tintColor },
   ];
 
-  const totalExpense = "1475.00";
-  const percentage = "47%";
+  // Render each card in the list. (No three dots now)
+  const renderGoalItem = ({ item }: { item: ExpenseType }) => (
+    <TouchableOpacity onPress={() => setExpandedGoal(item)}>
+      <View style={styles.goalCard}>
+        {/* Goal Header */}
+        <View style={styles.goalHeader}>
+          <Text style={styles.savingName}>{item.name}</Text>
+        </View>
 
-  // Prepend a static "Add Item" object to the expense list
-  const data = [{ name: "Add Item" }, ...expenseList];
+        {/* Progress Bar */}
+        <View style={styles.progressBarWrapper}>
+          <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />
+        </View>
 
-  const renderExpenseItem = ({
-    item,
-    index,
-  }: {
-    item: Partial<ExpenseType>;
-    index: number;
-  }) => {
-    // Render the "Add Item" button for the first item
-    if (index === 0) {
-      return (
-        <TouchableOpacity onPress={() => {}} key="add-item">
-          <View style={styles.addItemBtn}>
-            <Feather name="plus" size={22} color="#ccc" />
-          </View>
-        </TouchableOpacity>
-      );
-    }
-
-    // Split the amount into whole and cents parts
-    const amountParts = item.amount?.split(".") || ["0", "00"];
-
-    // Set colors based on the expense type
-    let bgColor = Colors.tintColor;
-    let textColor = Colors.white;
-    if (item.name === "Food") {
-      bgColor = Colors.blue;
-      textColor = Colors.black;
-    } else if (item.name === "Electronics") {
-      bgColor = Colors.white;
-      textColor = Colors.black;
-    }
-
-    return (
-      <View
-        style={[styles.expenseBlock, { backgroundColor: bgColor }]}
-        key={index.toString()}
-      >
-        <Text style={[styles.expenseBlockTxt1, { color: textColor }]}>
-          {item.name}
-        </Text>
-        <Text style={[styles.expenseBlockTxt2, { color: textColor }]}>
-          ${amountParts[0]}.
-          <Text style={styles.expenseBlockTxt2Span}>{amountParts[1]}</Text>
-        </Text>
-        {/* <View style={styles.expenseBlock3View}>
-          <Text style={[styles.expenseBlockTxt1, { color: textColor }]}>
-            {item.percentage}%
+        {/* Goal Details */}
+        <View style={styles.goalDetails}>
+          <Text style={styles.percentageText}>{item.percentage}%</Text>
+          <Text style={styles.savingAmount}>
+            ${item.amount} / ${item.totalAmount}
           </Text>
-        </View> */}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  // Expanded Card view for the tapped card
+  const renderExpandedCard = () => {
+    if (!expandedGoal) return null;
+    const goalExpenses = expensesData[expandedGoal.id] || [];
+    return (
+      <View style={styles.expandedCardContainer}>
+        <TouchableOpacity
+          style={styles.closeExpandedButton}
+          onPress={() => setExpandedGoal(null)}
+        >
+          <Feather name="x" size={24} color={Colors.white} />
+        </TouchableOpacity>
+        <View style={styles.expandedCard}>
+          <Text style={styles.expandedCardTitle}>{expandedGoal.name}</Text>
+          <Text style={styles.expandedCardDetail}>
+            ${expandedGoal.amount} / ${expandedGoal.totalAmount} ({expandedGoal.percentage}%)
+          </Text>
+          <View style={styles.expandedProgressBarWrapper}>
+            <View
+              style={{
+                ...styles.expandedProgressBar,
+                width: `${expandedGoal.percentage}%`,
+              }}
+            />
+          </View>
+        </View>
+        <View style={styles.expensesList}>
+          <Text style={styles.expensesHeader}>Expenses</Text>
+          {goalExpenses.map((expense) => (
+            <View key={expense.id} style={styles.expenseItem}>
+              <Text style={styles.expenseText}>{expense.description}</Text>
+              <Text style={styles.expenseText}>${expense.amount}</Text>
+            </View>
+          ))}
+        </View>
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Section with Expense Information and PieChart */}
-      <View style={styles.headerRow}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.expenseHeaderText}>
-            Total <Text style={{ fontWeight: "700" }}>Accumulated Budget </Text>
-          </Text>
-          <Text style={styles.expenseAmountText}>
-            ${totalExpense.split(".")[0]}.
-            <Text style={styles.expenseAmountCentsText}>
-              {totalExpense.split(".")[1]}
-            </Text>
-          </Text>
-        </View>
-        <View style={styles.headerRight}>
-        </View>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>My Total Budgets</Text>
+        <TouchableOpacity onPress={() => setManageModalVisible(true)}>
+          <Feather name="more-vertical" size={24} color={Colors.white} />
+        </TouchableOpacity>
       </View>
 
-      {/* Horizontal List of Expense Items */}
-      {/* <View style={styles.expenseListWrapper}>
+      {/* Total Savings Amount */}
+      <Text style={styles.expenseAmountText}>
+        ${totalSavings} / ${goalAmount}
+      </Text>
+      <View style={styles.pieChartContainer}>
+        <PieChart
+          data={pieData}
+          donut
+          showGradient
+          sectionAutoFocus
+          focusOnPress
+          radius={70}
+          innerRadius={55}
+          innerCircleColor={Colors.black}
+          centerLabelComponent={() => (
+            <View style={styles.centerLabel}>
+              <Text style={styles.centerLabelText}>{percentage}%</Text>
+            </View>
+          )}
+        />
+      </View>
+
+      {/* Expanded Card */}
+      {expandedGoal && renderExpandedCard()}
+
+      <ScrollView>
+        {/* Current Goals */}
+        <Text style={styles.sectionHeader}>Current Budgets</Text>
         <FlatList
-          data={data}
-          renderItem={renderExpenseItem}
+          data={currentGoals}
+          renderItem={renderGoalItem}
+          keyExtractor={(item) => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(_, index) => index.toString()}
+          contentContainerStyle={styles.horizontalList}
         />
-      </View> */}
+
+        {/* Completed Goals */}
+        <Text style={styles.sectionHeader}>Completed Budgets</Text>
+        <FlatList
+          data={completedGoals}
+          renderItem={renderGoalItem}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}
+        />
+      </ScrollView>
+
+      {/* Manage Savings Modal */}
+      <Modal visible={isManageModalVisible} animationType="slide">
+        <ManageSavingGoals
+          savings={savings}
+          setSavings={setSavings}
+          onClose={() => setManageModalVisible(false)}
+        />
+      </Modal>
     </View>
   );
 };
 
-export default ExpensesSection;
+export default BudgetCard;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
-    marginBottom: 30,
+    padding: 15,
+    backgroundColor: Colors.dark,
+    borderRadius: 10,
+    flex: 1,
   },
-  headerRow: {
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
   },
-  headerLeft: {
-    marginRight: 10,
-  },
-  expenseHeaderText: {
+  headerText: {
     color: Colors.white,
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: "700",
   },
   expenseAmountText: {
     color: Colors.white,
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: "700",
+    marginBottom: 10,
+    textAlign: "center",
   },
-  expenseAmountCentsText: {
-    fontSize: 22,
-    fontWeight: "400",
-  },
-  headerRight: {
-    paddingVertical: 20,
+  pieChartContainer: {
     alignItems: "center",
+    marginBottom: 20,
   },
   centerLabel: {
     justifyContent: "center",
@@ -159,41 +228,113 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  expenseListWrapper: {
-    paddingVertical: 20,
-  },
-  addItemBtn: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: "#666",
-    borderStyle: "dashed",
-    borderRadius: 10,
-    marginRight: 20,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  expenseBlock: {
-    width: 100,
-    padding: 15,
-    borderRadius: 15,
-    marginRight: 20,
-  },
-  expenseBlockTxt1: {
-    fontSize: 14,
-  },
-  expenseBlockTxt2: {
+  sectionHeader: {
+    color: Colors.white,
     fontSize: 16,
+    fontWeight: "700",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  horizontalList: {
+    paddingBottom: 10,
+  },
+  /* Goal Card (normal state) */
+  goalCard: {
+    backgroundColor: "#2C2C2E",
+    padding: 15,
+    borderRadius: 10,
+    marginRight: 10,
+    width: 180,
+  },
+  goalHeader: {
+    marginBottom: 5,
+  },
+  savingName: {
+    color: Colors.white,
+    fontSize: 14,
     fontWeight: "600",
   },
-  expenseBlockTxt2Span: {
-    fontSize: 12,
-    fontWeight: "400",
+  progressBarWrapper: {
+    height: 6,
+    backgroundColor: "#555",
+    borderRadius: 3,
+    overflow: "hidden",
+    marginBottom: 5,
   },
-  expenseBlock3View: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    paddingHorizontal: 5,
-    paddingVertical: 3,
+  progressBar: {
+    height: "100%",
+    borderRadius: 3,
+    backgroundColor: Colors.blue,
+  },
+  goalDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  percentageText: {
+    fontSize: 12,
+    color: Colors.white,
+    fontWeight: "bold",
+  },
+  savingAmount: {
+    color: Colors.white,
+    fontSize: 12,
+  },
+  /* Expanded Card Styles */
+  expandedCardContainer: {
+    backgroundColor: "#8A2BE2", // Violet background
     borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+  },
+  closeExpandedButton: {
+    alignSelf: "flex-end",
+  },
+  expandedCard: {
+    alignItems: "center",
+  },
+  expandedCardTitle: {
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 5,
+  },
+  expandedCardDetail: {
+    color: Colors.white,
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  expandedProgressBarWrapper: {
+    height: 8,
+    backgroundColor: "#555",
+    borderRadius: 4,
+    overflow: "hidden",
+    width: "100%",
+    marginBottom: 15,
+  },
+  expandedProgressBar: {
+    height: "100%",
+    borderRadius: 4,
+    backgroundColor: Colors.blue,
+  },
+  expensesList: {
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    paddingTop: 10,
+  },
+  expensesHeader: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 5,
+  },
+  expenseItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 5,
+  },
+  expenseText: {
+    color: Colors.white,
+    fontSize: 14,
   },
 });

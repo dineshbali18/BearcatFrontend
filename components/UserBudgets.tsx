@@ -55,17 +55,19 @@ const UserBudgets = ({ incomeList }: { incomeList: IncomeType[] }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>
-        My <Text style={styles.boldText}>Budgets</Text>
-      </Text>
-      <FlatList
-        data={incomeList}
-        renderItem={renderItem}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
-    </View>
+    <>
+    </>
+    // <View style={styles.container}>
+    //   <Text style={styles.headerText}>
+    //     My <Text style={styles.boldText}>Budgets</Text>
+    //   </Text>
+    //   <FlatList
+    //     data={incomeList}
+    //     renderItem={renderItem}
+    //     horizontal
+    //     showsHorizontalScrollIndicator={false}
+    //   />
+    // </View>
   );
 };
 

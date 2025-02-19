@@ -91,7 +91,7 @@ const ExpensesSection = () => {
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
           <Text style={styles.expenseHeaderText}>
-            My <Text style={{ fontWeight: "700" }}>Budgets</Text>
+            Total <Text style={{ fontWeight: "700" }}>Accumulated Budget </Text>
           </Text>
           <Text style={styles.expenseAmountText}>
             ${totalExpense.split(".")[0]}.
@@ -101,27 +101,11 @@ const ExpensesSection = () => {
           </Text>
         </View>
         <View style={styles.headerRight}>
-          <PieChart
-            data={pieData}
-            donut
-            showGradient
-            sectionAutoFocus
-            focusOnPress
-            semiCircle
-            radius={70}
-            innerRadius={55}
-            innerCircleColor={Colors.black}
-            centerLabelComponent={() => (
-              <View style={styles.centerLabel}>
-                <Text style={styles.centerLabelText}>{percentage}</Text>
-              </View>
-            )}
-          />
         </View>
       </View>
 
       {/* Horizontal List of Expense Items */}
-      <View style={styles.expenseListWrapper}>
+      {/* <View style={styles.expenseListWrapper}>
         <FlatList
           data={data}
           renderItem={renderExpenseItem}
@@ -129,7 +113,7 @@ const ExpensesSection = () => {
           showsHorizontalScrollIndicator={false}
           keyExtractor={(_, index) => index.toString()}
         />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -139,6 +123,7 @@ export default ExpensesSection;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
+    marginBottom: 30,
   },
   headerRow: {
     flexDirection: "row",

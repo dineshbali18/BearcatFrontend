@@ -102,7 +102,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
   return (
     <View style={styles.container}>
-      {/* Horizontal scrolling expense items */}
+      {/* Horizontal scrolling expense items  -- for menu buttons..... */}
       <FlatList
         data={expenseList}
         renderItem={renderItem}

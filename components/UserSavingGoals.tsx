@@ -56,15 +56,15 @@ const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>
+      {/* <Text style={styles.headerText}>
         My <Text style={styles.boldText}>Saving Goals</Text>
-      </Text>
-      <FlatList
+      </Text> */}
+      {/* <FlatList
         data={incomeList}
         renderItem={renderItem}
         horizontal
         showsHorizontalScrollIndicator={false}
-      />
+      /> */}
     </View>
   );
 };

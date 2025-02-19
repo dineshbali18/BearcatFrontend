@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, Modal } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { ExpenseType } from "@/types";
 import { PieChart } from "react-native-gifted-charts";
+import ManageSavingGoals from "./ManageSavingGoals"; // Import CRUD component
 
 const SavingGoals = () => {
   const [savings, setSavings] = useState<ExpenseType[]>([
@@ -11,6 +12,8 @@ const SavingGoals = () => {
     { id: "2", name: "Vacation", amount: "1500.00", totalAmount: "3000.00", percentage: "50" },
     { id: "3", name: "Emergency Fund", amount: "1000.00", totalAmount: "2000.00", percentage: "50" },
   ]);
+
+  const [isManageModalVisible, setManageModalVisible] = useState(false);
 
   const completedGoals = savings.filter((goal) => parseInt(goal.percentage) === 100);
   const currentGoals = savings.filter((goal) => parseInt(goal.percentage) < 100);
@@ -30,7 +33,7 @@ const SavingGoals = () => {
       {/* Goal Header */}
       <View style={styles.goalHeader}>
         <Text style={styles.savingName}>{item.name}</Text>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => setManageModalVisible(true)}>
           <Feather name="more-vertical" size={20} color={Colors.white} />
         </TouchableOpacity>
       </View>
@@ -53,7 +56,7 @@ const SavingGoals = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>My Total Savings</Text>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => setManageModalVisible(true)}>
           <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
@@ -99,6 +102,15 @@ const SavingGoals = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.horizontalList}
       />
+
+      {/* Manage Savings Modal */}
+      <Modal visible={isManageModalVisible} animationType="slide">
+        <ManageSavingGoals
+          savings={savings}
+          setSavings={setSavings}
+          onClose={() => setManageModalVisible(false)}
+        />
+      </Modal>
     </View>
   );
 };

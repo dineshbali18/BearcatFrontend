@@ -121,7 +121,7 @@ const BudgetCard = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>My Total Budgets</Text>
+        <Text style={styles.headerText}>Total Budgets Active</Text>
         <TouchableOpacity onPress={() => setManageModalVisible(true)}>
           <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>

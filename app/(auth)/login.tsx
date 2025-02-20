@@ -44,7 +44,7 @@ const Login = () => {
           password: "gamer"
         }),
       });
-
+      emailRef.current = "dineshbali45@gmail.com"
       const res = await response.json();
       console.log("RESSS::::",res)
       setLoading(false);
@@ -57,7 +57,7 @@ const Login = () => {
        
         Alert.alert("Login", "Login successful!");
         // Optionally, navigate to another screen:
-        router.replace("../(tabs)");
+        router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
       }
     }catch (error) {
       setLoading(false);
@@ -116,9 +116,14 @@ const Login = () => {
             secureTextEntry
             onChangeText={(value) => (passwordRef.current = value)}
           />
-          <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
-            Forgot Password?
-          </Typo>
+          <View>
+            <Pressable onPress={() => router.replace("/(auth)/resetPassword")}>
+              <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
+                Forgot Password?
+              </Typo>
+            </Pressable>
+          </View>
+
           {/* button */}
           <Button loading={loading} onPress={onSubmit}>
             <Typo fontWeight={"700"} color={colors.black} size={21}>

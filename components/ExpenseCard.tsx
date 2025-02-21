@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -8,38 +8,70 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import { ExpenseType } from "@/types";
 import { PieChart } from "react-native-gifted-charts";
 
 const ExpensesSection = () => {
-  // Default expense list data
-  const expenseList: ExpenseType[] = [
-    { id: "1", name: "Food", amount: "250.00", percentage: "30" },
-    { id: "2", name: "Electronics", amount: "500.00", percentage: "35" },
-    { id: "3", name: "Clothing", amount: "725.00", percentage: "35" },
-  ];
+  const userId = 1;
+  const [expenses, setExpenses] = useState([]);
+  const [totalExpense, setTotalExpense] = useState("0.00");
+  const [pieData, setPieData] = useState([]);
 
-  // Default PieChart data
-  const pieData: any[] = [
-    { value: 30, color: Colors.blue },
-    { value: 35, color: Colors.white },
-    { value: 35, color: Colors.tintColor },
-  ];
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await fetch(
+          `http://192.168.1.194:3002/expense/expenses/user/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0`, // Replace with actual token
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+        console.log("Fetched Data:", data);
 
-  const totalExpense = "1475.00";
-  const percentage = "47%";
+        if (data.categorizedExpenses) {
+          let total = 0;
+          const colors = [
+            "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
+            "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
+          ];
 
-  // Prepend a static "Add Item" object to the expense list
-  const data = [{ name: "Add Item" }, ...expenseList];
+          const formattedExpenses = data.categorizedExpenses.map((category, index) => {
+            const categoryTotal = parseFloat(category.debitTotal);
+            total += categoryTotal;
+            return {
+              id: category.categoryName,
+              name: category.categoryName,
+              amount: category.debitTotal,
+              percentage: categoryTotal,
+              color: colors[index % colors.length], // Assign a unique color
+            };
+          });
 
-  const renderExpenseItem = ({
-    item,
-    index,
-  }: {
-    item: Partial<ExpenseType>;
-    index: number;
-  }) => {
-    // Render the "Add Item" button for the first item
+          setExpenses(formattedExpenses);
+          setTotalExpense(total.toFixed(2));
+
+          // Prepare pie chart data
+          const pieChartData = formattedExpenses.map((exp) => ({
+            value: parseFloat(exp.percentage),
+            color: exp.color,
+          }));
+          setPieData(pieChartData);
+        }
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
+    };
+
+    fetchExpenses();
+  }, [userId]);
+
+  const data = [{ name: "Add Item" }, ...expenses];
+
+  const renderExpenseItem = ({ item, index }) => {
     if (index === 0) {
       return (
         <TouchableOpacity onPress={() => {}} key="add-item">
@@ -50,44 +82,27 @@ const ExpensesSection = () => {
       );
     }
 
-    // Split the amount into whole and cents parts
     const amountParts = item.amount?.split(".") || ["0", "00"];
-
-    // Set colors based on the expense type
-    let bgColor = Colors.tintColor;
-    let textColor = Colors.white;
-    if (item.name === "Food") {
-      bgColor = Colors.blue;
-      textColor = Colors.black;
-    } else if (item.name === "Electronics") {
-      bgColor = Colors.white;
-      textColor = Colors.black;
-    }
 
     return (
       <View
-        style={[styles.expenseBlock, { backgroundColor: bgColor }]}
+        style={[
+          styles.expenseBlock,
+          { backgroundColor: item.color }, // Assign color dynamically
+        ]}
         key={index.toString()}
       >
-        <Text style={[styles.expenseBlockTxt1, { color: textColor }]}>
-          {item.name}
-        </Text>
-        <Text style={[styles.expenseBlockTxt2, { color: textColor }]}>
+        <Text style={styles.expenseBlockTxt1}>{item.name}</Text>
+        <Text style={styles.expenseBlockTxt2}>
           ${amountParts[0]}.
           <Text style={styles.expenseBlockTxt2Span}>{amountParts[1]}</Text>
         </Text>
-        {/* <View style={styles.expenseBlock3View}>
-          <Text style={[styles.expenseBlockTxt1, { color: textColor }]}>
-            {item.percentage}%
-          </Text>
-        </View> */}
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Section with Expense Information and PieChart */}
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
           <Text style={styles.expenseHeaderText}>
@@ -113,14 +128,15 @@ const ExpensesSection = () => {
             innerCircleColor={Colors.black}
             centerLabelComponent={() => (
               <View style={styles.centerLabel}>
-                <Text style={styles.centerLabelText}>{percentage}</Text>
+                <Text style={styles.centerLabelText}>
+                  ${totalExpense} {/* Show total expense */}
+                </Text>
               </View>
             )}
           />
         </View>
       </View>
 
-      {/* Horizontal List of Expense Items */}
       <View style={styles.expenseListWrapper}>
         <FlatList
           data={data}
@@ -170,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centerLabelText: {
-    fontSize: 22,
+    fontSize: 18,
     color: "white",
     fontWeight: "bold",
   },
@@ -196,19 +212,16 @@ const styles = StyleSheet.create({
   },
   expenseBlockTxt1: {
     fontSize: 14,
+    color: "white",
   },
   expenseBlockTxt2: {
     fontSize: 16,
     fontWeight: "600",
+    color: "white",
   },
   expenseBlockTxt2Span: {
     fontSize: 12,
     fontWeight: "400",
-  },
-  expenseBlock3View: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    paddingHorizontal: 5,
-    paddingVertical: 3,
-    borderRadius: 10,
+    color: "white",
   },
 });

@@ -1,36 +1,83 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Image,
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { SpendingType, BudgetType } from "@/types";
-import Colors from "@/constants/Colors";
-import {
-  AirbnbIcon,
-  AmazonIcon,
-  DollarIcon,
-  FigmaIcon,
-  NetflixIcon,
-  ShoopingCartIcon,
-  SpotifyIcon,
-} from "@/constants/Icons";
 import { Feather } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
 
+// Define types
+interface SpendingType {
+  ExpenseID: number;
+  CategoryID: number;
+  CategoryName: string;
+  Amount: string;
+  Description: string;
+  TransactionType: string;
+  Merchandise: string;
+  Date: string;
+}
+
+interface BudgetType {
+  id: string;
+  name: string;
+}
+
+// Dummy budgets for selection
 const dummyBudgets: BudgetType[] = [
   { id: "1", name: "Entertainment" },
   { id: "2", name: "Groceries" },
   { id: "3", name: "Utilities" },
 ];
 
-const SpendingBlock = ({ spendingList }: { spendingList: SpendingType[] }) => {
+const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => {
+  const [spendingList, setSpendingList] = useState<SpendingType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<BudgetType | null>(null);
   const [selectedSpending, setSelectedSpending] = useState<SpendingType | null>(null);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    console.log("!1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    try {
+      // const userId = 1;
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0"
+      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/1`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0`, // Pass token in header
+        },
+      });
+
+      const data = await response.json();
+      console.log("{Data}::",data)
+      if (response.ok && data.categorizedExpenses) {
+        // Filter only debit transactions
+        const debits = data.categorizedExpenses
+          .flatMap((category: any) => category.expenses)
+          .filter((expense: SpendingType) => expense.TransactionType === "Debit");
+
+        setSpendingList(debits);
+      } else {
+        Alert.alert("Error", "Failed to fetch expenses.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong while fetching expenses.");
+      console.log("ERRR:::",error)
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMenuClick = (spending: SpendingType) => {
     setSelectedSpending(spending);
@@ -43,7 +90,7 @@ const SpendingBlock = ({ spendingList }: { spendingList: SpendingType[] }) => {
       return;
     }
 
-    Alert.alert("Success", `Added ${selectedSpending.amount} to ${selectedBudget.name}!`);
+    Alert.alert("Success", `Added ${selectedSpending.Amount} to ${selectedBudget.name}!`);
     handleCloseModal();
   };
 
@@ -56,45 +103,33 @@ const SpendingBlock = ({ spendingList }: { spendingList: SpendingType[] }) => {
   return (
     <View style={styles.spendingSectionWrapper}>
       <Text style={styles.sectionTitle}>
-        July <Text style={{ fontWeight: "700" }}>Spending</Text>
+        February <Text style={{ fontWeight: "700" }}>Spending</Text>
       </Text>
-      {spendingList.map((item) => {
-        let iconSource = DollarIcon;
-        if (item.name === "AirBnB Rent") {
-          iconSource = AirbnbIcon;
-        } else if (item.name === "Netflix") {
-          iconSource = NetflixIcon;
-        } else if (item.name === "Spotify") {
-          iconSource = SpotifyIcon;
-        } else if (item.name === "Amazon") {
-          iconSource = AmazonIcon;
-        } else if (item.name === "Figma") {
-          iconSource = FigmaIcon;
-        } else if (item.name === "Online Shopping") {
-          iconSource = ShoopingCartIcon;
-        }
 
-        return (
-          <View style={styles.spendingWrapper} key={item.id}>
-            <View style={styles.iconWrapper}>
-              <Image source={iconSource} style={styles.icon} resizeMode="contain" />
-            </View>
+      {loading ? (
+        <ActivityIndicator size="large" color={Colors.blue} />
+      ) : spendingList.length > 0 ? (
+        spendingList.map((item) => (
+          <View style={styles.spendingWrapper} key={item.ExpenseID}>
             <View style={styles.textWrapper}>
               <View style={{ gap: 5 }}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={{ color: Colors.white }}>{item.date}</Text>
+                <Text style={styles.itemName}>{item.CategoryName} - {item.Description}</Text>
+                <Text style={{ color: Colors.white }}>{new Date(item.Date).toDateString()}</Text>
               </View>
               <View style={styles.rightWrapper}>
-                <Text style={styles.itemName}>${item.amount}</Text>
+                <Text style={styles.itemName}>${item.Amount}</Text>
                 <TouchableOpacity onPress={() => handleMenuClick(item)}>
                   <Feather name="more-horizontal" size={20} color={Colors.white} />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-        );
-      })}
+        ))
+      ) : (
+        <Text style={{ color: Colors.white, marginTop: 10 }}>No debit transactions found.</Text>
+      )}
 
+      {/* Modal for budget selection */}
       <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={handleCloseModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -127,8 +162,6 @@ const styles = StyleSheet.create({
   spendingSectionWrapper: { marginVertical: 20, alignItems: "flex-start" },
   sectionTitle: { color: Colors.white, fontSize: 16, marginBottom: 20 },
   spendingWrapper: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
-  iconWrapper: { backgroundColor: Colors.grey, padding: 15, borderRadius: 50, marginRight: 10 },
-  icon: { width: 22, height: 22, tintColor: Colors.white },
   textWrapper: { flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   rightWrapper: { flexDirection: "row", alignItems: "center", gap: 10 },
   itemName: { color: Colors.white, fontSize: 16, fontWeight: "600" },

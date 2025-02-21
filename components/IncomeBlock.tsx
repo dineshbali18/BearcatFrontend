@@ -6,17 +6,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
   Modal,
   Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { IncomeType, SavingsGoalType } from "@/types";
-import {
-  DollarIcon,
-  WalletAddMoneyIcon,
-  WalletCardIcon,
-} from "@/constants/Icons";
 import { Feather } from "@expo/vector-icons";
 
 const dummySavingsGoals: SavingsGoalType[] = [
@@ -30,28 +24,20 @@ const IncomeBlock = ({ incomeList }: { incomeList: IncomeType[] }) => {
   const [selectedGoal, setSelectedGoal] = useState<SavingsGoalType | null>(null);
   const [selectedIncome, setSelectedIncome] = useState<IncomeType | null>(null);
 
-  // Handle the three-dot menu click
   const handleMenuClick = (income: IncomeType) => {
     setSelectedIncome(income);
     setModalVisible(true);
   };
 
-  // Simulate updating the savings goal
   const handleConfirm = () => {
     if (!selectedGoal || !selectedIncome) {
       Alert.alert("Error", "Please select a savings goal.");
       return;
     }
-
-    Alert.alert(
-      "Success",
-      `Added ${selectedIncome.amount} to ${selectedGoal.name}!`
-    );
-
+    Alert.alert("Success", `Added ${selectedIncome.amount} to ${selectedGoal.name}!`);
     handleCloseModal();
   };
 
-  // Handle modal close and reset selection
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedGoal(null);
@@ -59,25 +45,12 @@ const IncomeBlock = ({ incomeList }: { incomeList: IncomeType[] }) => {
   };
 
   const renderItem: ListRenderItem<IncomeType> = ({ item }) => {
-    let iconSource = DollarIcon;
-    if (item.name === "Freelancing") {
-      iconSource = WalletCardIcon;
-    } else if (item.name === "Interest") {
-      iconSource = WalletAddMoneyIcon;
-    }
-
     const amount = item.amount.split(".");
 
     return (
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <View style={styles.iconWrapper}>
-            <Image
-              source={iconSource}
-              style={{ width: 22, height: 22, tintColor: Colors.white }}
-              resizeMode="contain"
-            />
-          </View>
+          <Text style={styles.incomeName}>{item.name}</Text>
           <TouchableOpacity onPress={() => handleMenuClick(item)}>
             <Feather name="more-horizontal" size={20} color={Colors.white} />
           </TouchableOpacity>
@@ -95,23 +68,11 @@ const IncomeBlock = ({ incomeList }: { incomeList: IncomeType[] }) => {
       <Text style={styles.headerText}>
         My <Text style={styles.boldText}>Income</Text>
       </Text>
-      <FlatList
-        data={incomeList}
-        renderItem={renderItem}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
+      <FlatList data={incomeList} renderItem={renderItem} horizontal showsHorizontalScrollIndicator={false} />
 
-      {/* Modal for selecting savings goal */}
-      <Modal
-        animationType="slide"
-        transparent
-        visible={modalVisible}
-        onRequestClose={handleCloseModal}
-      >
+      <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={handleCloseModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            {/* Close Button (X) */}
             <TouchableOpacity style={styles.closeIcon} onPress={handleCloseModal}>
               <Feather name="x" size={24} color="black" />
             </TouchableOpacity>
@@ -121,10 +82,7 @@ const IncomeBlock = ({ incomeList }: { incomeList: IncomeType[] }) => {
             {dummySavingsGoals.map((goal) => (
               <TouchableOpacity
                 key={goal.id}
-                style={[
-                  styles.goalItem,
-                  selectedGoal?.id === goal.id && styles.selectedGoal,
-                ]}
+                style={[styles.goalItem, selectedGoal?.id === goal.id && styles.selectedGoal]}
                 onPress={() => setSelectedGoal(goal)}
               >
                 <Text style={styles.goalText}>{goal.name}</Text>
@@ -172,12 +130,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  iconWrapper: {
-    borderColor: "#666",
-    borderWidth: 1,
-    borderRadius: 50,
-    padding: 5,
-    alignSelf: "flex-start",
+  incomeName: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: "600",
   },
   amountText: {
     color: Colors.white,
@@ -215,7 +171,7 @@ const styles = StyleSheet.create({
   },
   goalItem: {
     padding: 10,
-    backgroundColor: "#222", // Dark color
+    backgroundColor: "#222",
     marginVertical: 5,
     borderRadius: 5,
     width: "100%",
@@ -225,7 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
   },
   goalText: {
-    color: Colors.white, // White text for contrast
+    color: Colors.white,
     fontSize: 16,
   },
   confirmButton: {

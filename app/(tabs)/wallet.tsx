@@ -12,7 +12,7 @@ import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
 import { useAuth } from "@/contexts/authContext";
 import Loading from "@/components/Loading";
-import WalletListItem from "@/components/WalletListItem";
+import WalletListItem from "@/components/userBankAccounts/WalletListItem";
 
 const Wallet = () => {
   const router = useRouter();

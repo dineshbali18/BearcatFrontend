@@ -1,11 +1,11 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Typo from "./Typo";
+import Typo from "../Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { TransactionListType, TransactionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
-import Loading from "./Loading";
+import Loading from "../Loading";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { FlashList } from "@shopify/flash-list";

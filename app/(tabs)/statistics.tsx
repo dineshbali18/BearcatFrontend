@@ -23,7 +23,7 @@ import {
   fetchWeeklyStats,
   fetchYearlyStats,
 } from "@/services/transactionService";
-import TransactionList from "@/components/TransactionList";
+import TransactionList from "@/components/expenses/TransactionList";
 
 const { width: screenWidth } = Dimensions.get("window");
 

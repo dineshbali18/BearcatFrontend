@@ -4,7 +4,7 @@ import { WalletType } from "@/types";
 import { Image } from "expo-image";
 import { scale, verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import Typo from "./Typo";
+import Typo from "../Typo";
 import * as Icons from "phosphor-react-native";
 import { Router, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";

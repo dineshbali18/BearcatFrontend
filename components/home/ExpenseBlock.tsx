@@ -9,15 +9,15 @@ import {
 } from "react-native";
 import { ExpenseType } from "@/types";
 import Colors from "@/constants/Colors";
-import ExpenseScreen from "./ExpenseCard";
-import BudgetScreen from "./BudgetCard";
-import SavingScreen from "./SavingGoalCard";
-import IncomeBlock from "@/components/IncomeBlock";
-import SpendingBlock from "@/components/SpendingBlock";
+import ExpenseScreen from "../expenses/ExpenseCard";
+import BudgetScreen from "../budget/BudgetCard";
+import SavingScreen from "../savingGoals/SavingGoalCard";
+import IncomeBlock from "@/components/expenses/IncomeBlock";
+import SpendingBlock from "@/components/expenses/SpendingBlock";
 import incomeList from "@/data/income.json";
 import spendingList from "@/data/spending.json";
 import UserBudgets from "@/components/UserBudgets"
-import UserSavingGoals from "@/components/UserSavingGoals"
+import UserSavingGoals from "@/components/savingGoals/UserSavingGoals"
 
 // Correctly referencing the components
 const ExpensesComponent = () => <ExpenseScreen />;

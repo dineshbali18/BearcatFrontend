@@ -4,8 +4,8 @@ import Colors from "@/constants/Colors";
 import { Stack } from "expo-router";
 import Header from "@/components/Header";
 import { PieChart } from "react-native-gifted-charts";
-import ExpenseBlock from "@/components/ExpenseBlock";
-import ExpenseCard from "@/components/ExpenseCard"
+import ExpenseBlock from "@/components/home/ExpenseBlock";
+import ExpenseCard from "@/components/expenses/ExpenseCard"
 
 import ExpenseList from "@/data/expenses.json";
 import incomeList from "@/data/income.json";

@@ -54,8 +54,8 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDI2ODE3OSwiZXhwIjoxNzQwMjg2MTc5fQ.HcVo5Xib4OZIQeDHckTjzOcbE82qBQ3j6w642EkX68Y`, // Pass token in header
-        },
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo`, // Pass token in header
+        },      
       });
 
       const data = await response.json();

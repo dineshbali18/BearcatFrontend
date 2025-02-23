@@ -7,7 +7,7 @@ import ManageSavingGoals from "./ManageSavingGoals";
 import axios from "axios";
 
 const API_URL = "http://192.168.1.194:3002/savingGoal/user/1"; // Replace 1 with dynamic user ID
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDI3MzkyOSwiZXhwIjoxNzQwMjkxOTI5fQ.WQV-MScWio_QtsJqkzAaPsoMYvoZJhFQZqrcKb80hIM"
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
 
 const SavingGoals = () => {
   const [savings, setSavings] = useState([]);

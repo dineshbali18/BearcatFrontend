@@ -27,7 +27,7 @@ interface Expense {
 }
 
 const API_URL = "http://192.168.1.194:3002/expense/expenses/user/1";
-const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDI2ODE3OSwiZXhwIjoxNzQwMjg2MTc5fQ.HcVo5Xib4OZIQeDHckTjzOcbE82qBQ3j6w642EkX68Y"
+const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
 
 const IncomeBlock = () => {
   const [incomeList, setIncomeList] = useState<Expense[]>([]);

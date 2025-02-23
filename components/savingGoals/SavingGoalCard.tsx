@@ -45,8 +45,11 @@ const SavingGoals = () => {
   const goalAmount = 10000; // You can dynamically change this value as needed
   const percentage = ((parseFloat(totalSavings) / goalAmount) * 100).toFixed(0);
 
-  const pieData = savings.map((goal) => ({ value: parseFloat(goal.percentage), color: Colors.blue }));
-
+  const pieData = savings.map((goal) => [
+    { value: parseFloat(goal.percentage), color: Colors.blue }, // Display the percentage in blue
+    { value: 100 - parseFloat(goal.percentage), color: Colors.white }, // Remaining percentage in white
+  ]).flat();
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>

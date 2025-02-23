@@ -67,7 +67,7 @@ const Wallet = () => {
             </TouchableOpacity>
           </View>
 
-          {loading && <Loading />}
+          {/* {loading && <Loading />} */}
           {/* <FlatList
             data={wallets}
             renderItem={({ item, index }) => <WalletListItem item={item} index={index} />}

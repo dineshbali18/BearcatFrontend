@@ -2,8 +2,22 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
+import { useDispatch } from "react-redux";
+import { clearUser } from "@/store/userSlice";
+import { useRouter } from "expo-router";
+
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const router = useRouter()
+  const handleSignOut = () => {
+    console.log("INNNN")
+    // Clear user data from Redux store
+    dispatch(clearUser());
+
+    // Navigate to the login screen
+    router.replace({ pathname: "/(auth)/login" });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -18,11 +32,11 @@ const Header = () => {
           </View>
         </View>
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {handleSignOut()}}
           style={styles.btnWrapper}
         >
           <Text style={styles.btnText}>
-            My Transactions
+            Sign Out
           </Text>
         </TouchableOpacity>
       </View>

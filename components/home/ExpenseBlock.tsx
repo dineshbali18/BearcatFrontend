@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   ListRenderItem,
@@ -18,6 +18,7 @@ import incomeList from "@/data/income.json";
 import spendingList from "@/data/spending.json";
 import UserBudgets from "@/components/UserBudgets"
 import UserSavingGoals from "@/components/savingGoals/UserSavingGoals"
+import { useSelector } from "react-redux";
 
 // Correctly referencing the components
 const ExpensesComponent = () => <ExpenseScreen />;
@@ -35,6 +36,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
   const handleItemPress = (name: string) => {
     console.log("Tapped on:", name);
+    
 
     if (name === "Expenses") {
       setSelectedComponent(<ExpensesComponent />);

@@ -9,12 +9,27 @@ import {
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { PieChart } from "react-native-gifted-charts";
+import { useSelector } from "react-redux";
 
 const ExpensesSection = () => {
-  const userId = 1;
+  // const userId = 1;
   const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState("0.00");
   const [pieData, setPieData] = useState([]);
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  const userId = userState.user.id
+
+  console.log("User Data:", userState); 
+  console.log("User Data:1111111111111", userState.user);
+  console.log("User Data:1111111111112222221", userState.user.id); 
+
+  // try {
+  //   const parsedUser = JSON.parse(userState); // Parse JSON string if needed
+  //   console.log("Parsed User Token:", parsedUser?.token); // Access parsed token
+  // } catch (error) {
+  //   console.error("Error parsing JSON:", error); // Handle any parsing errors
+  // }
+  
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -24,7 +39,7 @@ const ExpensesSection = () => {
           {
             method: "GET",
             headers: {
-              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo`, // Replace with actual token
+              Authorization: `Bearer ${userState?.token}`, // Replace with actual token
               "Content-Type": "application/json",
             },
           }

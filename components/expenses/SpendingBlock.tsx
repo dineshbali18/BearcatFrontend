@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { useSelector } from "react-redux";
 
 // Define types
 interface SpendingType {
@@ -41,6 +42,8 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<BudgetType | null>(null);
   const [selectedSpending, setSelectedSpending] = useState<SpendingType | null>(null);
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  userId = userState.user.id
 
   useEffect(() => {
     fetchExpenses();
@@ -50,11 +53,11 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
     try {
       // const userId = 1;
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0"
-      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/1`, {
+      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo`, // Pass token in header
+          Authorization: `Bearer ${userState?.token}`,
         },      
       });
 

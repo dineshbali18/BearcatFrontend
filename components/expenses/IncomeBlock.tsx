@@ -13,7 +13,7 @@ import {
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import ManageSavingGoals from "../savingGoals/ManageSavingGoals"; // Import the ManageSavingGoals component
-
+import { useSelector } from "react-redux";
 // Define types
 interface Expense {
   ExpenseID: number;
@@ -35,6 +35,8 @@ const IncomeBlock = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<Expense | null>(null);
   const [showManageGoalModal, setShowManageGoalModal] = useState(false); // New state for showing ManageSavingGoals
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  const userId = userState.user.id
 
   useEffect(() => {
     fetchExpenses();
@@ -42,11 +44,11 @@ const IncomeBlock = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${AUTH_TOKEN}`,
+          Authorization: `Bearer ${userState?.token}`,
         },
       });
 

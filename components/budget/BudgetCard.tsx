@@ -15,7 +15,7 @@ import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "../savingGoals/ManageSavingGoals"; // CRUD Component
 import { useSelector } from "react-redux";
 
-const API_URL = "http://192.168.1.194:3002/budget/user/1/budgets"; // Replace with your actual API endpoint
+const API_URL = "http://18.117.93.67:3002/budget/user/1/budgets"; // Replace with your actual API endpoint
 
 const BudgetCard = () => {
   const [savings, setSavings] = useState([]);
@@ -31,7 +31,7 @@ const BudgetCard = () => {
     const fetchBudgets = async () => {
       try {
         const response = await fetch(
-          `http://192.168.1.194:3002/budget/user/${userId}/budgets`,
+          `http://18.117.93.67:3002/budget/user/${userId}/budgets`,
           {
             method: "GET",
             headers: {

@@ -53,7 +53,7 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
     try {
       // const userId = 1;
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0"
-      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/${userId}`, {
+      const response = await fetch(`http://18.117.93.67:3002/expense/expenses/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

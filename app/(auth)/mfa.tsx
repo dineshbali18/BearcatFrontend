@@ -18,7 +18,7 @@ const MFAScreen = () => {
 
     try {
       // Send OTP verification request to backend
-      const response = await fetch("http://192.168.1.194:3000/api/user/verifyotp", {
+      const response = await fetch("http://18.117.93.67:3000/api/user/verifyotp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

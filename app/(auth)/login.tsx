@@ -29,7 +29,7 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://192.168.1.194:3002/user/login", {
+      const response = await fetch("http://18.117.93.67:3002/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

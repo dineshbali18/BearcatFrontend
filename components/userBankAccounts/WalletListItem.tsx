@@ -7,7 +7,7 @@ import { format } from "date-fns"; // For better date formatting
 import { FontAwesome } from '@expo/vector-icons'; // For iconography
 import { useSelector } from "react-redux";
 
-const API_BASE_URL = "http://192.168.1.194:3002";
+const API_BASE_URL = "http://18.117.93.67:3002";
 const AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMyNzc0OCwiZXhwIjoxNzQwMzQ1NzQ4fQ.JctxMVd1_q38AZ-jXxurQexFHb756YToxHrswYDQgPU";
 
 const WalletListItem = () => {

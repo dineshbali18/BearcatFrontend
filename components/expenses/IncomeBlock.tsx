@@ -26,7 +26,7 @@ interface Expense {
   Date: string;
 }
 
-const API_URL = "http://192.168.1.194:3002/expense/expenses/user/1";
+const API_URL = "http://18.117.93.67:3002/expense/expenses/user/1";
 const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
 
 const IncomeBlock = () => {
@@ -44,7 +44,7 @@ const IncomeBlock = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch(`http://192.168.1.194:3002/expense/expenses/user/${userId}`, {
+      const response = await fetch(`http://18.117.93.67:3002/expense/expenses/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

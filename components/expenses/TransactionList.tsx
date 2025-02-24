@@ -10,7 +10,7 @@ import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { FlashList } from "@shopify/flash-list";
 
-const API_URL = "http://192.168.1.194:3002/expense/expenses/user/";
+const API_URL = "http://18.117.93.67:3002/expense/expenses/user/";
 
 const TransactionList = ({ title, emptyListMessage }: TransactionListType) => {
   const router = useRouter();

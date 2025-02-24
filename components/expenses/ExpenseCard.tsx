@@ -35,7 +35,7 @@ const ExpensesSection = () => {
     const fetchExpenses = async () => {
       try {
         const response = await fetch(
-          `http://192.168.1.194:3002/expense/expenses/user/${userId}`,
+          `http://18.117.93.67:3002/expense/expenses/user/${userId}`,
           {
             method: "GET",
             headers: {

@@ -7,7 +7,7 @@ import ManageSavingGoals from "./ManageSavingGoals";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const API_URL = "http://192.168.1.194:3002/savingGoal/user/1"; // Replace 1 with dynamic user ID
+const API_URL = "http://18.117.93.67:3002/savingGoal/user/1"; // Replace 1 with dynamic user ID
 const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
 
 const SavingGoals = () => {
@@ -19,7 +19,7 @@ const SavingGoals = () => {
   useEffect(() => {
     const fetchSavingGoals = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.194:3002/savingGoal/user/${userId}`, {
+        const response = await axios.get(`http://18.117.93.67:3002/savingGoal/user/${userId}`, {
           headers: { Authorization: `Bearer ${userState?.token}` },
         });
 

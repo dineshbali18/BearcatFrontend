@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 import { Href, Router, useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 
+import { Provider } from 'react-redux';
+// import store  from '@/store'; 
+
 import Loading from "@/components/Loading";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/constants/theme";
@@ -15,6 +18,7 @@ const SplashScreen = () => {
   //   }, 1500);
   // }, []);
   return (
+    // <Provider store={store}>
     <View style={styles.container}>
       <StatusBar style="light" />
       <Image
@@ -24,6 +28,7 @@ const SplashScreen = () => {
       />
       {/* <Text style={styles.title}>Expense Tracker</Text> */}
     </View>
+    // </Provider>
   );
 };
 

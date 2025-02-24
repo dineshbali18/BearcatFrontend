@@ -6,6 +6,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
+import { Provider } from 'react-redux';
+import store from '@/store'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
@@ -74,8 +76,10 @@ function StackLayout() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <StackLayout />
-    </AuthProvider>
+    <Provider store={store}> {/* Wrap with Redux Provider */}
+      <AuthProvider> {/* Wrap with AuthProvider */}
+        <StackLayout />
+      </AuthProvider>
+    </Provider>
   );
 }

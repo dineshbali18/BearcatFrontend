@@ -1,76 +1,70 @@
-import {
-  Alert,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
 import React, { useRef, useState } from "react";
-import ScreenWrapper from "../../components/ScreenWrapper";
+import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/userSlice"; // Ensure this path is correct
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ScreenWrapper from "../../components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { scale, verticalScale } from "@/utils/styling";
-import { colors, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
-import { useAuth } from "@/contexts/authContext";
-import HomeCard from "@/components/HomeCard";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { scale, verticalScale } from "@/utils/styling";
+import { colors, spacingX, spacingY } from "@/constants/theme";
 
 const Login = () => {
   const router = useRouter();
-  const emailRef = useRef("dineshbali45@gmail.com");
-  const passwordRef = useRef("gamer");
+  const dispatch = useDispatch();
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
 
   const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
-      Alert.alert("Login", "please fill all the fields!");
+      Alert.alert("Login", "Please fill all the fields!");
       return;
     }
+
     setLoading(true);
     try {
       const response = await fetch("http://192.168.1.194:3002/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: "dineshbali45@gmail.com",
-          password: "gamer"
+          email: emailRef.current,
+          password: passwordRef.current,
         }),
       });
-      emailRef.current = "dineshbali45@gmail.com"
-      const res = await response.json();
-      console.log("RESSS::::",res)
-      setLoading(false);
-      if (res.error != undefined) {
 
+      const res = await response.json();
+      console.log("Response:", res);
+      setLoading(false);
+
+      if (res.error) {
         Alert.alert("Login", res.error);
       } else {
+        // Dispatch action to store user data in Redux store
+        dispatch(setUser({
+          user: res.user,
+          token: res.token,
+          message: res.message,
+        }));
+
         // Store user data locally using AsyncStorage
-       await AsyncStorage.setItem("userData", JSON.stringify(res.user));
-       
+        await AsyncStorage.setItem("userData", JSON.stringify(res.user));
+
         Alert.alert("Login", "Login successful!");
-        // Optionally, navigate to another screen:
+
+        // Optionally, navigate to another screen
         router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
       }
-    }catch (error) {
+    } catch (error) {
       setLoading(false);
-      Alert.alert("Login", "An error occurred during registration.");
-      console.log("Registration error:", error);
+      Alert.alert("Login", "An error occurred during login.");
+      console.log("Login error:", error);
     }
-
-  //   setLoading(true);
-  //  // const res = await login(emailRef.current, passwordRef.current);
-  //   setLoading(false);
-  //   if (!res.success) {
-  //     Alert.alert("Login", res.msg);
-  //   }
   };
 
   return (
@@ -94,24 +88,12 @@ const Login = () => {
             Login now to track all your expenses
           </Typo>
           <Input
-            icon={
-              <Icons.At
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
+            icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
             placeholder="Enter your email"
             onChangeText={(value) => (emailRef.current = value)}
           />
           <Input
-            icon={
-              <Icons.Lock
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
+            icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
             placeholder="Enter your password"
             secureTextEntry
             onChangeText={(value) => (passwordRef.current = value)}
@@ -134,7 +116,7 @@ const Login = () => {
 
         {/* footer */}
         <View style={styles.footer}>
-          <Typo size={15}>Dont't have an account?</Typo>
+          <Typo size={15}>Don't have an account?</Typo>
           <Pressable onPress={() => router.navigate("/(auth)/register")}>
             <Typo size={15} fontWeight={"700"} color={colors.primary}>
               Sign up
@@ -145,8 +127,6 @@ const Login = () => {
     </ScreenWrapper>
   );
 };
-
-export default Login;
 
 const styles = StyleSheet.create({
   container: {
@@ -162,20 +142,12 @@ const styles = StyleSheet.create({
   form: {
     gap: spacingY._20,
   },
-  forgotPassword: {
-    textAlign: "right",
-    fontWeight: "500",
-    color: colors.text,
-  },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
   },
-  footerText: {
-    textAlign: "center",
-    color: colors.text,
-    fontSize: verticalScale(15),
-  },
 });
+
+export default Login;

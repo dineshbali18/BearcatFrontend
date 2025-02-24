@@ -1,20 +1,52 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useSelector } from "react-redux"; // Assuming Redux for user data
 
 const MFAScreen = () => {
-  const { email } = useLocalSearchParams();
+  const { email } = useLocalSearchParams(); // Get the email passed from previous screen
   const router = useRouter();
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(""); // State for OTP input
+  const user = useSelector((state) => state.user.user); // Get the user data from Redux store
 
-  const handleVerifyOTP = () => {
-    if (otp.length === 6 && otp === "123456") {
-      // Mock OTP validation, replace with actual backend check
-      Alert.alert("✅ Success", "OTP Verified Successfully!", [
-        { text: "OK", onPress: () => router.replace("../(tabs)") },
-      ]);
-    } else {
-      Alert.alert("❌ Error", "Invalid OTP. Please try again.");
+  // Function to handle OTP verification
+  const handleVerifyOTP = async () => {
+    if (otp.length !== 6) {
+      Alert.alert("❌ Error", "Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    try {
+      // Send OTP verification request to backend
+      const response = await fetch("http://192.168.1.194:3000/api/user/verifyotp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email, // Email from the local search params
+          Otp: otp, // OTP entered by the user
+        }),
+      });
+
+      const result = await response.json();
+      console.log(response)
+
+      if (result.message = "OTP verified successfully." || response.ok && result.success) {
+        // If OTP is verified successfully, navigate to home
+        Alert.alert("✅ Success", "OTP Verified Successfully!", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)"), // Navigate to home screen (replace with your home screen path)
+          },
+        ]);
+      } else {
+        // Handle error if OTP is incorrect
+        Alert.alert("❌ Error", result.message || "Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      console.error("OTP Verification error:", error);
+      Alert.alert("❌ Error", "An error occurred during OTP verification.");
     }
   };
 

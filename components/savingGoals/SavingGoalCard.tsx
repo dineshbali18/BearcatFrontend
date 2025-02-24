@@ -5,6 +5,7 @@ import Colors from "@/constants/Colors";
 import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "./ManageSavingGoals";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const API_URL = "http://192.168.1.194:3002/savingGoal/user/1"; // Replace 1 with dynamic user ID
 const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
@@ -12,12 +13,14 @@ const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoi
 const SavingGoals = () => {
   const [savings, setSavings] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  const userId = userState.user.id
 
   useEffect(() => {
     const fetchSavingGoals = async () => {
       try {
-        const response = await axios.get(API_URL, {
-          headers: { Authorization: `Bearer ${TOKEN}` },
+        const response = await axios.get(`http://192.168.1.194:3002/savingGoal/user/${userId}`, {
+          headers: { Authorization: `Bearer ${userState?.token}` },
         });
 
         // Process the data from API response

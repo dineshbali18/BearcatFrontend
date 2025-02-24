@@ -5,6 +5,7 @@ import { colors, spacingY, radius } from "@/constants/theme";
 import Typo from "../Typo";
 import { format } from "date-fns"; // For better date formatting
 import { FontAwesome } from '@expo/vector-icons'; // For iconography
+import { useSelector } from "react-redux";
 
 const API_BASE_URL = "http://192.168.1.194:3002";
 const AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMyNzc0OCwiZXhwIjoxNzQwMzQ1NzQ4fQ.JctxMVd1_q38AZ-jXxurQexFHb756YToxHrswYDQgPU";
@@ -15,12 +16,15 @@ const WalletListItem = () => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  const userId = userState.user.id
+  
 
   useEffect(() => {
     const fetchUserAccounts = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/userBankAccount/`, {
-          headers: { Authorization: AUTH_TOKEN },
+          headers: { Authorization: `Bearer ${userState?.token}` },
         });
         setUserAccounts(response.data);
       } catch (error) {

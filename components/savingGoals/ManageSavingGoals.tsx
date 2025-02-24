@@ -13,6 +13,7 @@ import Colors from "@/constants/Colors";
 import { ExpenseType } from "@/types";
 import { Picker } from "@react-native-picker/picker";
 
+
 const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ name: "", amount: "", totalAmount: "" });

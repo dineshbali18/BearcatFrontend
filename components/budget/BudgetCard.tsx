@@ -13,6 +13,7 @@ import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "../savingGoals/ManageSavingGoals"; // CRUD Component
+import { useSelector } from "react-redux";
 
 const API_URL = "http://192.168.1.194:3002/budget/user/1/budgets"; // Replace with your actual API endpoint
 
@@ -21,17 +22,20 @@ const BudgetCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [expandedGoal, setExpandedGoal] = useState(null);
+  const userState = useSelector((state) => state.user); // Assume user is a JSON string
+  const userId = userState.user.id
+  
 
   // Fetch data from API
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
         const response = await fetch(
-          API_URL,
+          `http://192.168.1.194:3002/budget/user/${userId}/budgets`,
           {
             method: "GET",
             headers: {
-              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo`, // Replace with actual token
+              Authorization: `Bearer ${userState?.token}`,
               "Content-Type": "application/json",
             },
           }

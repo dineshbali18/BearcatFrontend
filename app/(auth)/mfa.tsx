@@ -30,9 +30,9 @@ const MFAScreen = () => {
       });
 
       const result = await response.json();
-      console.log(response)
+      console.log("QQQQQQQQQQ",result)
 
-      if (result.message = "OTP verified successfully." || response.ok && result.success) {
+      if (result.message == "OTP verified successfully." && result.error == undefined) {
         // If OTP is verified successfully, navigate to home
         Alert.alert("✅ Success", "OTP Verified Successfully!", [
           {
@@ -42,7 +42,7 @@ const MFAScreen = () => {
         ]);
       } else {
         // Handle error if OTP is incorrect
-        Alert.alert("❌ Error", result.message || "Invalid OTP. Please try again.");
+        Alert.alert("❌ Error", result.error|| "Invalid OTP. Please try again.");
       }
     } catch (error) {
       console.error("OTP Verification error:", error);

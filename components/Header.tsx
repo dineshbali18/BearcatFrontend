@@ -5,11 +5,15 @@ import Colors from "@/constants/Colors";
 import { useDispatch } from "react-redux";
 import { clearUser } from "@/store/userSlice";
 import { useRouter } from "expo-router";
+import { useSelector } from "react-redux";
 
 
 const Header = () => {
   const dispatch = useDispatch();
   const router = useRouter()
+  const userState = useSelector((state) => state.user); 
+  const userId = userState.user.id
+
   const handleSignOut = () => {
     console.log("INNNN")
     // Clear user data from Redux store
@@ -25,9 +29,9 @@ const Header = () => {
       >
         <View style={styles.userInfoWrapper}>
           <View style={styles.userTxtWrapper}>
-            <Text style={[styles.userText, { fontSize: 12 }]}>Hi, Dinesh</Text>
+            <Text style={[styles.userText, { fontSize: 12 }]}>Hi, {userState.user.username}</Text>
             <Text style={[styles.userText, { fontSize: 16 }]}>
-              Your <Text style={styles.boldText}>Budget</Text>
+              My <Text style={styles.boldText}>Finance</Text>
             </Text>
           </View>
         </View>

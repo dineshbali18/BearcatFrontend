@@ -9,14 +9,18 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { useSelector } from "react-redux";
 
 
-const AddExpenseModal = ({ visible, onClose, userId, token, onExpenseAdded }) => {
+const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+  const userState = useSelector((state) => state.user);
+  const userId = userState?.user?.id;
 
   useEffect(() => {
     if (visible) fetchCategories();
@@ -27,7 +31,7 @@ const AddExpenseModal = ({ visible, onClose, userId, token, onExpenseAdded }) =>
       const response = await fetch("http://18.117.93.67:3002/category", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${userState?.token}`,
           "Content-Type": "application/json",
         },
       });
@@ -48,7 +52,8 @@ const AddExpenseModal = ({ visible, onClose, userId, token, onExpenseAdded }) =>
       userID: userId,
       Amount: parseFloat(amount),
       CategoryID: parseInt(selectedCategory),
-      description,
+      TransactionType: transactionType,
+      Description: description,
       date,
     };
 
@@ -56,15 +61,17 @@ const AddExpenseModal = ({ visible, onClose, userId, token, onExpenseAdded }) =>
       const response = await fetch("http://18.117.93.67:3002/expense/create/expenses", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${userState?.token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(expenseData),
       });
 
+      console.log("RESSSS",response.json())
+
       if (response.ok) {
         alert("Expense added successfully!");
-        onExpenseAdded();
+        // onExpenseAdded();
         onClose();
       } else {
         alert("Failed to add expense");
@@ -108,6 +115,12 @@ const AddExpenseModal = ({ visible, onClose, userId, token, onExpenseAdded }) =>
             placeholder="Description"
             value={description}
             onChangeText={setDescription}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Transaction Type"
+            value={transactionType}
+            onChangeText={setTransactionType}
           />
 
           <TextInput

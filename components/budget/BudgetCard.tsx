@@ -171,7 +171,7 @@ export default BudgetCard;
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: Colors.dark,
+    backgroundColor: Colors.black,
     borderRadius: 10,
     flex: 1,
   },

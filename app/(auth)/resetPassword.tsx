@@ -11,31 +11,103 @@ const ResetPasswordScreen = () => {
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Reset Password
   const [isVerified, setIsVerified] = useState(false);
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!email.includes("@")) {
       Alert.alert("❌ Error", "Please enter a valid email.");
       return;
     }
-    setStep(2);
-    Alert.alert("📩 OTP Sent", "Check your email for the OTP.");
+
+    try {
+      // First request: generate OTP
+      const generateOtpResponse = await fetch("http://18.117.93.67:3000/api/user/generateotp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+      const generateOtpData = await generateOtpResponse.json();
+      // console.log("!!!!!!!!",generateOtpData.message)
+      if (generateOtpData.message !== "OTP updated successfully." && generateOtpData.message !== "OTP generated and saved successfully.") {
+        throw new Error("Failed to generate OTP.");
+      }
+      
+
+      // Second request: send OTP
+      const sendOtpResponse = await fetch("http://18.117.93.67:3000/api/user/sendotp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+      const sendOtpData = await sendOtpResponse.json();
+      console.log(sendOtpData)
+      if (sendOtpData.message !== "OTP sent successfully.") {
+        throw new Error("Failed to send OTP.");
+      }
+
+      Alert.alert("📩 OTP Sent", "Check your email for the OTP.");
+      setStep(2);
+    } catch (error) {
+      Alert.alert("❌ Error", error.message);
+    }
   };
 
-  const handleVerifyOtp = () => {
-    if (otp !== "123456") {
-      Alert.alert("❌ Error", "Invalid OTP. Try again.");
+  const handleVerifyOtp = async () => {
+    if (otp === "") {
+      Alert.alert("❌ Error", "Please enter the OTP.");
       return;
     }
-    setIsVerified(true);
-    setStep(3);
+
+    try {
+      // Third request: verify OTP
+      const verifyOtpResponse = await fetch("http://18.117.93.67:3000/api/user/verifyotp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, Otp: otp }),
+      });
+      const verifyOtpData = await verifyOtpResponse.json();
+      console.log("VVVVV",verifyOtpData)
+      if (verifyOtpData.message != "OTP verified successfully.") {
+        throw new Error("Invalid OTP. Please try again.");
+      }
+
+      Alert.alert("✅ Success", "OTP verified successfully.");
+      setIsVerified(true);
+      setStep(3);
+    } catch (error) {
+      Alert.alert("❌ Error", "Error in verified ");
+    }
   };
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     if (password.length < 6) {
       Alert.alert("❌ Error", "Password must be at least 6 characters.");
       return;
     }
-    Alert.alert("✅ Success", "Password reset successful! Redirecting...");
-    router.replace("../login");
+
+    try {
+      // Final request: update password
+      const resetPasswordResponse = await fetch("http://18.117.93.67:3000/api/user/updatepassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const resetPasswordData = await resetPasswordResponse.json();
+      if (!resetPasswordData.success) {
+        throw new Error("Failed to reset password.");
+      }
+
+      Alert.alert("✅ Success", "Password reset successful! Redirecting...");
+      router.replace("../login");
+    } catch (error) {
+      Alert.alert("❌ Error", error.message);
+    }
   };
 
   const handleClose = () => {
@@ -44,7 +116,7 @@ const ResetPasswordScreen = () => {
     setPassword("");
     setStep(1);
     setIsVerified(false);
-    router.replace("/(auth)/login")
+    router.replace("/(auth)/login");
   };
 
   return (

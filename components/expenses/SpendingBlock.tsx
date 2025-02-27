@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
 import {
+  FlatList,
+  ListRenderItem,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
+  View,
   Modal,
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { Feather } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
+import { Picker } from "@react-native-picker/picker";
 
 // Define types
-interface SpendingType {
+interface Expense {
   ExpenseID: number;
   CategoryID: number;
   CategoryName: string;
@@ -24,26 +27,26 @@ interface SpendingType {
   Date: string;
 }
 
-interface BudgetType {
-  id: string;
-  name: string;
+interface Budget {
+  BudgetID: number;
+  BudgetName: string;
 }
 
-// Dummy budgets for selection
-const dummyBudgets: BudgetType[] = [
-  { id: "1", name: "Entertainment" },
-  { id: "2", name: "Groceries" },
-  { id: "3", name: "Utilities" },
-];
+const API_BASE_URL = "http://18.117.93.67:3002";
 
-const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => {
-  const [spendingList, setSpendingList] = useState<SpendingType[]>([]);
-  const [loading, setLoading] = useState(true);
+const SpendingBlock = () => {
+  const [spendingList, setSpendingList] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<BudgetType | null>(null);
-  const [selectedSpending, setSelectedSpending] = useState<SpendingType | null>(null);
-  const userState = useSelector((state) => state.user); // Assume user is a JSON string
-  userId = userState.user.id
+  const [selectedSpending, setSelectedSpending] = useState<Expense | null>(null);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [selectedBudget, setSelectedBudget] = useState<number | null>(null);
+  const [isLoadingBudgets, setIsLoadingBudgets] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  
+  const userState = useSelector((state) => state.user);
+  const userId = userState?.user?.id;
+  const token = userState?.token;
 
   useEffect(() => {
     fetchExpenses();
@@ -51,106 +54,156 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
 
   const fetchExpenses = async () => {
     try {
-      // const userId = 1;
-      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwMTQzMjAzLCJleHAiOjE3NDAxNjEyMDN9.kxLSzczurDWiJB55wnaE_isjuJTcWHmgYWY8APmBGm0"
-      const response = await fetch(`http://18.117.93.67:3002/expense/expenses/user/${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userState?.token}`,
-        },      
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const data = await response.json();
-      console.log("{Data}::",data)
-      if (response.ok && data.categorizedExpenses) {
-        // Filter only debit transactions
-        const debits = data.categorizedExpenses
-          .flatMap((category: any) => category.expenses)
-          .filter((expense: SpendingType) => expense.TransactionType === "Debit");
-
+      if (data?.categorizedExpenses) {
+        const debits = data.categorizedExpenses.flatMap((category: any) =>
+          category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
+        );
         setSpendingList(debits);
-      } else {
-        Alert.alert("Error", "Failed to fetch expenses.");
       }
     } catch (error) {
-      Alert.alert("Error", "Something went wrong while fetching expenses.");
-      console.log("ERRR:::",error)
+      console.error("Error fetching expenses:", error);
+      Alert.alert("Error", "Failed to load transactions.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMenuClick = (spending: SpendingType) => {
-    setSelectedSpending(spending);
-    setModalVisible(true);
+  const fetchBudgets = async () => {
+    setIsLoadingBudgets(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/budget/user/${userId}/budgets`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setBudgets(data);
+      } else {
+        setBudgets([]);
+      }
+    } catch (error) {
+      console.error("Error fetching budgets:", error);
+      Alert.alert("Error", "Failed to load budgets.");
+    } finally {
+      setIsLoadingBudgets(false);
+    }
   };
 
-  const handleConfirm = () => {
-    if (!selectedBudget || !selectedSpending) {
+  const handleAddToBudget = async () => {
+    if (!selectedSpending || !selectedBudget) {
       Alert.alert("Error", "Please select a budget.");
       return;
     }
 
-    Alert.alert("Success", `Added ${selectedSpending.Amount} to ${selectedBudget.name}!`);
-    handleCloseModal();
+    setIsSaving(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/expense/expenses/${selectedSpending.ExpenseID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ BudgetID: selectedBudget }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update expense.");
+
+      Alert.alert("Success", "Expense added to budget successfully.");
+      setModalVisible(false);
+      setSelectedBudget(null);
+    } catch (error) {
+      console.error("Error updating expense:", error);
+      Alert.alert("Error", "Failed to add expense to budget.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
-    setSelectedBudget(null);
-    setSelectedSpending(null);
+  const openModal = (expense: Expense) => {
+    setSelectedSpending(expense);
+    setModalVisible(true);
+    fetchBudgets();
+  };
+
+  const renderItem: ListRenderItem<Expense> = ({ item }) => {
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.expenseName}>{item.CategoryName}</Text>
+          <TouchableOpacity onPress={() => openModal(item)}>
+            <Feather name="more-horizontal" size={20} color={Colors.white} />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
+        <Text style={styles.description}>{item.Description}</Text>
+      </View>
+    );
   };
 
   return (
-    <View style={styles.spendingSectionWrapper}>
-      <Text style={styles.sectionTitle}>
-        February <Text style={{ fontWeight: "700" }}>Spending</Text>
+    <View style={styles.container}>
+      <Text style={styles.headerText}>
+        My <Text style={styles.boldText}>Spending</Text>
       </Text>
-
       {loading ? (
-        <ActivityIndicator size="large" color={Colors.blue} />
+        <ActivityIndicator size="large" color={Colors.black} />
       ) : spendingList.length > 0 ? (
-        spendingList.map((item) => (
-          <View style={styles.spendingWrapper} key={item.ExpenseID}>
-            <View style={styles.textWrapper}>
-              <View style={{ gap: 5 }}>
-                <Text style={styles.itemName}>{item.CategoryName} - {item.Description}</Text>
-                <Text style={{ color: Colors.white }}>{new Date(item.Date).toDateString()}</Text>
-              </View>
-              <View style={styles.rightWrapper}>
-                <Text style={styles.itemName}>${item.Amount}</Text>
-                <TouchableOpacity onPress={() => handleMenuClick(item)}>
-                  <Feather name="more-horizontal" size={20} color={Colors.white} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))
+        <FlatList data={spendingList} renderItem={renderItem} showsHorizontalScrollIndicator={false} />
       ) : (
-        <Text style={{ color: Colors.white, marginTop: 10 }}>No debit transactions found.</Text>
+        <Text style={styles.noSpendingText}>No debit transactions found.</Text>
       )}
 
-      {/* Modal for budget selection */}
-      <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={handleCloseModal}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.closeIcon} onPress={handleCloseModal}>
-              <Feather name="x" size={24} color="black" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select a Budget</Text>
-            {dummyBudgets.map((budget) => (
-              <TouchableOpacity
-                key={budget.id}
-                style={[styles.budgetItem, selectedBudget?.id === budget.id && styles.selectedBudget]}
-                onPress={() => setSelectedBudget(budget)}
-              >
-                <Text style={styles.budgetText}>{budget.name}</Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-              <Text style={styles.confirmButtonText}>Confirm</Text>
-            </TouchableOpacity>
+      {/* Modal for transaction details */}
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {selectedSpending && (
+              <>
+                <Text style={styles.modalTitle}>Transaction Details</Text>
+                <Text style={styles.modalText}>Category: {selectedSpending.CategoryName}</Text>
+                <Text style={styles.modalText}>Amount: ${parseFloat(selectedSpending.Amount).toFixed(2)}</Text>
+                <Text style={styles.modalText}>Description: {selectedSpending.Description}</Text>
+                <Text style={styles.modalText}>Date: {selectedSpending.Date}</Text>
+
+                {/* Budgets Picker */}
+                <Text style={styles.modalTitle}>Select a Budget</Text>
+                {isLoadingBudgets ? (
+                  <ActivityIndicator size="small" color={Colors.primary} />
+                ) : (
+                  <Picker
+                    selectedValue={selectedBudget}
+                    onValueChange={(itemValue) => setSelectedBudget(itemValue)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Select a Budget" value={null} />
+                    {budgets.map((budget) => (
+                      <Picker.Item key={budget.BudgetID} label={budget.BudgetName} value={budget.BudgetID} />
+                    ))}
+                  </Picker>
+                )}
+
+                <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
+                  <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
       </Modal>
@@ -161,19 +214,35 @@ const SpendingBlock = ({ userId, token }: { userId: string; token: string }) => 
 export default SpendingBlock;
 
 const styles = StyleSheet.create({
-  spendingSectionWrapper: { marginVertical: 20, alignItems: "flex-start" },
-  sectionTitle: { color: Colors.white, fontSize: 16, marginBottom: 20 },
-  spendingWrapper: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
-  textWrapper: { flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  rightWrapper: { flexDirection: "row", alignItems: "center", gap: 10 },
-  itemName: { color: Colors.white, fontSize: 16, fontWeight: "600" },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
-  modalContainer: { backgroundColor: Colors.white, padding: 20, borderRadius: 10, width: "80%", alignItems: "center", position: "relative" },
-  closeIcon: { position: "absolute", top: 10, right: 10, padding: 5 },
-  modalTitle: { fontSize: 18, fontWeight: "600", marginBottom: 10 },
-  budgetItem: { padding: 10, backgroundColor: "#222", marginVertical: 5, borderRadius: 5, width: "100%", alignItems: "center" },
-  selectedBudget: { backgroundColor: Colors.secondary },
-  budgetText: { color: Colors.white, fontSize: 16 },
-  confirmButton: { marginTop: 10, padding: 10, backgroundColor: Colors.blue, borderRadius: 5, width: "100%", alignItems: "center" },
-  confirmButtonText: { color: Colors.white, fontSize: 16 },
+  container: { padding: 15, backgroundColor: Colors.background, flex: 1 },
+  headerText: { fontSize: 18, fontWeight: "bold", color: Colors.white, marginBottom: 10 },
+  boldText: { fontWeight: "bold", color: Colors.primary },
+  noSpendingText: { textAlign: "center", color: Colors.white, fontSize: 16, marginTop: 20 },
+  
+  card: { 
+    backgroundColor: Colors.card, 
+    padding: 15, 
+    borderRadius: 10, 
+    marginVertical: 5, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.2, 
+    shadowRadius: 4, 
+    elevation: 5 
+  },
+  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5 },
+  expenseName: { fontSize: 16, fontWeight: "bold", color: Colors.white },
+  amountText: { fontSize: 18, fontWeight: "bold", color: Colors.primary, marginVertical: 5 },
+  description: { fontSize: 14, color: Colors.white, fontStyle: "italic" },
+
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "85%", backgroundColor: Colors.white, padding: 20, borderRadius: 10, alignItems: "center" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", color: Colors.black, marginBottom: 10 },
+  modalText: { fontSize: 16, color: Colors.black, marginBottom: 5 },
+  picker: { width: "100%", backgroundColor: Colors.lightGray, borderRadius: 8, marginBottom: 15 },
+  
+  addButton: { backgroundColor: Colors.primary, paddingVertical: 10, borderRadius: 8, width: "100%", alignItems: "center", marginTop: 10 },
+  closeButton: { backgroundColor: Colors.gray, paddingVertical: 10, borderRadius: 8, width: "100%", alignItems: "center", marginTop: 10 },
+  buttonText: { color: Colors.white, fontSize: 16, fontWeight: "bold" },
 });
+

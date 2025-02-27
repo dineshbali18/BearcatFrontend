@@ -82,9 +82,9 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
           style={styles.picker}
           onValueChange={(itemValue) => setSelectedGoal(itemValue)}
         >
-          <Picker.Item label="🔽 Select an existing goal" value={null} color="gray" />
+          <Picker.Item label="🔽 Select an existing goal" value={null} color="black" />
           {savings.map((goal) => (
-            <Picker.Item key={goal.id} label={goal.name} value={goal.id} color="gray" />
+            <Picker.Item key={goal.id} label={goal.name} value={goal.id} color="black" />
           ))}
           <Picker.Item label="➕ Add New Goal" value="new" color="green" />
         </Picker>
@@ -126,6 +126,8 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
           </View>
         )}
 
+        <Text style={{fontWeight:"800",fontSize:20,margin:20}}>My Current Goals</Text>
+
         <FlatList
           data={savings}
           keyExtractor={(item) => item.id}
@@ -153,9 +155,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     borderRadius: 20,
-    paddingTop: 20,
+    paddingTop: 35,
     paddingHorizontal: 20,
     paddingBottom: 20,
+    margin: 25,
+    marginTop: 55,
+    borderWidth: 7
   },
   header: {
     flexDirection: "row",
@@ -180,6 +185,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     alignItems: "center",
+    margin: 10,
   },
   addButtonText: {
     color: "white",
@@ -200,4 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  picker:{
+    margin: 20
+  }
 });

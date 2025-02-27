@@ -9,10 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import Colors from "@/constants/Colors";
-import { ExpenseType } from "@/types";
 import { Picker } from "@react-native-picker/picker";
-
 
 const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
@@ -35,7 +32,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
   const updateGoal = () => {
     if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
 
-    const updatedSavings = savings.map((goal: ExpenseType) =>
+    const updatedSavings = savings.map((goal) =>
       goal.id === selectedGoal
         ? {
             ...goal,
@@ -52,13 +49,12 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
   };
 
   const deleteGoal = (id: string) => {
-    setSavings(savings.filter((goal: ExpenseType) => goal.id !== id));
+    setSavings(savings.filter((goal) => goal.id !== id));
   };
 
-  // Load selected goal's data into the input fields if it's not the "new" option.
   React.useEffect(() => {
     if (selectedGoal && selectedGoal !== "new") {
-      const goal = savings.find((g: ExpenseType) => g.id === selectedGoal);
+      const goal = savings.find((g) => g.id === selectedGoal);
       if (goal) {
         setNewGoal({
           name: goal.name,
@@ -73,46 +69,39 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
 
   return (
     <View style={styles.container}>
-      {/* Header with Close Button */}
       <View style={styles.header}>
         <Text style={styles.headerText}>💰 Manage Savings Goals</Text>
         <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-          <Feather name="x" size={24} color={Colors.white} />
+          <Feather name="x" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Goal Selection Dropdown */}
         <Picker
           selectedValue={selectedGoal}
           style={styles.picker}
-          dropdownIconColor={Colors.black}
-          itemStyle={styles.pickerItem} // This customizes the dropdown item appearance on iOS
-          onValueChange={(itemValue) => {
-            setSelectedGoal(itemValue);
-          }}
+          onValueChange={(itemValue) => setSelectedGoal(itemValue)}
         >
-          <Picker.Item label="🔽 Select an existing goal" value={null} color={Colors.grey} />
-          {savings.map((goal: ExpenseType) => (
-            <Picker.Item key={goal.id} label={goal.name} value={goal.id} color={Colors.grey} />
+          <Picker.Item label="🔽 Select an existing goal" value={null} color="gray" />
+          {savings.map((goal) => (
+            <Picker.Item key={goal.id} label={goal.name} value={goal.id} color="gray" />
           ))}
-          <Picker.Item label="➕ Add New Goal" value="new" color={Colors.green} />
+          <Picker.Item label="➕ Add New Goal" value="new" color="green" />
         </Picker>
 
-        {/* New Goal Input Fields (Only Show if 'New' is Selected or an Existing Goal is Selected) */}
         {(selectedGoal === "new" || selectedGoal) && (
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               placeholder="🏆 Goal Name"
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor="gray"
               value={newGoal.name}
               onChangeText={(text) => setNewGoal({ ...newGoal, name: text })}
             />
             <TextInput
               style={styles.input}
               placeholder="💵 Current Saved Amount"
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor="gray"
               keyboardType="numeric"
               value={newGoal.amount}
               onChangeText={(text) => setNewGoal({ ...newGoal, amount: text })}
@@ -120,13 +109,12 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
             <TextInput
               style={styles.input}
               placeholder="🎯 Total Savings Goal"
-              placeholderTextColor={Colors.grey}
+              placeholderTextColor="gray"
               keyboardType="numeric"
               value={newGoal.totalAmount}
               onChangeText={(text) => setNewGoal({ ...newGoal, totalAmount: text })}
             />
 
-            {/* Add/Update Button */}
             <TouchableOpacity
               style={styles.addButton}
               onPress={selectedGoal === "new" ? addGoal : updateGoal}
@@ -138,7 +126,6 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
           </View>
         )}
 
-        {/* List of Goals with Delete Option */}
         <FlatList
           data={savings}
           keyExtractor={(item) => item.id}
@@ -148,7 +135,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
                 🎯 {item.name}: ${item.amount} / ${item.totalAmount} ({item.percentage}%)
               </Text>
               <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton}>
-                <Feather name="trash" size={20} color={Colors.red} />
+                <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>
           )}
@@ -164,10 +151,9 @@ export default ManageSavingGoals;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
-    paddingTop: 50,
-  },
-  content: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
@@ -175,51 +161,28 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: "#222831",
-    borderBottomWidth: 1,
-    borderBottomColor: "#333845",
   },
   headerText: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#FFD700",
-  },
-  closeIcon: {
-    padding: 5,
-  },
-  picker: {
-    backgroundColor: "#333845",
-    color: Colors.white,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  // This style will affect the dropdown items on iOS.
-  pickerItem: {
-    backgroundColor: "#444B5A", // Change this to your desired background color for items
-    color: Colors.white,
-  },
-  inputContainer: {
-    marginBottom: 20,
+    color: "black",
   },
   input: {
-    backgroundColor: "#444B5A",
+    backgroundColor: "#F5F5F5",
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
-    color: Colors.white,
+    color: "black",
     fontSize: 16,
   },
   addButton: {
     backgroundColor: "#4CAF50",
     padding: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
-    marginBottom: 20,
   },
   addButtonText: {
-    color: Colors.white,
+    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -228,19 +191,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 14,
-    backgroundColor: "#333845",
+    backgroundColor: "#F5F5F5",
     marginBottom: 10,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   goalText: {
-    color: "#F8F8F8",
+    color: "black",
     fontSize: 16,
     fontWeight: "600",
-  },
-  deleteButton: {
-    padding: 5,
-  },
-  listContainer: {
-    paddingBottom: 20,
   },
 });

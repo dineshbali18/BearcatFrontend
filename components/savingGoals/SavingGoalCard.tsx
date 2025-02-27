@@ -7,20 +7,20 @@ import ManageSavingGoals from "./ManageSavingGoals";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const API_URL = "http://18.117.93.67:3002/savingGoal/user/1"; // Replace 1 with dynamic user ID
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo"
+const API_URL = "http://18.117.93.67:3002/savingGoal/user"; // Base URL for the API
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo";
 
 const SavingGoals = () => {
   const [savings, setSavings] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const userState = useSelector((state) => state.user); // Assume user is a JSON string
-  const userId = userState.user.id
+  const userId = userState.user.id; // Dynamic User ID
 
   useEffect(() => {
     const fetchSavingGoals = async () => {
       try {
-        const response = await axios.get(`http://18.117.93.67:3002/savingGoal/user/${userId}`, {
-          headers: { Authorization: `Bearer ${userState?.token}` },
+        const response = await axios.get(`${API_URL}/${userId}`, {
+          headers: { Authorization: `Bearer ${userState.token}` },
         });
 
         // Process the data from API response
@@ -31,7 +31,7 @@ const SavingGoals = () => {
           totalAmount: goal.TargetAmount,
           percentage: ((parseFloat(goal.CurrentAmount) / parseFloat(goal.TargetAmount)) * 100).toFixed(0),
         }));
-        
+
         setSavings(formattedData);
       } catch (error) {
         console.error("Error fetching saving goals:", error);
@@ -39,7 +39,7 @@ const SavingGoals = () => {
     };
 
     fetchSavingGoals();
-  }, []);
+  }, [userId, userState.token]);
 
   const completedGoals = savings.filter((goal) => parseInt(goal.percentage) === 100);
   const currentGoals = savings.filter((goal) => parseInt(goal.percentage) < 100);
@@ -52,7 +52,7 @@ const SavingGoals = () => {
     { value: parseFloat(goal.percentage), color: Colors.blue }, // Display the percentage in blue
     { value: 100 - parseFloat(goal.percentage), color: Colors.white }, // Remaining percentage in white
   ]).flat();
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

@@ -133,25 +133,22 @@ const SpendingBlock = () => {
   };
 
   const openModal = (expense: Expense) => {
+    console.log("Opening modal for:", expense);
     setSelectedSpending(expense);
     setModalVisible(true);
     fetchBudgets();
   };
 
-  const renderItem: ListRenderItem<Expense> = ({ item }) => {
-    return (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.expenseName}>{item.CategoryName}</Text>
-          <TouchableOpacity onPress={() => openModal(item)}>
-            <Feather name="more-horizontal" size={20} color={Colors.white} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
-        <Text style={styles.description}>{item.Description}</Text>
+  const renderItem: ListRenderItem<Expense> = ({ item }) => (
+    <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.expenseName}>{item.CategoryName}</Text>
+        <Feather name="more-horizontal" size={20} color={Colors.white} />
       </View>
-    );
-  };
+      <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
+      <Text style={styles.description}>{item.Description}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -166,47 +163,54 @@ const SpendingBlock = () => {
         <Text style={styles.noSpendingText}>No debit transactions found.</Text>
       )}
 
-      {/* Modal for transaction details */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {selectedSpending && (
-              <>
-                <Text style={styles.modalTitle}>Transaction Details</Text>
-                <Text style={styles.modalText}>Category: {selectedSpending.CategoryName}</Text>
-                <Text style={styles.modalText}>Amount: ${parseFloat(selectedSpending.Amount).toFixed(2)}</Text>
-                <Text style={styles.modalText}>Description: {selectedSpending.Description}</Text>
-                <Text style={styles.modalText}>Date: {selectedSpending.Date}</Text>
+<Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      
+      {selectedSpending && (
+        <>
+          <Text style={styles.modalTitle}>Transaction Details</Text>
+          <Text style={styles.modalText}>Category: {selectedSpending.CategoryName}</Text>
+          <Text style={styles.modalText}>Amount: ${parseFloat(selectedSpending.Amount).toFixed(2)}</Text>
+          <Text style={styles.modalText}>Description: {selectedSpending.Description}</Text>
 
-                {/* Budgets Picker */}
-                <Text style={styles.modalTitle}>Select a Budget</Text>
-                {isLoadingBudgets ? (
-                  <ActivityIndicator size="small" color={Colors.primary} />
-                ) : (
-                  <Picker
-                    selectedValue={selectedBudget}
-                    onValueChange={(itemValue) => setSelectedBudget(itemValue)}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Select a Budget" value={null} />
-                    {budgets.map((budget) => (
-                      <Picker.Item key={budget.BudgetID} label={budget.BudgetName} value={budget.BudgetID} />
-                    ))}
-                  </Picker>
-                )}
+          {/* Budget Picker */}
+          <Text style={styles.modalTitle}>Select a Budget</Text>
+          {isLoadingBudgets ? (
+            <ActivityIndicator size="small" color={Colors.blue} />
+          ) : (
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={selectedBudget}
+                onValueChange={(itemValue) => setSelectedBudget(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Select a Budget" value={null} />
+                {budgets.map((budget) => (
+                  <Picker.Item key={budget.BudgetID} label={budget.BudgetName} value={budget.BudgetID} />
+                ))}
+              </Picker>
+            </View>
 
-                <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
-                  <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
-                </TouchableOpacity>
+          )}
 
-                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                  <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
-              </>
-            )}
+          {/* Button Section */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
+              <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+
+        </>
+      )}
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 };
@@ -214,35 +218,159 @@ const SpendingBlock = () => {
 export default SpendingBlock;
 
 const styles = StyleSheet.create({
-  container: { padding: 15, backgroundColor: Colors.background, flex: 1 },
-  headerText: { fontSize: 18, fontWeight: "bold", color: Colors.white, marginBottom: 10 },
-  boldText: { fontWeight: "bold", color: Colors.primary },
-  noSpendingText: { textAlign: "center", color: Colors.white, fontSize: 16, marginTop: 20 },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)", // Semi-transparent background
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: "white", // Dark background for modal (adjust as needed)
+    padding: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 10, // Shadow effect for Android
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black", // White text color
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    color: "black", // White text color
+    marginBottom: 5,
+    textAlign: "center",
+  },
+  pickerContainer: {
+    width: "100%",
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: "black", // Ensures a black border
+    backgroundColor: "white", // Keeps a clean white background
+    marginVertical: 10,
+    overflow: "hidden", // Prevents overflow issues
+  },
   
+  picker: {
+    width: "100%",
+    color: "black", // Ensures text is visible
+    paddingHorizontal: 10, // Adds spacing
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 15,
+  },
+  addButton: {
+    flex: 1,
+    backgroundColor: "#4CAF50", // Green color for the add button
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5,
+  },
+  closeButton: {
+    flex: 1,
+    backgroundColor: "#D32F2F", // Red color for the close button
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: "#FFFFFF", // White text for buttons
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   card: { 
     backgroundColor: Colors.card, 
     padding: 15, 
-    borderRadius: 10, 
-    marginVertical: 5, 
+    borderRadius: 12, 
+    marginVertical: 8, 
     shadowColor: "#000", 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.2, 
-    shadowRadius: 4, 
-    elevation: 5 
+    shadowOffset: { width: 0, height: 3 }, 
+    shadowOpacity: 0.3, 
+    shadowRadius: 5, 
+    elevation: 6 
   },
-  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5 },
-  expenseName: { fontSize: 16, fontWeight: "bold", color: Colors.white },
-  amountText: { fontSize: 18, fontWeight: "bold", color: Colors.primary, marginVertical: 5 },
-  description: { fontSize: 14, color: Colors.white, fontStyle: "italic" },
-
-  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: { width: "85%", backgroundColor: Colors.white, padding: 20, borderRadius: 10, alignItems: "center" },
-  modalTitle: { fontSize: 18, fontWeight: "bold", color: Colors.black, marginBottom: 10 },
-  modalText: { fontSize: 16, color: Colors.black, marginBottom: 5 },
-  picker: { width: "100%", backgroundColor: Colors.lightGray, borderRadius: 8, marginBottom: 15 },
-  
-  addButton: { backgroundColor: Colors.primary, paddingVertical: 10, borderRadius: 8, width: "100%", alignItems: "center", marginTop: 10 },
-  closeButton: { backgroundColor: Colors.gray, paddingVertical: 10, borderRadius: 8, width: "100%", alignItems: "center", marginTop: 10 },
-  buttonText: { color: Colors.white, fontSize: 16, fontWeight: "bold" },
+  container: {
+    padding: 15,
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: Colors.white,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  boldText: {
+    fontWeight: "bold",
+    color: Colors.primary,
+  },
+  noSpendingText: {
+    textAlign: "center",
+    color: Colors.white,
+    fontSize: 16,
+    marginTop: 20,
+  },
+  cardContainer: {
+    marginVertical: 10,
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  card: {
+    padding: 18,
+    borderRadius: 12,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  expenseName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.white,
+  },
+  amountText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#f1c40f",
+    marginVertical: 5,
+  },
+  description: {
+    fontSize: 14,
+    color: Colors.white,
+    fontStyle: "italic",
+    marginBottom: 8,
+  },
+  cardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  dateText: {
+    fontSize: 13,
+    color: "#ecf0f1",
+  },
 });
-

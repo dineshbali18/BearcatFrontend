@@ -91,15 +91,18 @@ const ResetPasswordScreen = () => {
 
     try {
       // Final request: update password
-      const resetPasswordResponse = await fetch("http://18.117.93.67:3000/api/user/updatepassword", {
+      console.log("QQQQQQ")
+      const resetPasswordResponse = await fetch("http://18.117.93.67:3002/user/update", {
         method: "POST",
         headers: {
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDc0NTg0NywiZXhwIjoxNzQwNzYzODQ3fQ.XEf_KLuubm2_GAVk3hqWvHRquw9msBv6R6j1EYKPEzk",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email:email, password:password }),
       });
       const resetPasswordData = await resetPasswordResponse.json();
-      if (!resetPasswordData.success) {
+      console.log("RRRRRREEEE",resetPasswordData)
+      if (resetPasswordData.message !== "User details updated successfully") {
         throw new Error("Failed to reset password.");
       }
 

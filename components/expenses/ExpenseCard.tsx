@@ -15,8 +15,20 @@ import AddExpenseModal from "./AddExpense";
 import { Picker } from "@react-native-picker/picker";
 import ManageExpenses from "./ManageExpenses";
 
+// Define types
+interface Expense {
+  ExpenseID: number;
+  CategoryID: number;
+  CategoryName: string;
+  Amount: string;
+  Description: string;
+  TransactionType: string;
+  Merchandise: string;
+  Date: string;
+}
 
 const ExpensesSection = () => {
+  const [spendingList, setSpendingList] = useState<Expense[]>([]);
   const [expenses, setExpenses] = useState([]);
   const [totalExpense, setTotalExpense] = useState("0.00");
   const [pieData, setPieData] = useState([]);
@@ -39,6 +51,13 @@ const ExpensesSection = () => {
           }
         );
         const data = await response.json();
+
+        if (data?.categorizedExpenses) {
+          const debits = data.categorizedExpenses.flatMap((category: any) =>
+            category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
+          );
+          setSpendingList(debits);
+        }
 
         if (data.categorizedExpenses) {
           let total = 0;
@@ -121,7 +140,7 @@ const ExpensesSection = () => {
         showsHorizontalScrollIndicator={false}
       />
       <Modal visible={isManageModalVisible} animationType="slide">
-        <ManageExpenses expenses={expenses} setExpenses={setExpenses} onClose={() => setManageModalVisible(false)} />
+        <ManageExpenses expenses={spendingList} setExpenses={setExpenses} onClose={() => setManageModalVisible(false)} />
       </Modal>
       <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>

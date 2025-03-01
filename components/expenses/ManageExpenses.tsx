@@ -14,7 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null);
   const [newExpense, setNewExpense] = useState({ name: "", amount: "" });
-
+  
   const addExpense = () => {
     if (!newExpense.name || !newExpense.amount) return;
     const newEntry = {
@@ -72,7 +72,7 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
         >
           <Picker.Item label="🔽 Select an existing expense" value={null} color="black" />
           {expenses.map((expense) => (
-            <Picker.Item key={expense.id} label={expense.name} value={expense.id} color="black" />
+            <Picker.Item key={expense.id} label={expense.CategoryName.concat(" - "+expense.Description)} value={expense.ExpenseID} color="black" />
           ))}
           <Picker.Item label="➕ Add New Expense" value="new" color="red" />
         </Picker>
@@ -113,7 +113,7 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.expenseCard}>
-              <Text style={styles.expenseText}>💳 {item.name}: ${item.amount}</Text>
+              <Text style={styles.expenseText}>💳 {item.CategoryName} - {item.Description}: ${item.Amount}</Text>
               <TouchableOpacity onPress={() => deleteExpense(item.id)} style={styles.deleteButton}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>

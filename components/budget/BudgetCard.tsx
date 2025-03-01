@@ -14,7 +14,6 @@ import Colors from "@/constants/Colors";
 import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "../savingGoals/ManageSavingGoals"; // CRUD Component
 import { useSelector } from "react-redux";
-import ManageBudgets from "./ManageBudgets";
 
 const API_URL = "http://18.117.93.67:3002/budget/user/1/budgets"; // Replace with your actual API endpoint
 
@@ -155,7 +154,7 @@ const BudgetCard = () => {
       </ScrollView>
 
       <Modal visible={isManageModalVisible} animationType="slide">
-        <ManageBudgets
+        <ManageSavingGoals
           savings={savings}
           setSavings={setSavings}
           onClose={() => setManageModalVisible(false)}
@@ -171,7 +170,7 @@ export default BudgetCard;
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.dark,
     borderRadius: 10,
     flex: 1,
   },

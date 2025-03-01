@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -12,6 +13,7 @@ import { PieChart } from "react-native-gifted-charts";
 import { useSelector } from "react-redux";
 import AddExpenseModal from "./AddExpense";
 import { Picker } from "@react-native-picker/picker";
+import ManageExpenses from "./ManageExpenses";
 
 
 const ExpensesSection = () => {
@@ -19,6 +21,7 @@ const ExpensesSection = () => {
   const [totalExpense, setTotalExpense] = useState("0.00");
   const [pieData, setPieData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isManageModalVisible, setManageModalVisible] = useState(false);
   const userState = useSelector((state) => state.user);
   const userId = userState?.user?.id;
 
@@ -91,6 +94,11 @@ const ExpensesSection = () => {
             </View>
           )}
         />
+        <View style={styles.header}>
+            <TouchableOpacity onPress={() => setManageModalVisible(true)}>
+              <Feather name="more-vertical" size={24} color={Colors.white} />
+            </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -112,7 +120,9 @@ const ExpensesSection = () => {
         horizontal
         showsHorizontalScrollIndicator={false}
       />
-      
+      <Modal visible={isManageModalVisible} animationType="slide">
+        <ManageExpenses expenses={expenses} setExpenses={setExpenses} onClose={() => setManageModalVisible(false)} />
+      </Modal>
       <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>
   );

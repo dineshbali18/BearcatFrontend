@@ -11,7 +11,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 
-const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
+const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null);
   const [newExpense, setNewExpense] = useState({ name: "", amount: "" });
   
@@ -47,8 +47,8 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
   };
 
   useEffect(()=>{
-    console.log("QQQQQ",expenses)
-  },[])
+    console.log("QQQQQ111111111111",cred)
+  })
 
   React.useEffect(() => {
     if (selectedExpense && selectedExpense !== "new") {
@@ -114,12 +114,27 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
 
         <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>My Expenses</Text>
 
+        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Debits</Text>
         <FlatList
           data={expenses}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.expenseCard}>
               <Text style={styles.expenseText}>💳 {item.CategoryName} - {item.Description}: ${item.Amount}</Text>
+              <TouchableOpacity onPress={() => deleteExpense(item.ExpenseID)} style={styles.deleteButton}>
+                <Feather name="trash" size={20} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+          contentContainerStyle={styles.listContainer}
+        />
+        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Credits</Text>
+        <FlatList
+          data={cred}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.expenseCard}>
+              <Text style={styles.expenseText}>💳 {item.Description} - {item.CategoryName}: ${item.Amount}</Text>
               <TouchableOpacity onPress={() => deleteExpense(item.ExpenseID)} style={styles.deleteButton}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>

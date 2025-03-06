@@ -34,8 +34,8 @@ interface SavingGoal {
 
 const API_BASE_URL = "http://18.117.93.67:3002";
 
-const IncomeBlock = () => {
-  const [incomeList, setIncomeList] = useState<Expense[]>([]);
+const IncomeBlock = ({incomeList}) => {
+  // const [incomeList, setIncomeList] = useState<Expense[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<Expense | null>(null);
@@ -48,34 +48,34 @@ const IncomeBlock = () => {
   const userId = userState?.user?.id;
   const token = userState?.token;
 
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
+  // useEffect(() => {
+  //   fetchExpenses();
+  // }, []);
 
-  const fetchExpenses = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  // const fetchExpenses = async () => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-      const data = await response.json();
-      if (data?.categorizedExpenses) {
-        const credits = data.categorizedExpenses.flatMap((category: any) =>
-          category.expenses.filter((expense: Expense) => expense.TransactionType === "Credit")
-        );
-        setIncomeList(credits);
-      }
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      Alert.alert("Error", "Failed to load transactions.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     if (data?.categorizedExpenses) {
+  //       const credits = data.categorizedExpenses.flatMap((category: any) =>
+  //         category.expenses.filter((expense: Expense) => expense.TransactionType === "Credit")
+  //       );
+  //       setIncomeList(credits);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching expenses:", error);
+  //     Alert.alert("Error", "Failed to load transactions.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchSavingGoals = async () => {
     setIsLoadingGoals(true);
@@ -156,11 +156,9 @@ const IncomeBlock = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>
-        My <Text style={styles.boldText}>Income</Text>
+        My <Text style={styles.boldText}>Income </Text>
       </Text>
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.white} />
-      ) : incomeList.length > 0 ? (
+      {incomeList.length > 0 ? (
         <FlatList data={incomeList} renderItem={renderItem} horizontal showsHorizontalScrollIndicator={false} />
       ) : (
         <Text style={styles.noIncomeText}>No credit transactions found.</Text>

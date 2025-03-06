@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -41,8 +41,14 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
   };
 
   const deleteExpense = (id: string) => {
-    setExpenses(expenses.filter((expense) => expense.id !== id));
+    console.log("IDDD",id)
+    const deletedExpenses=expenses.filter((expense) => expense.ExpenseID !== Number(id));
+    setExpenses(deletedExpenses);
   };
+
+  useEffect(()=>{
+    console.log("QQQQQ",expenses)
+  },[])
 
   React.useEffect(() => {
     if (selectedExpense && selectedExpense !== "new") {
@@ -114,7 +120,7 @@ const ManageExpenses = ({ expenses, setExpenses, onClose }) => {
           renderItem={({ item }) => (
             <View style={styles.expenseCard}>
               <Text style={styles.expenseText}>💳 {item.CategoryName} - {item.Description}: ${item.Amount}</Text>
-              <TouchableOpacity onPress={() => deleteExpense(item.id)} style={styles.deleteButton}>
+              <TouchableOpacity onPress={() => deleteExpense(item.ExpenseID)} style={styles.deleteButton}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>

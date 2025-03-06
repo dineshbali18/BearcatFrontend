@@ -25,11 +25,16 @@ interface Expense {
   TransactionType: string;
   Merchandise: string;
   Date: string;
+}interface ExpenseSectionProps{
+  expen: Expense;
+  spendingList: [];
+  setSpendingList: Object;
 }
 
-const ExpensesSection = () => {
-  const [spendingList, setSpendingList] = useState<Expense[]>([]);
-  const [expenses, setExpenses] = useState([]);
+
+const ExpensesSection = ({ expen, spendingList, setSpendingList, total}) => {
+  // const [spendingList, setSpendingList] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState(expen);
   const [totalExpense, setTotalExpense] = useState("0.00");
   const [pieData, setPieData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,58 +42,16 @@ const ExpensesSection = () => {
   const userState = useSelector((state) => state.user);
   const userId = userState?.user?.id;
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const response = await fetch(
-          `http://18.117.93.67:3002/expense/expenses/user/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${userState?.token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
+useEffect(()=>{
+  console.log("IN EXPENSE....",expen)
+  console.log("IN SPENDING LIST",spendingList)
+  setTotalExpense(total);
+  setPieData(expen.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
+},[expen])
 
-        if (data?.categorizedExpenses) {
-          const debits = data.categorizedExpenses.flatMap((category: any) =>
-            category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
-          );
-          setSpendingList(debits);
-        }
-
-        if (data.categorizedExpenses) {
-          let total = 0;
-          const colors = [
-            "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
-            "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA",
-            "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
-          ];
-
-          const formattedExpenses = data.categorizedExpenses.map((category, index) => {
-            const categoryTotal = parseFloat(category.debitTotal);
-            total += categoryTotal;
-            return {
-              id: category.categoryName,
-              name: category.categoryName,
-              amount: category.debitTotal,
-              color: colors[index % colors.length],
-            };
-          });
-
-          setExpenses(formattedExpenses);
-          setTotalExpense(total.toFixed(2));
-          setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
-        }
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
-
-    fetchExpenses();
-  }, [userId]);
+useEffect(()=>{
+  console.log("IN EXPENSE SPENDING LIST....",spendingList)
+},[spendingList])
 
   return (
     <View style={styles.container}>
@@ -140,7 +103,7 @@ const ExpensesSection = () => {
         showsHorizontalScrollIndicator={false}
       />
       <Modal visible={isManageModalVisible} animationType="slide">
-        <ManageExpenses expenses={spendingList} setExpenses={setExpenses} onClose={() => setManageModalVisible(false)} />
+        <ManageExpenses expenses={spendingList} setExpenses={setSpendingList} onClose={() => setManageModalVisible(false)} />
       </Modal>
       <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>

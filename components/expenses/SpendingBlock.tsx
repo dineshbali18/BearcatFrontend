@@ -32,10 +32,11 @@ interface Budget {
   BudgetName: string;
 }
 
+
 const API_BASE_URL = "http://18.117.93.67:3002";
 
-const SpendingBlock = () => {
-  const [spendingList, setSpendingList] = useState<Expense[]>([]);
+const SpendingBlock = ({spendingList}) => {
+  // const [spendingList, setSpendingList] = useState<Expense[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSpending, setSelectedSpending] = useState<Expense | null>(null);
@@ -48,34 +49,39 @@ const SpendingBlock = () => {
   const userId = userState?.user?.id;
   const token = userState?.token;
 
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
+  // useEffect(() => {
+  //   fetchExpenses();
+  // }, []);
 
-  const fetchExpenses = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  // const fetchExpenses = async () => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-      const data = await response.json();
-      if (data?.categorizedExpenses) {
-        const debits = data.categorizedExpenses.flatMap((category: any) =>
-          category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
-        );
-        setSpendingList(debits);
-      }
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      Alert.alert("Error", "Failed to load transactions.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     if (data?.categorizedExpenses) {
+  //       const debits = data.categorizedExpenses.flatMap((category: any) =>
+  //         category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
+  //       );
+  //       setSpendingList(debits);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching expenses:", error);
+  //     Alert.alert("Error", "Failed to load transactions.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  useEffect(()=>{
+    console.log("My Spending ---- ",spendingList)
+  })
 
   const fetchBudgets = async () => {
     setIsLoadingBudgets(true);
@@ -155,12 +161,14 @@ const SpendingBlock = () => {
       <Text style={styles.headerText}>
         My <Text style={styles.boldText}>Spending</Text>
       </Text>
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.black} />
-      ) : spendingList.length > 0 ? (
+      {spendingList.length > 0 ? (
+        <>
         <FlatList data={spendingList} renderItem={renderItem} showsHorizontalScrollIndicator={false} />
+        </>
       ) : (
+        <>
         <Text style={styles.noSpendingText}>No debit transactions found.</Text>
+        </>
       )}
 
 <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>

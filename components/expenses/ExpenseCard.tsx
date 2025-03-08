@@ -102,7 +102,7 @@ useEffect(()=>{
         horizontal
         showsHorizontalScrollIndicator={false}
       />
-      <Modal visible={isManageModalVisible} animationType="slide">
+      <Modal visible={isManageModalVisible} animationType="slide" transparent>
         <ManageExpenses cred={incomeList} setCred={setIncomeList} expenses={spendingList} setExpenses={setSpendingList} onClose={() => setManageModalVisible(false)} />
       </Modal>
       <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />

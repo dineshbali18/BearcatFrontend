@@ -63,6 +63,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.internalContainer}>
       <View style={styles.header}>
         <Text style={styles.headerText}>💸 Manage Expenses</Text>
         <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
@@ -143,6 +144,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
           contentContainerStyle={styles.listContainer}
         />
       </ScrollView>
+      </View>
     </View>
   );
 };
@@ -152,7 +154,11 @@ export default ManageExpenses;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  internalContainer: {
+    flex: 1,
+    backgroundColor: 'white',
     borderRadius: 20,
     paddingTop: 35,
     paddingHorizontal: 20,

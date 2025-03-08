@@ -13,6 +13,7 @@ const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoi
 const SavingGoals = () => {
   const [savings, setSavings] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
+  const [isSavingGoalExpenseVisibel, setIsSavingGoalExpenseVisible] = useState(false);
   const userState = useSelector((state) => state.user); // Assume user is a JSON string
   const userId = userState.user.id; // Dynamic User ID
 
@@ -80,17 +81,38 @@ const SavingGoals = () => {
         />
       </View>
       <Text style={styles.sectionHeader}>Current Goals</Text>
-      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} />} keyExtractor={(item) => item.id} horizontal />
+      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
       <Text style={styles.sectionHeader}>Completed Goals</Text>
       <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} />} keyExtractor={(item) => item.id} horizontal />
       <Modal visible={isManageModalVisible} animationType="slide">
         <ManageSavingGoals savings={savings} setSavings={setSavings} onClose={() => setManageModalVisible(false)} />
       </Modal>
+      <Modal visible={isSavingGoalExpenseVisibel} animationType="slide" transparent>
+            <View style={styles.modalBackground}>
+              <View style={styles.expensesModal}>
+                <TouchableOpacity style={styles.closeButton} onPress={() => setIsSavingGoalExpenseVisible(false)}>
+                  <Feather name="x" size={24} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.modalHeader}>Expenses</Text>
+                <FlatList
+                  data={savings}
+                  renderItem={({ item }) => (
+                    <View style={styles.expenseItem}>
+                      <Text style={styles.expenseDescription}>{item.description}</Text>
+                      <Text style={styles.expenseAmount}>${item.amount}</Text>
+                    </View>
+                  )}
+                  keyExtractor={(item) => item.id.toString()}
+                />
+              </View>
+            </View>
+        </Modal>
     </View>
   );
 };
 
-const GoalItem = ({ item }) => (
+const GoalItem = ({ item, setIsSavingGoalExpenseVisibel }) => (
+  <TouchableOpacity onPress={()=>{setIsSavingGoalExpenseVisibel(true)}}>
   <View style={styles.goalCard}>
     <View style={styles.goalHeader}>
       <Text style={styles.savingName}>{item.name}</Text>
@@ -103,9 +125,59 @@ const GoalItem = ({ item }) => (
       <Text style={styles.savingAmount}>${item.amount} / ${item.totalAmount}</Text>
     </View>
   </View>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
+  feather:{
+    color: 'white'
+
+  },
+  internalContainer:{
+    flex: 1,
+    flexDirection: 'row',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  expensesModal: {
+    width: '80%',
+    backgroundColor: '#2c3e50',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  modalHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ecf0f1',
+    marginBottom: 15,
+  },
+  expenseItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#7f8c8d',
+  },
+  expenseDescription: {
+    fontSize: 16,
+    color: '#ecf0f1',
+  },
+  expenseAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+  },
   container: { padding: 15, backgroundColor: Colors.dark, borderRadius: 10 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   headerText: { color: Colors.white, fontSize: 18, fontWeight: "700" },

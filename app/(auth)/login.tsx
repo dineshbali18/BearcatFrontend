@@ -33,8 +33,8 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: emailRef.current,
-          password: passwordRef.current,
+          email: "dineshbali45@gmail.com",
+          password: "gamer45",
         }),
       });
 
@@ -58,7 +58,7 @@ const Login = () => {
         Alert.alert("Login", "Login successful!");
 
         // Optionally, navigate to another screen
-        router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
+        router.replace({ pathname: "/(tabs)", params: { email: emailRef.current } });
       }
     } catch (error) {
       setLoading(false);

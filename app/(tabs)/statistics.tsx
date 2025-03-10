@@ -1,11 +1,12 @@
+import React, { useState } from "react";
 import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
   Dimensions,
   ScrollView,
-  StyleSheet,
-  Text,
-  View,
 } from "react-native";
-import React, { useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
@@ -20,96 +21,220 @@ const { width: screenWidth } = Dimensions.get("window");
 
 const Analytics = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [budgetAmount, setBudgetAmount] = useState(1100);
+  const [expenses, setExpenses] = useState(0);
+  const [savings, setSavings] = useState(500);
 
-  // Generate random values for charts
-  const generateRandomData = (length) => {
-    return Array.from({ length }, () => Math.random() * 100);
+  // Deduct expense from budget and add to savings
+  const addExpense = (amount) => {
+    setExpenses(expenses + amount);
+    setBudgetAmount(budgetAmount - amount);
   };
 
-  // Expenses Bar Chart Data
-  const expensesBarData = generateRandomData(5);
-  const budgetBarData = generateRandomData(5);
-  const savingsGoalData = [0.7, 0.5, 0.9]; // Example progress values
+  const addToSavings = (amount) => {
+    setSavings(savings + amount);
+  };
 
-  // Bezier Line Chart Data
-  const lineChartData = generateRandomData(6);
+  // Expenses Data
+  const lineChartData = [100, 200, 300, 450, 600, expenses];
+  const barChartData = [200, 300, 150, 400, 250];
+  const budgetBarData = [(budgetAmount / 1100) * 100, 80, 60, 40, 20];
+  const savingsGoalData = [savings / 1000];
+
+  const chartConfig = {
+    backgroundGradientFrom: "#1E2923",
+    backgroundGradientTo: "#08130D",
+    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    propsForDots: { r: "6", strokeWidth: "2", stroke: "#ffa726" },
+  };
+
+  const chartData = [
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+    {
+      title: "Category-wise Expenses",
+      component: (
+        <BarChart
+          data={{ labels: ["Food", "Rent", "Travel", "Entertainment", "Savings"], datasets: [{ data: barChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          style={styles.chartStyle}
+        />
+      ),
+    },
+  ];
+
+  const budgetData = [
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+  ] 
+
+  const savingGoalData = [
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+    {
+      title: "Income vs Expenses",
+      component: (
+        <LineChart
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 40}
+          height={220}
+          yAxisLabel="$"
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chartStyle}
+        />
+      ),
+    },
+  ] 
+
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         <Header title="Statistics" />
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <SegmentedControl
-            values={["Weekly", "Monthly", "Yearly"]}
-            selectedIndex={activeIndex}
-            onChange={(event) => setActiveIndex(event.nativeEvent.selectedSegmentIndex)}
-            style={styles.segmentedControl}
-          />
-
-          {/* Line Chart */}
-          <Text style={styles.sectionTitle}>Income vs Expenses</Text>
-          <LineChart
-            data={{
-              labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-              datasets: [{ data: lineChartData }],
-            }}
-            width={screenWidth - 40}
-            height={220}
-            yAxisLabel="$"
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chartStyle}
-          />
-
-          {/* Budget Bar Chart */}
-          <Text style={styles.sectionTitle}>Budget Allocation</Text>
-          <BarChart
-            data={{
-              labels: ["Food", "Rent", "Travel", "Entertainment", "Savings"],
-              datasets: [{ data: budgetBarData }],
-            }}
-            width={screenWidth - 40}
-            height={220}
-            yAxisLabel="$"
-            chartConfig={chartConfig}
-            style={styles.chartStyle}
-          />
-
-          {/* Savings Goal Progress Chart */}
-          <Text style={styles.sectionTitle}>Savings Goal Progress</Text>
-          <ProgressChart
-            data={{ data: savingsGoalData }}
-            width={screenWidth - 40}
-            height={200}
-            strokeWidth={16}
-            radius={32}
-            chartConfig={chartConfig}
-            style={styles.chartStyle}
-          />
+        <SegmentedControl
+          values={["Weekly", "Monthly", "Yearly"]}
+          selectedIndex={activeIndex}
+          onChange={(event) => setActiveIndex(event.nativeEvent.selectedSegmentIndex)}
+          style={styles.segmentedControl}
+        />
+        <ScrollView>
+        <Text style={styles.text}>Expenses:</Text>
+        <FlatList
+          data={chartData}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.chartContainer}>
+              <Text style={styles.sectionTitle}>{item.title}</Text>
+              {item.component}
+            </View>
+          )}
+        />
+        <Text style={styles.text}>Budgets:</Text>
+        <FlatList
+          data={budgetData}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.chartContainer}>
+              <Text style={styles.sectionTitle}>{item.title}</Text>
+              {item.component}
+            </View>
+          )}
+        />
+        <Text style={styles.text}>Savings:</Text>
+        <FlatList
+          data={savingGoalData}
+          horizontal
+          style={{marginBottom: 100}}
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.chartContainer}>
+              <Text style={styles.sectionTitle}>{item.title}</Text>
+              {item.component}
+            </View>
+          )}
+        />
         </ScrollView>
+        {/* <View style={styles.lowerSection}>
+
+        </View> */}
       </View>
     </ScreenWrapper>
   );
 };
 
-const chartConfig = {
-  backgroundGradientFrom: "#1E2923",
-  backgroundGradientTo: "#08130D",
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  style: {
-    borderRadius: 16,
-  },
-  propsForDots: {
-    r: "6",
-    strokeWidth: "2",
-    stroke: "#ffa726",
-  },
-};
-
 const styles = StyleSheet.create({
   container: { paddingHorizontal: spacingX._20 },
-  scrollContainer: { gap: spacingY._20, paddingBottom: 100 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -123,6 +248,20 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 16,
   },
+  chartContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: screenWidth - 40,
+    paddingHorizontal: 10,
+  },
+  text: {
+    color: 'white',
+    fontWeight: 600,
+  },
+  lowerSection: {
+    marginTop: 50,
+  }
+
 });
 
 export default Analytics;

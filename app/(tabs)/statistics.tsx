@@ -36,7 +36,9 @@ const Analytics = () => {
   };
 
   // Expenses Data
-  const lineChartData = [100, 200, 300, 450, 600, expenses];
+  const lineChartData = [100, 200, 300, 450, 600,100, 200, 300, 450, 600, expenses];
+  const expenseLineChartData = [100, 200, 300, 450, 600,700, expenses];
+  const SavingGoalLineChartData = [100, 200, 300, 0, expenses];
   const barChartData = [200, 300, 150, 400, 250];
   const budgetBarData = [(budgetAmount / 1100) * 100, 80, 60, 40, 20];
   const savingsGoalData = [savings / 1000];
@@ -54,7 +56,7 @@ const Analytics = () => {
       title: "Income vs Expenses",
       component: (
         <LineChart
-          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          data={{ labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], datasets: [{ data: expenseLineChartData }] }}
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
@@ -84,10 +86,11 @@ const Analytics = () => {
       title: "Income vs Expenses",
       component: (
         <LineChart
-          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
-          width={screenWidth - 40}
+          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","July","Aug","Sep","Oct","Nov","Dec"], datasets: [{ data: lineChartData }] }}
+          width={screenWidth - 10}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -129,7 +132,7 @@ const Analytics = () => {
       title: "Income vs Expenses",
       component: (
         <LineChart
-          data={{ labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], datasets: [{ data: lineChartData }] }}
+          data={{ labels: ["Week1","Week2","Week3","Week4"], datasets: [{ data: SavingGoalLineChartData }] }}
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"

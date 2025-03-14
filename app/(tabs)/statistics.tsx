@@ -38,7 +38,7 @@ const Analytics = () => {
   // Expenses Data
   const lineChartData = [100, 200, 300, 450, 600,100, 200, 300, 450, 600, expenses];
   const expenseLineChartData = [100, 200, 300, 450, 600,700, expenses];
-  const SavingGoalLineChartData = [100, 200, 300, 0, expenses];
+  const SavingGoalLineChartData = [100, 200, 300, expenses];
   const barChartData = [200, 300, 150, 400, 250];
   const budgetBarData = [(budgetAmount / 1100) * 100, 80, 60, 40, 20];
   const savingsGoalData = [savings / 1000];
@@ -60,6 +60,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -74,6 +75,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           style={styles.chartStyle}
         />
@@ -105,6 +107,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -119,6 +122,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -136,6 +140,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -150,6 +155,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}
@@ -164,6 +170,7 @@ const Analytics = () => {
           width={screenWidth - 40}
           height={220}
           yAxisLabel="$"
+          formatYLabel={(label) => parseInt(label)}
           chartConfig={chartConfig}
           bezier
           style={styles.chartStyle}

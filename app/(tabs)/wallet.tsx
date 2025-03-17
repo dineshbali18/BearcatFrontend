@@ -14,7 +14,7 @@ import WalletListItem from "@/components/userBankAccounts/WalletListItem";
 import axios from "axios";
 import RNPickerSelect from "react-native-picker-select";
 
-const API_BASE_URL = "http://18.117.93.67:3002";
+const API_BASE_URL = "${Constants.expoConfig?.extra?.REACT_APP_API}:3002";
 
 const Wallet = () => {
   const router = useRouter();

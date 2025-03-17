@@ -9,8 +9,9 @@ import Loading from "../Loading";
 import { useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { FlashList } from "@shopify/flash-list";
+import Constants from 'expo-constants';
 
-const API_URL = "http://18.117.93.67:3002/expense/expenses/user/";
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/`;
 
 const TransactionList = ({ title, emptyListMessage }: TransactionListType) => {
   const router = useRouter();

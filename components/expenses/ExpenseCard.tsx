@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import AddExpenseModal from "./AddExpense";
 import { Picker } from "@react-native-picker/picker";
 import ManageExpenses from "./ManageExpenses";
+import Constants from 'expo-constants';
 
 // Define types
 interface Expense {

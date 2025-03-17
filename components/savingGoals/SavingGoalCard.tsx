@@ -6,9 +6,9 @@ import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "./ManageSavingGoals";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Constants from 'expo-constants';
 
-const API_URL = "http://18.117.93.67:3002/savingGoal/user"; // Base URL for the API
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZGluZXNoYmFsaTQ1QGdtYWlsLmNvbSIsImlhdCI6MTc0MDMwOTY5NywiZXhwIjoxNzQwMzI3Njk3fQ.Cz9nPhtbHUzfPE5MB_mHBARiXq9WucdMEB1Uv_6CNxo";
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/user`; // Base URL for the API
 
 const SavingGoals = () => {
   const [savings, setSavings] = useState([]);

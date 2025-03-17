@@ -19,6 +19,7 @@ import spendingList from "@/data/spending.json";
 import UserBudgets from "@/components/UserBudgets"
 import UserSavingGoals from "@/components/savingGoals/UserSavingGoals"
 import { useSelector } from "react-redux";
+import Constants from 'expo-constants';
 
 // // Correctly referencing the components
 const ExpensesComponent = () => <ExpenseScreen />;
@@ -61,7 +62,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
     const fetchExpenses = async () => {
       try {
         const response = await fetch(
-          `http://18.117.93.67:3002/expense/expenses/user/${userId}`,
+          `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
           {
             method: "GET",
             headers: {

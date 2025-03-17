@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import Constants from 'expo-constants';
 
 const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null);

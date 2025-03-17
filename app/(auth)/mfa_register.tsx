@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSelector } from "react-redux"; // Assuming Redux for user data
-
+import Constants from 'expo-constants';
 const MFARegisterScreen = () => {
   const { email } = useLocalSearchParams(); // Get the email passed from previous screen
   const router = useRouter();
@@ -18,7 +18,7 @@ const MFARegisterScreen = () => {
 
     try {
       // Send OTP verification request to backend
-      const response = await fetch("http://18.117.93.67:3000/api/user/verifyotp", {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

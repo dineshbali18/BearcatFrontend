@@ -13,7 +13,7 @@ import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
 import { scale, verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
-
+import Constants from 'expo-constants';
 const Login = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -29,7 +29,10 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://18.117.93.67:3002/user/login", {
+      console.log(`Àaaaaa ${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`)
+      const apiUrl = String(Constants.expoConfig?.extra?.REACT_APP_API)+":3002/user/login";
+      console.log(apiUrl)
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

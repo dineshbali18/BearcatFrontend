@@ -16,7 +16,7 @@ import {
   BarChart,
   ProgressChart,
 } from "react-native-chart-kit";
-
+import Constants from 'expo-constants';
 const { width: screenWidth } = Dimensions.get("window");
 
 const Analytics = () => {

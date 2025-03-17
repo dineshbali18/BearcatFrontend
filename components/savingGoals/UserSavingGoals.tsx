@@ -16,6 +16,7 @@ import {
   WalletCardIcon,
 } from "@/constants/Icons";
 import { Feather } from "@expo/vector-icons";
+import Constants from 'expo-constants';
 
 const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
   const renderItem: ListRenderItem<IncomeType> = ({ item }) => {

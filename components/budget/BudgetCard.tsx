@@ -15,8 +15,7 @@ import { PieChart } from "react-native-gifted-charts";
 import ManageSavingGoals from "../savingGoals/ManageSavingGoals"; // CRUD Component
 import { useSelector } from "react-redux";
 import ManageBudgets from "./ManageBudgets";
-
-const API_URL = "http://18.117.93.67:3002/budget/user/1/budgets"; // Replace with your actual API endpoint
+import Constants from 'expo-constants';
 
 const BudgetCard = () => {
   const [savings, setSavings] = useState([]);
@@ -33,7 +32,7 @@ const BudgetCard = () => {
     const fetchBudgets = async () => {
       try {
         const response = await fetch(
-          `http://18.117.93.67:3002/budget/user/${userId}/budgets`,
+          `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user/${userId}/budgets`,
           {
             method: "GET",
             headers: {
@@ -67,7 +66,7 @@ const BudgetCard = () => {
   const fetchExpenses = async (budgetId) => {
     // try {
     //   const response = await fetch(
-    //     `http://18.117.93.67:3002/budget/${budgetId}/expenses`,
+    //     `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/${budgetId}/expenses`,
     //     {
     //       method: "GET",
     //       headers: {

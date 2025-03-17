@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useSelector } from "react-redux";
+import Constants from 'expo-constants';
 
 
 const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
@@ -28,7 +29,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://18.117.93.67:3002/category", {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/category`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${userState?.token}`,
@@ -58,7 +59,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
     };
 
     try {
-      const response = await fetch("http://18.117.93.67:3002/expense/create/expenses", {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/create/expenses`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${userState?.token}`,

@@ -18,6 +18,8 @@ import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
 import { useAuth } from "@/contexts/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from 'expo-constants';
+
 
 const SignUp = () => {
   const router = useRouter();
@@ -41,7 +43,7 @@ const SignUp = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://18.117.93.67:3002/user/register", {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -44,7 +44,7 @@ const Analytics = ({ route }) => {
     };
 
     fetchData();
-  }, [userId]);
+  }, []);
 
   if (loading) {
     return (
@@ -90,15 +90,11 @@ const Analytics = ({ route }) => {
     return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   };
 
-  const getMonthlyData = (yearlyData) => {
-    const months = [
+  const getMonthlyLabels = () => {
+    return [
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ];
-    return months.map((month, index) => {
-      const monthKey = `${index + 1}`.padStart(2, "0"); // Convert to "01", "02", etc.
-      return yearlyData[monthKey] || 0; // Return 0 if no data for the month
-    });
   };
 
   const renderBudgetCharts = () => {
@@ -111,23 +107,18 @@ const Analytics = ({ route }) => {
       if (selectedPeriod === "weekly") {
         data = budget.weekly;
         labels = getWeeklyLabels();
-      } else if (selectedPeriod === "yearly") {
-        // Use last year's data for yearly reports
-        const lastYearData = financialData?.yearlyBreakdown?.["2024"] || {};
-        data = getMonthlyData(lastYearData);
-        labels = [
-          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-        ];
-      } else {
+      } else if (selectedPeriod === "monthly") {
         data = budget.monthly;
-        labels = data.map((_, i) => `Week ${i + 1}`);
+        labels = data.map((_, i) => `Month ${i + 1}`);
+      } else {
+        data = budget.yearly;
+        labels = getMonthlyLabels();
       }
 
       return renderChart(
         data,
         labels,
-        `Budget ${index + 1}`,
+        `Budget ${index + 1} (Target: $${budget.budgetTargetamount})`,
         activeIndex === 0 // Line chart for weekly, bar chart for others
       );
     });
@@ -143,17 +134,12 @@ const Analytics = ({ route }) => {
       if (selectedPeriod === "weekly") {
         data = savings.weekly;
         labels = getWeeklyLabels();
-      } else if (selectedPeriod === "yearly") {
-        // Use last year's data for yearly reports
-        const lastYearData = financialData?.yearlyBreakdown?.["2024"] || {};
-        data = getMonthlyData(lastYearData);
-        labels = [
-          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-        ];
-      } else {
+      } else if (selectedPeriod === "monthly") {
         data = savings.monthly;
-        labels = data.map((_, i) => `Week ${i + 1}`);
+        labels = data.map((_, i) => `Month ${i + 1}`);
+      } else {
+        data = savings.yearly;
+        labels = getMonthlyLabels();
       }
 
       return renderChart(
@@ -178,16 +164,13 @@ const Analytics = ({ route }) => {
       data = Object.values(weekData);
       labels = getWeeklyLabels();
     } else if (selectedPeriod === "yearly") {
-      // Use last year's data for yearly reports
-      const lastYearData = financialData.yearlyBreakdown?.["2024"] || {};
-      data = getMonthlyData(lastYearData);
-      labels = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-      ];
+      const lastYearData = Object.values(financialData.yearlyBreakdown?.["2025"] || {});
+      data = lastYearData;
+      labels = getMonthlyLabels();
     } else {
       const breakdown = financialData.monthlyBreakdown;
-      labels = Object.keys(breakdown);
+      const firstEntry = Object.values(breakdown)[0] || [];
+      labels = firstEntry.map((_, index) => `Month ${index + 1}`);
       data = Object.values(breakdown).map((period) =>
         Object.values(period).reduce((a, b) => a + b, 0)
       );

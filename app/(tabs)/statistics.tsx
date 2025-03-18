@@ -109,7 +109,7 @@ const Analytics = ({ route }) => {
         labels = getWeeklyLabels();
       } else if (selectedPeriod === "monthly") {
         data = budget.monthly;
-        labels = data.map((_, i) => `Month ${i + 1}`);
+        labels = data.map((_, i) => `Week ${i + 1}`);
       } else {
         data = budget.yearly;
         labels = getMonthlyLabels();

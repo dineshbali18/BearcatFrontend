@@ -45,6 +45,8 @@ interface Expense {
 const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
   console.log("MENU",expenseList)
 
+  const [allExpenses,setAllExpenses] = useState([])
+
   const [expenses, setExpenses] = useState([]);
   const [incomeList,setIncomeList] = useState([]);
   const [spendingList,setSpendingList] = useState([]);
@@ -77,6 +79,11 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
           const debits = data.categorizedExpenses.flatMap((category: any) =>
             category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
           );
+          const expenses = data.categorizedExpenses.flatMap((category: any) =>
+            category.expenses);
+
+          setAllExpenses(expenses)
+
           console.log("DEBITS:::::",debits)
           setSpendingList(debits);
           console.log("AAAAAQQQQQ:::SPENDING",spendingList)
@@ -233,8 +240,8 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
       {selectedComponent !== null && selectedScreen === "Saving Goal"?
       <View style={styles.verticalComponents}>
-        <SavingScreen/>
-        <UserSavingGoals incomeList={incomeList} />
+        <SavingScreen expenses={allExpenses}/>
+        <UserSavingGoals incomeList={incomeList}/>
         {/* <SpendingBlock spendingList={spendingList} /> */}
       </View>:<></>
       }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, Modal } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -10,12 +10,16 @@ import Constants from 'expo-constants';
 
 const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/user`; // Base URL for the API
 
-const SavingGoals = () => {
+const SavingGoals = ({expenses}) => {
+
+  console.log("EEEEQQQ",expenses)
+
   const [savings, setSavings] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [isSavingGoalExpenseVisibel, setIsSavingGoalExpenseVisible] = useState(false);
   const userState = useSelector((state) => state.user); // Assume user is a JSON string
   const userId = userState.user.id; // Dynamic User ID
+  const GoalID = useRef(0);
 
   useEffect(() => {
     const fetchSavingGoals = async () => {
@@ -81,9 +85,9 @@ const SavingGoals = () => {
         />
       </View>
       <Text style={styles.sectionHeader}>Current Goals</Text>
-      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
+      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
       <Text style={styles.sectionHeader}>Completed Goals</Text>
-      <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} />} keyExtractor={(item) => item.id} horizontal />
+      <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
       <Modal visible={isManageModalVisible} animationType="slide">
         <ManageSavingGoals savings={savings} setSavings={setSavings} onClose={() => setManageModalVisible(false)} />
       </Modal>
@@ -95,14 +99,14 @@ const SavingGoals = () => {
                 </TouchableOpacity>
                 <Text style={styles.modalHeader}>Expenses</Text>
                 <FlatList
-                  data={savings}
+                  data={expenses.filter(expense => expense.GoalID === GoalID.current)}
                   renderItem={({ item }) => (
                     <View style={styles.expenseItem}>
-                      <Text style={styles.expenseDescription}>{item.description}</Text>
-                      <Text style={styles.expenseAmount}>${item.amount}</Text>
+                      <Text style={styles.expenseDescription}>{item.Description}</Text>
+                      <Text style={styles.expenseAmount}>${item.Amount}</Text>
                     </View>
                   )}
-                  keyExtractor={(item) => item.id.toString()}
+                  keyExtractor={(item) => item.ExpenseID.toString()}
                 />
               </View>
             </View>
@@ -111,11 +115,12 @@ const SavingGoals = () => {
   );
 };
 
-const GoalItem = ({ item, setIsSavingGoalExpenseVisibel }) => (
-  <TouchableOpacity onPress={()=>{setIsSavingGoalExpenseVisibel(true)}}>
+const GoalItem = ({ item, expenses, GoalID, setIsSavingGoalExpenseVisibel }) => (
+  <View>
+  <TouchableOpacity onPress={() => { GoalID.current=Number(item.id); setIsSavingGoalExpenseVisibel(true); }}>
   <View style={styles.goalCard}>
     <View style={styles.goalHeader}>
-      <Text style={styles.savingName}>{item.name}</Text>
+      <Text style={styles.savingName}>{item.name}-{item.GoalID}</Text>
     </View>
     <View style={styles.progressBarWrapper}>
       <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />
@@ -126,6 +131,7 @@ const GoalItem = ({ item, setIsSavingGoalExpenseVisibel }) => (
     </View>
   </View>
   </TouchableOpacity>
+  </View>
 );
 
 const styles = StyleSheet.create({

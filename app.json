@@ -40,7 +40,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "REACT_APP_API":"http://10.38.100.59",
+      "REACT_APP_API":"http://10.31.126.64",
       "router": {
         "origin": false
       },

@@ -10,7 +10,7 @@ import Constants from 'expo-constants';
 
 const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/user`; // Base URL for the API
 
-const SavingGoals = ({expenses}) => {
+const SavingGoals = ({expenses,setExpenses}) => {
 
   console.log("EEEEQQQ",expenses)
 
@@ -22,35 +22,38 @@ const SavingGoals = ({expenses}) => {
   const GoalID = useRef(0);
 
   useEffect(() => {
-    const fetchSavingGoals = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/${userId}`, {
-          headers: { Authorization: `Bearer ${userState.token}` },
-        });
-
-        // Process the data from API response
-        const formattedData = response.data.map((goal) => ({
-          id: goal.GoalID.toString(),
-          name: goal.GoalName,
-          amount: goal.CurrentAmount,
-          totalAmount: goal.TargetAmount,
-          percentage: ((parseFloat(goal.CurrentAmount) / parseFloat(goal.TargetAmount)) * 100).toFixed(0),
-        }));
-
-        setSavings(formattedData);
-      } catch (error) {
-        console.error("Error fetching saving goals:", error);
-      }
-    };
-
     fetchSavingGoals();
-  }, [userId, userState.token]);
+  }, [isSavingGoalExpenseVisibel]);
 
-  const completedGoals = savings.filter((goal) => parseInt(goal.percentage) === 100);
+  const fetchSavingGoals = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/${userId}`, {
+        headers: { Authorization: `Bearer ${userState.token}` },
+      });
+
+      // Process the data from API response
+      const formattedData = response.data.map((goal) => ({
+        id: goal.GoalID.toString(),
+        name: goal.GoalName,
+        amount: goal.CurrentAmount,
+        totalAmount: goal.TargetAmount,
+        percentage: ((parseFloat(goal.CurrentAmount) / parseFloat(goal.TargetAmount)) * 100).toFixed(0),
+      }));
+
+      setSavings(formattedData);
+    } catch (error) {
+      console.error("Error fetching saving goals:", error);
+    }
+  };
+
+  useEffect(()=>{
+    setExpenses([...expenses])
+  },[])
+  const completedGoals = savings.filter((goal) => parseInt(goal.percentage) >= 100);
   const currentGoals = savings.filter((goal) => parseInt(goal.percentage) < 100);
 
   const totalSavings = savings.reduce((acc, goal) => acc + parseFloat(goal.amount), 0).toFixed(2);
-  const goalAmount = 10000; // You can dynamically change this value as needed
+  const goalAmount = savings.reduce((acc, goal) => acc + parseFloat(goal.totalAmount), 0).toFixed(2); // You can dynamically change this value as needed
   const percentage = ((parseFloat(totalSavings) / goalAmount) * 100).toFixed(0);
 
   const pieData = savings.map((goal) => [
@@ -89,12 +92,12 @@ const SavingGoals = ({expenses}) => {
       <Text style={styles.sectionHeader}>Completed Goals</Text>
       <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
       <Modal visible={isManageModalVisible} animationType="slide">
-        <ManageSavingGoals savings={savings} setSavings={setSavings} onClose={() => setManageModalVisible(false)} />
+        <ManageSavingGoals savings={savings} setSavings={setSavings} fetchSaving={fetchSavingGoals} onClose={() => setManageModalVisible(false)} />
       </Modal>
       <Modal visible={isSavingGoalExpenseVisibel} animationType="slide" transparent>
             <View style={styles.modalBackground}>
               <View style={styles.expensesModal}>
-                <TouchableOpacity style={styles.closeButton} onPress={() => setIsSavingGoalExpenseVisible(false)}>
+                <TouchableOpacity style={styles.closeButton} onPress={() => {setIsSavingGoalExpenseVisible(false)}}>
                   <Feather name="x" size={24} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.modalHeader}>Expenses</Text>
@@ -120,7 +123,7 @@ const GoalItem = ({ item, expenses, GoalID, setIsSavingGoalExpenseVisibel }) => 
   <TouchableOpacity onPress={() => { GoalID.current=Number(item.id); setIsSavingGoalExpenseVisibel(true); }}>
   <View style={styles.goalCard}>
     <View style={styles.goalHeader}>
-      <Text style={styles.savingName}>{item.name}-{item.GoalID}</Text>
+      <Text style={styles.savingName}>{item.name}</Text>
     </View>
     <View style={styles.progressBarWrapper}>
       <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />

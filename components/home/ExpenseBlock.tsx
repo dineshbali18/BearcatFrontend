@@ -240,7 +240,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
       {selectedComponent !== null && selectedScreen === "Saving Goal"?
       <View style={styles.verticalComponents}>
-        <SavingScreen expenses={allExpenses}/>
+        <SavingScreen expenses={allExpenses} setExpenses={setAllExpenses}/>
         <UserSavingGoals incomeList={incomeList}/>
         {/* <SpendingBlock spendingList={spendingList} /> */}
       </View>:<></>

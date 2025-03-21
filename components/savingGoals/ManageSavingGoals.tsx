@@ -11,47 +11,115 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
+import { useSelector } from "react-redux";
 
-const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
+const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) => {
+
+  console.log("SSSAAAAAA",savings)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ name: "", amount: "", totalAmount: "" });
+    const userState = useSelector((state) => state.user);
+    const userId = userState?.user?.id;
+    const token = userState?.token;
 
-  const addGoal = () => {
-    if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-    const newEntry = {
-      id: Math.random().toString(),
-      name: newGoal.name,
-      amount: newGoal.amount,
-      totalAmount: newGoal.totalAmount,
-      percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
+
+    const addGoal = async () => {
+      if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
+    
+      const newEntry = {
+        id: Number(Math.random()*10),
+        name: newGoal.name,
+        amount: newGoal.amount,
+        totalAmount: newGoal.totalAmount,
+        percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
+      };
+    
+      try {
+        const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            UserID: userId, 
+            GoalName: newGoal.name,
+            TargetAmount: parseFloat(newGoal.totalAmount),
+            currentAmount: parseFloat(newGoal.amount),
+            Deadline: "2024-12-31", 
+          }),
+        });
+
+        console.log("RESS::::",response)
+    
+        if (!response.ok) {
+          throw new Error("Failed to add savings goal");
+        }
+    
+        await fetchSaving();
+    
+        // setSavings(result);
+        setNewGoal({ name: "", amount: "", totalAmount: "" });
+        setSelectedGoal(null);
+      } catch (error) {
+        console.error("Error adding savings goal:", error);
+      }
     };
-    setSavings([...savings, newEntry]);
-    setNewGoal({ name: "", amount: "", totalAmount: "" });
-    setSelectedGoal(null);
+
+    const updateGoal = async () => {
+      if (!selectedGoal || !newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
+      console.log("SSSSSEEEE",selectedGoal)
+      try {
+        const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            GoalName: newGoal.name,
+            TargetAmount: parseFloat(newGoal.totalAmount),
+            currentAmount: parseFloat(newGoal.amount),
+          }),
+        });
+
+        console.log("qqqqqq",response)
+  
+        if (!response.ok) throw new Error("Failed to update savings goal");
+  
+        setSavings(savings.map(goal => goal.id === selectedGoal ? {
+          ...goal,
+          name: newGoal.name,
+          amount: newGoal.amount,
+          totalAmount: newGoal.totalAmount,
+          percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
+        } : goal));
+        
+        setNewGoal({ name: "", amount: "", totalAmount: "" });
+        setSelectedGoal(null);
+      } catch (error) {
+        console.error("Error updating savings goal:", error);
+      }
+    };
+
+  const deleteGoal = async (id) => {
+    try {
+      console.log("ISDDDDDD",id)
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) throw new Error("Failed to delete savings goal");
+      
+      setSavings(savings.filter(goal => goal.id !== id));
+    } catch (error) {
+      console.error("Error deleting savings goal:", error);
+    }
   };
 
-  const updateGoal = () => {
-    if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-
-    const updatedSavings = savings.map((goal) =>
-      goal.id === selectedGoal
-        ? {
-            ...goal,
-            name: newGoal.name,
-            amount: newGoal.amount,
-            totalAmount: newGoal.totalAmount,
-            percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
-          }
-        : goal
-    );
-    setSavings(updatedSavings);
-    setNewGoal({ name: "", amount: "", totalAmount: "" });
-    setSelectedGoal(null);
-  };
-
-  const deleteGoal = (id: string) => {
-    setSavings(savings.filter((goal) => goal.id !== id));
-  };
 
   React.useEffect(() => {
     if (selectedGoal && selectedGoal !== "new") {
@@ -131,7 +199,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose }: any) => {
 
         <FlatList
           data={savings}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.GoalID}
           renderItem={({ item }) => (
             <View style={styles.goalCard}>
               <Text style={styles.goalText}>

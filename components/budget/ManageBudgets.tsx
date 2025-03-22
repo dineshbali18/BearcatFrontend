@@ -8,49 +8,124 @@ import React, { useState } from "react";
    View,
    ScrollView,
  } from "react-native";
+ import { useSelector } from "react-redux";
  import { Feather } from "@expo/vector-icons";
  import { Picker } from "@react-native-picker/picker";
+ import Constants from 'expo-constants';
+
  
- const ManageBudgets = ({ savings, setSavings, onClose }: any) => {
+ const ManageBudgets = ({ savings, setSavings, onClose, fetchBudgets }: any) => {
+
+  console.log("SSSS",savings)
+
    const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
    const [newGoal, setNewGoal] = useState({ name: "", amount: "", totalAmount: "" });
+   const userState = useSelector((state) => state.user); // Assume user is a JSON string
+   const userId = userState.user.id;
+   const token = userState?.token;
+
+
+   const addGoal = async () => {
+    if (!newGoal.name || !newGoal.amount) return;
+  
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userState.token}`,
+        },
+        body: JSON.stringify({
+          BudgetName: newGoal.name,
+          UserID: userId, // Use the current user's ID
+          Amount: newGoal.totalAmount,
+          AmountSpent: newGoal.amount,
+          StartDate: new Date().toISOString().split("T")[0], // Current date
+          EndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0], // One month from now
+        }),
+      });
+
+      console.log("RRRRRR",response)
+  
+      if (!response.ok) {
+        throw new Error("Failed to add budget");
+      }
+  
+      await fetchBudgets();
+  
+      // Reset the form
+      setNewGoal({ name: "", amount: "", totalAmount: "" });
+      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error adding budget:", error);
+    }
+  };
  
-   const addGoal = () => {
-     if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-     const newEntry = {
-       id: Math.random().toString(),
-       name: newGoal.name,
-       amount: newGoal.amount,
-       totalAmount: newGoal.totalAmount,
-       percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
-     };
-     setSavings([...savings, newEntry]);
-     setNewGoal({ name: "", amount: "", totalAmount: "" });
-     setSelectedGoal(null);
-   };
- 
-   const updateGoal = () => {
-     if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
- 
-     const updatedSavings = savings.map((goal) =>
-       goal.id === selectedGoal
-         ? {
-             ...goal,
-             name: newGoal.name,
-             amount: newGoal.amount,
-             totalAmount: newGoal.totalAmount,
-             percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
-           }
-         : goal
-     );
-     setSavings(updatedSavings);
-     setNewGoal({ name: "", amount: "", totalAmount: "" });
-     setSelectedGoal(null);
-   };
- 
-   const deleteGoal = (id: string) => {
-     setSavings(savings.filter((goal) => goal.id !== id));
-   };
+  const updateGoal = async () => {
+    if (!newGoal.name || !newGoal.amount || !selectedGoal) return;
+  
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets/${selectedGoal}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userState.token}`,
+        },
+        body: JSON.stringify({
+          BudgetName: newGoal.name,
+          Amount: newGoal.totalAmount,
+          AmountSpent: newGoal.amount,
+          StartDate: new Date().toISOString().split("T")[0], // Current date
+          EndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0], // One month from now
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update budget");
+      }
+  
+      // Update local state with the updated budget
+      const updatedSavings = savings.map((goal) =>
+        goal.id === selectedGoal
+          ? {
+              ...goal,
+              name: newGoal.name,
+              amount: newGoal.amount,
+              totalAmount: newGoal.totalAmount,
+              percentage: (parseFloat(newGoal.totalAmount)/parseFloat(newGoal.amount))*100,
+            }
+          : goal
+      );
+  
+      setSavings(updatedSavings);
+  
+      // Reset the form
+      setNewGoal({ name: "", amount: "", totalAmount: "" });
+      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error updating budget:", error);
+    }
+  };
+
+  const deleteGoal = async (id) => {
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${userState.token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete budget");
+      }
+  
+      // Update local state by removing the deleted budget
+      setSavings(savings.filter((goal) => goal.id !== id));
+    } catch (error) {
+      console.error("Error deleting budget:", error);
+    }
+  };
  
    React.useEffect(() => {
      if (selectedGoal && selectedGoal !== "new") {
@@ -59,7 +134,7 @@ import React, { useState } from "react";
          setNewGoal({
            name: goal.name,
            amount: goal.amount,
-           totalAmount: goal.totalAmount,
+           totalAmount: goal.amountSpent,
          });
        }
      } else {
@@ -100,19 +175,19 @@ import React, { useState } from "react";
              />
              <TextInput
                style={styles.input}
-               placeholder="💵 Current Saved Amount"
-               placeholderTextColor="gray"
-               keyboardType="numeric"
-               value={newGoal.amount}
-               onChangeText={(text) => setNewGoal({ ...newGoal, amount: text })}
-             />
-             <TextInput
-               style={styles.input}
-               placeholder="🎯 Total Savings Goal"
+               placeholder="💵 Current Budget Amount"
                placeholderTextColor="gray"
                keyboardType="numeric"
                value={newGoal.totalAmount}
                onChangeText={(text) => setNewGoal({ ...newGoal, totalAmount: text })}
+             />
+             <TextInput
+               style={styles.input}
+               placeholder="🎯 Total Budget"
+               placeholderTextColor="gray"
+               keyboardType="numeric"
+               value={newGoal.amount}
+               onChangeText={(text) => setNewGoal({ ...newGoal, amount: text })}
              />
  
              <TouchableOpacity
@@ -134,7 +209,7 @@ import React, { useState } from "react";
            renderItem={({ item }) => (
              <View style={styles.goalCard}>
                <Text style={styles.goalText}>
-                 🎯 {item.name}: ${item.amount} / ${item.totalAmount} ({item.percentage}%)
+                 🎯 {item.name}: ${item.amountSpent} / ${item.amount} ({item.percentage}%)
                </Text>
                <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton}>
                  <Feather name="trash" size={20} color="red" />

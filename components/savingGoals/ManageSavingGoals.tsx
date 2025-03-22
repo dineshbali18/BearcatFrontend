@@ -25,6 +25,8 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
 
     const addGoal = async () => {
       if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
+
+      console.log("AMAMAM",newGoal.amount)
     
       const newEntry = {
         id: Number(Math.random()*10),
@@ -45,7 +47,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
             UserID: userId, 
             GoalName: newGoal.name,
             TargetAmount: parseFloat(newGoal.totalAmount),
-            currentAmount: parseFloat(newGoal.amount),
+            CurrentAmount: newGoal.amount,
             Deadline: "2024-12-31", 
           }),
         });

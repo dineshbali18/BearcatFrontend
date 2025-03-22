@@ -29,39 +29,41 @@ const BudgetCard = () => {
 
   // Fetch data from API
   useEffect(() => {
-    const fetchBudgets = async () => {
-      try {
-        const response = await fetch(
-          `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user/${userId}/budgets`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${userState?.token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
 
-        // Calculate percentage for each budget
-        const formattedData = data.map((item) => ({
-          id: item.BudgetID,
-          name: item.BudgetName,
-          amount: parseFloat(item.Amount).toFixed(2),
-          amountSpent: parseFloat(item.AmountSpent).toFixed(2),
-          percentage: ((parseFloat(item.AmountSpent) / parseFloat(item.Amount)) * 100).toFixed(0),
-        }));
-
-        setSavings(formattedData);
-      } catch (error) {
-        console.error("Error fetching budgets:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     fetchBudgets();
   }, []);
+
+  const fetchBudgets = async () => {
+    try {
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user/${userId}/budgets`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${userState?.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      // Calculate percentage for each budget
+      const formattedData = data.map((item) => ({
+        id: item.BudgetID,
+        name: item.BudgetName,
+        amount: parseFloat(item.Amount).toFixed(2),
+        amountSpent: parseFloat(item.AmountSpent).toFixed(2),
+        percentage: ((parseFloat(item.AmountSpent) / parseFloat(item.Amount)) * 100).toFixed(0),
+      }));
+
+      setSavings(formattedData);
+    } catch (error) {
+      console.error("Error fetching budgets:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchExpenses = async (budgetId) => {
     // try {
@@ -137,7 +139,7 @@ const BudgetCard = () => {
       <Text style={styles.headingname}>Completed Budgets</Text>
       <FlatList data={completedGoals} renderItem={renderGoalItem} keyExtractor={(item) => item.id.toString()} horizontal showsHorizontalScrollIndicator={false} />
       <Modal transparent={true} animationType="slide" visible={isManageModalVisible}>
-        <ManageBudgets savings={savings} setSavings={setSavings} onClose={()=>{setManageModalVisible(false)}} />
+        <ManageBudgets savings={savings} setSavings={setSavings} onClose={()=>{setManageModalVisible(false)}} fetchBudgets={fetchBudgets}/>
       </Modal>
       <Modal visible={isExpensesModalVisible} animationType="slide" transparent>
       <View style={styles.modalBackground}>

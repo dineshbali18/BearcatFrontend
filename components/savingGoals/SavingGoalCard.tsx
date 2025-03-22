@@ -49,17 +49,31 @@ const SavingGoals = ({expenses,setExpenses}) => {
   useEffect(()=>{
     setExpenses([...expenses])
   },[])
-  const completedGoals = savings.filter((goal) => parseInt(goal.percentage) >= 100);
-  const currentGoals = savings.filter((goal) => parseInt(goal.percentage) < 100);
 
-  const totalSavings = savings.reduce((acc, goal) => acc + parseFloat(goal.amount), 0).toFixed(2);
-  const goalAmount = savings.reduce((acc, goal) => acc + parseFloat(goal.totalAmount), 0).toFixed(2); // You can dynamically change this value as needed
-  const percentage = ((parseFloat(totalSavings) / goalAmount) * 100).toFixed(0);
+// Ensure savings is always an array, even if it's null or undefined
+const savingsArray = savings || [];
 
-  const pieData = savings.map((goal) => [
-    { value: parseFloat(goal.percentage), color: Colors.blue }, // Display the percentage in blue
-    { value: 100 - parseFloat(goal.percentage), color: Colors.white }, // Remaining percentage in white
-  ]).flat();
+// Filter completed and current goals
+const completedGoals = savingsArray.filter((goal) => parseInt(goal.percentage) >= 100);
+const currentGoals = savingsArray.filter((goal) => parseInt(goal.percentage) < 100);
+
+// Calculate totalSavings and goalAmount safely
+const totalSavings = savingsArray.reduce((acc, goal) => acc + (parseFloat(goal.amount) || 0), 0).toFixed(2);
+const goalAmount = savingsArray.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0).toFixed(2);
+
+// Calculate percentage safely (avoid division by zero)
+const percentage = goalAmount > 0 
+  ? ((parseFloat(totalSavings) / parseFloat(goalAmount)) * 100).toFixed(0) 
+  : "0";
+
+// Generate pieData safely
+const pieData = savingsArray.map((goal) => {
+  const goalPercentage = parseFloat(goal.percentage) || 0;
+  return [
+    { value: goalPercentage, color: Colors.blue }, // Display the percentage in blue
+    { value: 100 - goalPercentage, color: Colors.white }, // Remaining percentage in white
+  ];
+}).flat();
 
   return (
     <View style={styles.container}>

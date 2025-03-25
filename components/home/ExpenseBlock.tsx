@@ -61,75 +61,77 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
   useEffect(() => {
     console.log("FETCH EXPENSES.....")
-    const fetchExpenses = async () => {
-      try {
-        const response = await fetch(
-          `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${userState?.token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        if (data?.categorizedExpenses) {
-          const debits = data.categorizedExpenses.flatMap((category: any) =>
-            category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
-          );
-          const expenses = data.categorizedExpenses.flatMap((category: any) =>
-            category.expenses);
-
-          setAllExpenses(expenses)
-
-          console.log("DEBITS:::::",debits)
-          setSpendingList(debits);
-          console.log("AAAAAQQQQQ:::SPENDING",spendingList)
-        }
-
-        if (data?.categorizedExpenses) {
-          const credits = data.categorizedExpenses.flatMap((category: any) =>
-            category.expenses.filter((expense: Expense) => expense.TransactionType === "Credit")
-          );
-          console.log("credits:::::",credits)
-          setIncomeList(credits);
-          console.log("AAAAAQQQQQ:::INCOME",incomeList)
-        }
-
-        if (data.categorizedExpenses) {
-          let total = 0;
-          const colors = [
-            "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
-            "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA",
-            "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
-          ];
-
-          const formattedExpenses = data.categorizedExpenses.map((category, index) => {
-            const categoryTotal = parseFloat(category.debitTotal);
-            total += categoryTotal;
-            return {
-              id: category.categoryName,
-              name: category.categoryName,
-              amount: category.debitTotal,
-              color: colors[index % colors.length],
-            };
-          });
-
-          console.log("FORMAATTED",formattedExpenses)
-
-          setExpenses(formattedExpenses);
-          setTotalExpenseAmt(total.toFixed(2));
-          // setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
-        }
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
 
     fetchExpenses();
   }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${userState?.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (data?.categorizedExpenses) {
+        const debits = data.categorizedExpenses.flatMap((category: any) =>
+          category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
+        );
+        const expenses = data.categorizedExpenses.flatMap((category: any) =>
+          category.expenses);
+
+        setAllExpenses(expenses)
+
+        console.log("DEBITS:::::",debits)
+        setSpendingList(debits);
+        console.log("AAAAAQQQQQ:::SPENDING",spendingList)
+      }
+
+      if (data?.categorizedExpenses) {
+        const credits = data.categorizedExpenses.flatMap((category: any) =>
+          category.expenses.filter((expense: Expense) => expense.TransactionType === "Credit")
+        );
+        console.log("credits:::::",credits)
+        setIncomeList(credits);
+        console.log("AAAAAQQQQQ:::INCOME",incomeList)
+      }
+
+      if (data.categorizedExpenses) {
+        let total = 0;
+        const colors = [
+          "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
+          "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA",
+          "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
+        ];
+
+        const formattedExpenses = data.categorizedExpenses.map((category, index) => {
+          const categoryTotal = parseFloat(category.debitTotal);
+          total += categoryTotal;
+          return {
+            id: category.categoryName,
+            name: category.categoryName,
+            amount: category.debitTotal,
+            color: colors[index % colors.length],
+          };
+        });
+
+        console.log("FORMAATTED",formattedExpenses)
+
+        setExpenses(formattedExpenses);
+        setTotalExpenseAmt(total.toFixed(2));
+        // setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
+      }
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
+  };
+
 
   useEffect(()=>{
     console.log("CHANGES IN SPENDING BLOCK.........")
@@ -233,14 +235,14 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
       {selectedComponent !== null && selectedScreen === "Budgets"?
       <View style={styles.verticalComponents}>
-        <BudgetScreen/>
+        <BudgetScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
         <UserBudgets incomeList={incomeList} />
       </View>:<></>
       }
 
       {selectedComponent !== null && selectedScreen === "Saving Goal"?
       <View style={styles.verticalComponents}>
-        <SavingScreen expenses={allExpenses} setExpenses={setAllExpenses}/>
+        <SavingScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
         <UserSavingGoals incomeList={incomeList}/>
         {/* <SpendingBlock spendingList={spendingList} /> */}
       </View>:<></>

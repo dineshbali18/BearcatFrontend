@@ -82,7 +82,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
           {expenses.map((expense) => (
             <Picker.Item key={expense.id} label={expense.CategoryName.concat(" - "+expense.Description)} value={expense.ExpenseID} color="black" />
           ))}
-          <Picker.Item label="➕ Add New Expense" value="new" color="red" />
+          {/* <Picker.Item label="➕ Add New Expense" value="new" color="red" /> */}
         </Picker>
 
         {(selectedExpense === "new" || selectedExpense) && (

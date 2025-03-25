@@ -10,7 +10,7 @@ import Constants from 'expo-constants';
 
 const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/user`; // Base URL for the API
 
-const SavingGoals = ({expenses,setExpenses}) => {
+const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
 
   console.log("EEEEQQQ",expenses)
 
@@ -23,6 +23,7 @@ const SavingGoals = ({expenses,setExpenses}) => {
 
   useEffect(() => {
     fetchSavingGoals();
+    fetchExpenses();
   }, [isSavingGoalExpenseVisibel]);
 
   const fetchSavingGoals = async () => {
@@ -46,19 +47,18 @@ const SavingGoals = ({expenses,setExpenses}) => {
     }
   };
 
-  useEffect(()=>{
-    setExpenses([...expenses])
-  },[])
-
 // Ensure savings is always an array, even if it's null or undefined
 const savingsArray = savings || [];
 
+console.log("SSSS",savings)
 // Filter completed and current goals
 const completedGoals = savingsArray.filter((goal) => parseInt(goal.percentage) >= 100);
 const currentGoals = savingsArray.filter((goal) => parseInt(goal.percentage) < 100);
 
+console.log("ZZZZZZZ",savingsArray)
 // Calculate totalSavings and goalAmount safely
-const totalSavings = savingsArray.reduce((acc, goal) => acc + (parseFloat(goal.amount) || 0), 0).toFixed(2);
+const totalSavings = savings.reduce((acc, goal) => acc + parseFloat(goal.amount), 0).toFixed(2);
+console.log("TTTTTT",totalSavings)
 const goalAmount = savingsArray.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0).toFixed(2);
 
 // Calculate percentage safely (avoid division by zero)

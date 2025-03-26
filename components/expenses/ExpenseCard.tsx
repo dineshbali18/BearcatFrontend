@@ -33,7 +33,7 @@ interface Expense {
 }
 
 
-const ExpensesSection = ({ expen, spendingList, setSpendingList, total, incomeList, setIncomeList}) => {
+const ExpensesSection = ({ expen, spendingList, setSpendingList, total, incomeList, setIncomeList, fetchExpenses}) => {
   // const [spendingList, setSpendingList] = useState<Expense[]>([]);
   const [expenses, setExpenses] = useState(expen);
   const [totalExpense, setTotalExpense] = useState("0.00");
@@ -104,7 +104,7 @@ useEffect(()=>{
         showsHorizontalScrollIndicator={false}
       />
       <Modal visible={isManageModalVisible} animationType="slide" transparent>
-        <ManageExpenses cred={incomeList} setCred={setIncomeList} expenses={spendingList} setExpenses={setSpendingList} onClose={() => setManageModalVisible(false)} />
+        <ManageExpenses cred={incomeList} setCred={setIncomeList} expenses={spendingList} setExpenses={setSpendingList} onClose={() => setManageModalVisible(false)} fetchExpenses={fetchExpenses} />
       </Modal>
       <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </View>

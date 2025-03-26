@@ -11,45 +11,82 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
+import { useSelector } from "react-redux";
 
-const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
+const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchExpenses }) => {
   const [selectedExpense, setSelectedExpense] = useState<string | null>(null);
   const [newExpense, setNewExpense] = useState({ name: "", amount: "" });
+  const userState = useSelector((state) => state.user)
+  const token = userState?.token;
+
+  const updateExpense = async () => {
+    if (!newExpense.name || !newExpense.amount || !selectedExpense) return;
   
-  const addExpense = () => {
-    if (!newExpense.name || !newExpense.amount) return;
-    const newEntry = {
-      id: Math.random().toString(),
-      name: newExpense.name,
-      amount: newExpense.amount,
-    };
-    setExpenses([...expenses, newEntry]);
-    setNewExpense({ name: "", amount: "" });
-    setSelectedExpense(null);
+    try {
+      console.log("Updating Expense ID:", selectedExpense);
+  
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/${selectedExpense}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Ensure authToken is defined
+          },
+          body: JSON.stringify({
+            Description: newExpense.name,
+            Amount: newExpense.amount,
+          }),
+        }
+      );
+
+      console.log("EEEEEEE",response)
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+  
+      await fetchExpenses();
+  
+      // Reset input fields
+      setNewExpense({ name: "", amount: "" });
+      setSelectedExpense(null);
+  
+      console.log("Expense updated successfully");
+    } catch (error) {
+      console.error("Failed to update expense:", error);
+    }
+  };
+  
+
+  const deleteExpense = async (id: string) => {
+    try {
+      console.log("Deleting Expense ID:", id);
+  
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Ensure authToken is defined
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+  
+      await fetchExpenses();
+
+      console.log("Expense deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+    }
   };
 
-  const updateExpense = () => {
-    if (!newExpense.name || !newExpense.amount) return;
-
-    const updatedExpenses = expenses.map((expense) =>
-      expense.id === selectedExpense
-        ? { ...expense, name: newExpense.name, amount: newExpense.amount }
-        : expense
-    );
-    setExpenses(updatedExpenses);
-    setNewExpense({ name: "", amount: "" });
-    setSelectedExpense(null);
-  };
-
-  const deleteExpense = (id: string) => {
-    console.log("IDDD",id)
-    const deletedExpenses=expenses.filter((expense) => expense.ExpenseID !== Number(id));
-    setExpenses(deletedExpenses);
-  };
-
-  useEffect(()=>{
-    console.log("QQQQQ111111111111",cred)
-  })
+  let allExpenses = [...expenses,...cred]
 
   React.useEffect(() => {
     if (selectedExpense && selectedExpense !== "new") {
@@ -79,7 +116,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose }) => {
           onValueChange={(itemValue) => setSelectedExpense(itemValue)}
         >
           <Picker.Item label="🔽 Select an existing expense" value={null} color="black" />
-          {expenses.map((expense) => (
+          {allExpenses.map((expense) => (
             <Picker.Item key={expense.id} label={expense.CategoryName.concat(" - "+expense.Description)} value={expense.ExpenseID} color="black" />
           ))}
           {/* <Picker.Item label="➕ Add New Expense" value="new" color="red" /> */}

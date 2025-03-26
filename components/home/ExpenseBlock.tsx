@@ -227,7 +227,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
       {/* Vertical stacking of IncomeBlock and SpendingBlock */}
       {selectedComponent !== null && selectedScreen === "Expenses"?
       <View style={styles.verticalComponents}>
-        <ExpenseScreen expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList}/>
+        <ExpenseScreen expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList} fetchExpenses={fetchExpenses}/>
         <IncomeBlock incomeList={incomeList} />
         <SpendingBlock spendingList={spendingList} />
       </View>:<></>

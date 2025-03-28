@@ -1,29 +1,24 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import React from "react";
-import { Href, Router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { StatusBar } from "expo-status-bar";
-import { scale, verticalScale } from "@/utils/styling";
+import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import Typo from "@/components/Typo";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import Button from "@/components/Button";
-import { useAuth } from "@/contexts/authContext";
-import Loading from "@/components/Loading";
 
 const WelcomePage = () => {
   const router = useRouter();
+  
   return (
     <ScreenWrapper>
       <StatusBar style="light" />
       <View style={styles.container}>
-        {/* login & image */}
+        {/* Login & Image */}
         <View>
-          <TouchableOpacity
-            onPress={() => router.push("/(auth)/login")}
-            style={styles.loginButton}
-          >
-            <Typo fontWeight={"500"}>Sign in</Typo>
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")} style={styles.loginButton}>
+            <Text style={[styles.signInText, { fontWeight: "500" }]}>Sign in</Text>
           </TouchableOpacity>
 
           <Animated.Image
@@ -34,44 +29,40 @@ const WelcomePage = () => {
           />
         </View>
 
+        {/* Footer */}
         <View style={styles.footer}>
           <Animated.View
             entering={FadeInDown.duration(1000).springify().damping(12)}
             style={{ alignItems: "center" }}
           >
-            <Typo size={30} fontWeight={"800"}>
+            <Text style={[styles.footerText, { fontSize: 30, fontWeight: "800" }]}>
               Always take control
-            </Typo>
-            <Typo size={30} fontWeight={"800"}>
+            </Text>
+            <Text style={[styles.footerText, { fontSize: 30, fontWeight: "800" }]}>
               of your finances
-            </Typo>
-          </Animated.View>
-          <Animated.View
-            entering={FadeInDown.duration(1000)
-              .delay(100)
-              .springify()
-              .damping(12)}
-            style={{ alignItems: "center", gap: 2 }}
-          >
-            <Typo size={17} color={colors.textLighter}>
-              Finances must be arranged to set a better
-            </Typo>
-            <Typo size={17} color={colors.textLighter}>
-              lifestyle in future
-            </Typo>
+            </Text>
           </Animated.View>
 
           <Animated.View
-            entering={FadeInDown.duration(1000)
-              .delay(200)
-              .springify()
-              .damping(12)}
+            entering={FadeInDown.duration(1000).delay(100).springify().damping(12)}
+            style={{ alignItems: "center", gap: 2 }}
+          >
+            <Text style={[styles.footerText, { fontSize: 17, color: colors.textLighter }]}>
+              Finances must be arranged to set a better
+            </Text>
+            <Text style={[styles.footerText, { fontSize: 17, color: colors.textLighter }]}>
+              lifestyle in future
+            </Text>
+          </Animated.View>
+
+          <Animated.View
+            entering={FadeInDown.duration(1000).delay(200).springify().damping(12)}
             style={styles.buttonContainer}
           >
             <Button onPress={() => router.push("/(auth)/register")}>
-              <Typo size={22} color={colors.neutral900} fontWeight={"600"}>
+              <Text style={[styles.buttonText, { fontSize: 22, fontWeight: "600" }]}>
                 Get Started
-              </Typo>
+              </Text>
             </Button>
           </Animated.View>
         </View>
@@ -90,12 +81,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: verticalScale(300),
     alignSelf: "center",
-
     marginTop: verticalScale(100),
   },
   loginButton: {
     alignSelf: "flex-end",
     marginRight: spacingX._20,
+  },
+  signInText: {
+    color: colors.text,
   },
   footer: {
     backgroundColor: colors.neutral900,
@@ -109,9 +102,16 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
     shadowOpacity: 0.15,
   },
+  footerText: {
+    color: colors.text,
+    textAlign: "center",
+  },
   buttonContainer: {
     width: "100%",
     paddingHorizontal: spacingX._25,
+  },
+  buttonText: {
+    color: colors.neutral900,
   },
 });
 

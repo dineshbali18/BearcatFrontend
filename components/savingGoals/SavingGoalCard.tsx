@@ -57,24 +57,39 @@ const currentGoals = savingsArray.filter((goal) => parseInt(goal.percentage) < 1
 
 console.log("ZZZZZZZ",savingsArray)
 // Calculate totalSavings and goalAmount safely
-const totalSavings = savings.reduce((acc, goal) => acc + parseFloat(goal.amount), 0).toFixed(2);
-console.log("TTTTTT",totalSavings)
-const goalAmount = savingsArray.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0).toFixed(2);
+const totalSavings = savings.length > 0 
+  ? savings.reduce((acc, goal) => acc + (parseFloat(goal.amount) || 0), 0) 
+  : 0;
+
+const goalAmount = savings.length > 0 
+  ? savings.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0) 
+  : 0;
 
 // Calculate percentage safely (avoid division by zero)
-const percentage = goalAmount > 0 
+const percentage = goalAmount > 0 && totalSavings > 0 && goalAmount > 0 
   ? ((parseFloat(totalSavings) / parseFloat(goalAmount)) * 100).toFixed(0) 
-  : "0";
+  : 0;
 
 // Generate pieData safely
-const pieData = savingsArray.map((goal) => {
-  const goalPercentage = parseFloat(goal.percentage) || 0;
-  return [
-    { value: goalPercentage, color: Colors.blue }, // Display the percentage in blue
-    { value: 100 - goalPercentage, color: Colors.white }, // Remaining percentage in white
-  ];
-}).flat();
+// Generate pieData safely
+const pieData = savingsArray.length > 0
+  ? savingsArray.map((goal) => {
+      const goalPercentage = parseFloat(goal.percentage) || 0;
+      return [
+        { value: goalPercentage, color: Colors.blue }, // Display the percentage in blue
+        { value: 100 - goalPercentage, color: Colors.white }, // Remaining percentage in white
+      ];
+    }).flat()
+  : [
+      { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
+      { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
+    ];
 
+
+console.log("TTTTSSSS",totalSavings)
+console.log("GoalAmt",goalAmount)
+console.log("perrrr",percentage)
+console.log("pieData",pieData)
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -83,7 +98,7 @@ const pieData = savingsArray.map((goal) => {
           <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.expenseAmountText}>${totalSavings} / ${goalAmount}</Text>
+      <Text style={styles.expenseAmountText}>${totalSavings} / ${goalAmount} </Text>
       <View style={styles.pieChartContainer}>
         <PieChart
           data={pieData}

@@ -47,7 +47,10 @@ useEffect(()=>{
   console.log("IN EXPENSE....",expen)
   console.log("IN SPENDING LIST",spendingList)
   setTotalExpense(total);
-  setPieData(expen.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
+  setPieData(expen.length > 0 ? expen.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })):[
+        { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
+        { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
+      ]);
 },[expen])
 
 useEffect(()=>{

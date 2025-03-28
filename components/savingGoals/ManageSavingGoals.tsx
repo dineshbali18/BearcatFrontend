@@ -89,13 +89,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
   
         if (!response.ok) throw new Error("Failed to update savings goal");
   
-        setSavings(savings.map(goal => goal.id === selectedGoal ? {
-          ...goal,
-          name: newGoal.name,
-          amount: newGoal.amount,
-          totalAmount: newGoal.totalAmount,
-          percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
-        } : goal));
+        await fetchSaving();
         
         setNewGoal({ name: "", amount: "", totalAmount: "" });
         setSelectedGoal(null);
@@ -116,7 +110,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
       
       if (!response.ok) throw new Error("Failed to delete savings goal");
       
-      setSavings(savings.filter(goal => goal.id !== id));
+      await fetchSaving();
     } catch (error) {
       console.error("Error deleting savings goal:", error);
     }

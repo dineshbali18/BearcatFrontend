@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextStyle, View } from "react-native";
+import { Text, TextStyle } from "react-native";
 import React from "react";
 import { verticalScale } from "@/utils/styling";
 import { colors } from "@/constants/theme";
@@ -17,9 +17,16 @@ const Typo = ({
     color,
     fontWeight,
   };
+
+  if (children == null) {
+    return null; // Prevents rendering `undefined` or `null`
+  }
+
   return (
     <Text style={[textStyle, style]} {...textProps}>
-      {children}
+      {typeof children === "string" || typeof children === "number"
+        ? children.toString()
+        : children}
     </Text>
   );
 };

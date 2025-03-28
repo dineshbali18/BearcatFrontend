@@ -109,8 +109,11 @@ useEffect(()=>{
       <Modal visible={isManageModalVisible} animationType="slide" transparent>
         <ManageExpenses cred={incomeList} setCred={setIncomeList} expenses={spendingList} setExpenses={setSpendingList} onClose={() => setManageModalVisible(false)} fetchExpenses={fetchExpenses} />
       </Modal>
-      <AddExpenseModal visible={modalVisible} onClose={() => setModalVisible(false)} />
-    </View>
+      <AddExpenseModal visible={modalVisible} onClose={async () => { 
+            setModalVisible(false);
+            await fetchExpenses(); 
+        }} />    
+        </View>
   );
 };
 

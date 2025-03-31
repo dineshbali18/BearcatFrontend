@@ -23,12 +23,26 @@ import { getProfileImage } from "@/services/imageService";
 import { updateUser } from "@/services/userService";
 import { useRouter } from "expo-router";
 import BackButton from "@/components/BackButton";
+import { useSelector,useDispatch } from "react-redux";
+import Constants from 'expo-constants';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setUser } from "@/store/userSlice"; 
 
 const ProfileModal = () => {
+
+  const dispatch = useDispatch()
+  const userCurrentData = useSelector((state)=>state.user)
+
+  console.log("QQQQQQ",userCurrentData)
+
   let [userData, setUserData] = useState<UserDataType>({
-    name: "",
+    id: userCurrentData?.user?.id,
+    name: userCurrentData?.user?.name,
+    email: userCurrentData?.user?.email,
+    phoneNumber: userCurrentData?.user?.phoneNumber,
     image: null,
   });
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -38,22 +52,71 @@ const ProfileModal = () => {
   };
 
   const onSubmit = async () => {
-    let { name, image } = userData;
-    if (!name.trim() || !image) {
-      Alert.alert("User", "Please fill all the fields!");
+    const { name, email, phoneNumber } = userData;
+
+    console.log("NAMMMAaaaaaa",name)
+  
+    // Basic validatio
+    if (!name?.trim()) {
+      Alert.alert("Error", "Please enter your name");
       return;
     }
-
+  
+    if (!email?.trim()) {
+      Alert.alert("Error", "Please enter your email");
+      return;
+    }
+  
+    if (!phoneNumber?.trim()) {
+      Alert.alert("Error", "Please enter your phone number");
+      return;
+    }
     setLoading(true);
+  
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userCurrentData?.user?.token}`
+        },
+        body: JSON.stringify({
+          id: userCurrentData?.user?.id, // or whatever your user ID field is
+          username: name.trim(),
+          email: email.trim(),
+          phoneNumber: phoneNumber.trim(),
+        })
+      });
+  
+      const data = await response.json();
+  
+      setLoading(false);
 
-    const res = await updateUser(user?.uid as string, userData);
-    setLoading(false);
-    console.log("res: ", res);
-    if (res.success) {
-      updateUserData(user?.uid as string);
-      router.back();
-    } else {
-      Alert.alert("User", res.msg);
+      console.log("DDDDDD",data)      
+      
+      if (response.ok) {
+        // Update local user data
+        // updateUser(userCurrentData?.user?.uid);
+         dispatch(setUser({
+                  token: userCurrentData?.token,
+                  user: userData,
+                  msg: userCurrentData.msg
+                }));
+        // await AsyncStorage.setItem("userData", JSON.stringify({
+        //   ...userCurrentData,
+        //   user: userData
+        // }));
+        setUserData(userData)
+        Alert.alert("Success", "Profile updated successfully");
+        
+        router.back();
+      } else {
+        Alert.alert("Error", data.message || "Failed to update profile");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Update error:", error);
+      Alert.alert("Error", "An error occurred while updating your profile");
     }
   };
 
@@ -103,6 +166,22 @@ const ProfileModal = () => {
               value={userData.name}
               onChangeText={(value) =>
                 setUserData({ ...userData, name: value })
+              }
+            />
+            <Typo color={colors.neutral200}>Email</Typo>
+            <Input
+              placeholder="Email"
+              value={userData.email}
+              onChangeText={(value) =>
+                setUserData({ ...userData, email: value })
+              }
+            />
+            <Typo color={colors.neutral200}>Phone Number</Typo>
+            <Input
+              placeholder="Phone Number"
+              value={userData.phoneNumber}
+              onChangeText={(value) =>
+                setUserData({ ...userData, phoneNumber: value })
               }
             />
           </View>

@@ -138,8 +138,11 @@ export type UserType = {
 } | null;
 
 export type UserDataType = {
-  name: string;
-  image?: any;
+  id: string,
+  name: string,
+    email: string,
+    phoneNumber: string,
+    image: null,
 };
 
 export type AuthContextType = {

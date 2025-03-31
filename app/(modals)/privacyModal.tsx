@@ -72,7 +72,7 @@ import {
       <ModalWrapper>
         <View style={styles.container}>
           <Header
-            title={"Privacy Settings"}
+            title={"Settings"}
             leftIcon={<BackButton />}
             style={{ marginBottom: spacingY._10 }}
           />

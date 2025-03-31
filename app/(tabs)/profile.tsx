@@ -72,7 +72,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      routeName: "/()/",
+      routeName: "/(auth)/welcome",
       bgColor: "#e11d48",
     },
   ];
@@ -80,6 +80,7 @@ const Profile = () => {
   const handleLogout = async () => {
     // Custom logout logic instead of Firebase's signOut
     await AsyncStorage.clear();
+    router.push("/(auth)/welcome");
   };
 
   const showLogoutAlert = () => {

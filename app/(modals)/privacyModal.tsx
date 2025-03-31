@@ -2,177 +2,172 @@ import {
     Alert,
     ScrollView,
     StyleSheet,
-    Text,
-    TouchableOpacity,
     View,
   } from "react-native";
-  import React, { useEffect, useState } from "react";
+  import React, { useState } from "react";
   import { colors, spacingX, spacingY } from "@/constants/theme";
   import ModalWrapper from "@/components/ModalWrapper";
   import Header from "@/components/Header1";
   import Typo from "@/components/Typo";
-  import Input from "@/components/Input";
-  import { UserDataType, UserType } from "@/types";
-  import ImageUpload from "@/components/ImageUpload";
   import Button from "@/components/Button";
-  import { Image } from "expo-image";
-  import { scale, verticalScale } from "@/utils/styling";
-  import * as Icons from "phosphor-react-native";
-  import * as ImagePicker from "expo-image-picker";
-  import { getProfileImage } from "@/services/imageService";
-  import { updateUser } from "@/services/userService";
   import { useRouter } from "expo-router";
   import BackButton from "@/components/BackButton";
+  import { Switch } from "react-native";
   
-  const ProfileModal = () => {
-    let [userData, setUserData] = useState<UserDataType>({
-      name: "",
-      image: null,
-    });
+  const PrivacyModal = () => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const [settings, setSettings] = useState({
+      dataSharing: false,
+      biometricAuth: true,
+    });
   
-    const onSelectImage = (file: any) => {
-      // console.log("file: ", file);
-      if (file) setUserData({ ...userData, image: file });
+    const toggleSetting = (key: keyof typeof settings) => {
+      setSettings(prev => ({ ...prev, [key]: !prev[key] }));
     };
   
-    const onSubmit = async () => {
-      let { name, image } = userData;
-      if (!name.trim() || !image) {
-        Alert.alert("User", "Please fill all the fields!");
-        return;
-      }
-  
-      setLoading(true);
-  
-      const res = await updateUser(user?.uid as string, userData);
-      setLoading(false);
-      console.log("res: ", res);
-      if (res.success) {
-        updateUserData(user?.uid as string);
-        router.back();
-      } else {
-        Alert.alert("User", res.msg);
-      }
+    const handleShareData = () => {
+      Alert.alert(
+        "Share Data with Partners",
+        "This allows trusted partners to provide personalized offers and ads based on your financial activity.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Enable Sharing",
+            onPress: () => toggleSetting('dataSharing')
+          },
+        ]
+      );
     };
   
-    const onPickImage = async () => {
-      // No permissions request is necessary for launching the image library
-      let result: ImagePicker.ImagePickerResult =
-        await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          aspect: [4, 3],
-          quality: 0.5,
-        });
-  
-      if (!result.canceled) {
-        setUserData({ ...userData, image: result.assets?.[0] });
-      }
+    const handleDeleteFinancialData = () => {
+      Alert.alert(
+        "Delete All Financial Data",
+        "This will permanently erase all your transaction history, budgets, and financial records.",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              setLoading(true);
+              // API call to delete data would go here
+              setTimeout(() => {
+                setLoading(false);
+                Alert.alert("Success", "All financial data has been deleted");
+              }, 1500);
+            }
+          },
+        ]
+      );
     };
   
     return (
       <ModalWrapper>
         <View style={styles.container}>
           <Header
-            title={"Update Profile"}
+            title={"Privacy Settings"}
             leftIcon={<BackButton />}
             style={{ marginBottom: spacingY._10 }}
           />
-          {/* form */}
+          
           <ScrollView contentContainerStyle={styles.form}>
-            {/* form */}
-            <View style={styles.avatarContainer}>
-              <Image
-                style={styles.avatar}
-                source={getProfileImage(userData.image)}
-                contentFit="cover"
-                transition={100}
-              />
-              <TouchableOpacity style={styles.editIcon} onPress={onPickImage}>
-                <Icons.Pencil
-                  size={verticalScale(20)}
-                  color={colors.neutral800}
+            <View style={styles.section}>
+              <Typo size={16} fontWeight="600" color={colors.neutral100}>
+                Data Sharing
+              </Typo>
+              
+              <View style={styles.settingItem}>
+                <View style={styles.settingText}>
+                  <Typo>Share with Marketing Partners</Typo>
+                  <Typo size={12} color={colors.neutral300}>
+                    Receive personalized offers and ads
+                  </Typo>
+                </View>
+                <Switch
+                  value={settings.dataSharing}
+                  onValueChange={() => handleShareData()}
+                  trackColor={{ true: colors.primary }}
                 />
-              </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.inputContainer}>
-              <Typo color={colors.neutral200}>Name</Typo>
-              <Input
-                placeholder="Name"
-                value={userData.name}
-                onChangeText={(value) =>
-                  setUserData({ ...userData, name: value })
-                }
-              />
+  
+  
+            {/* Action Buttons */}
+            <View style={styles.actionButtons}>
+              <Button 
+                onPress={handleShareData}
+                style={[styles.actionButton, styles.shareButton]}
+              >
+                <Typo color={colors.white} fontWeight="600">
+                  Share Data with Partners
+                </Typo>
+              </Button>
+              
+              <Button 
+                onPress={handleDeleteFinancialData}
+                style={[styles.actionButton, styles.deleteButton]}
+                loading={loading}
+              >
+                <Typo color={colors.white} fontWeight="600">
+                  Delete All Financial Data
+                </Typo>
+              </Button>
             </View>
           </ScrollView>
-        </View>
-        <View style={styles.footer}>
-          <Button onPress={onSubmit} style={{ flex: 1 }} loading={loading}>
-            <Typo color={colors.black} fontWeight={"700"} size={18}>
-              Update
-            </Typo>
-          </Button>
         </View>
       </ModalWrapper>
     );
   };
   
-  export default ProfileModal;
+  export default PrivacyModal;
   
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: "space-between",
       paddingHorizontal: spacingY._20,
-      // paddingVertical: spacingY._30,
-    },
-    footer: {
-      alignItems: "center",
-      flexDirection: "row",
-      justifyContent: "center",
-      paddingHorizontal: spacingX._20,
-      gap: scale(12),
-      paddingTop: spacingY._15,
-      borderTopColor: colors.neutral700,
-      marginBottom: spacingY._5,
-      borderTopWidth: 1,
     },
     form: {
-      gap: spacingY._30,
-      marginTop: spacingY._15,
+      gap: spacingY._20,
+      paddingBottom: spacingY._20,
     },
-    avatarContainer: {
-      position: "relative",
-      alignSelf: "center",
+    section: {
+      backgroundColor: colors.neutral800,
+      borderRadius: 10,
+      padding: spacingY._16,
+      gap: spacingY._16,
     },
-    avatar: {
-      alignSelf: "center",
-      backgroundColor: colors.neutral300,
-      height: verticalScale(135),
-      width: verticalScale(135),
-      borderRadius: 200,
-      borderWidth: 1,
-      borderColor: colors.neutral500,
-      // overflow: "hidden",
-      // position: "relative",
+    settingItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
-    editIcon: {
-      position: "absolute",
-      bottom: spacingY._5,
-      right: spacingY._7,
-      borderRadius: 100,
-      backgroundColor: colors.neutral100,
-      shadowColor: colors.black,
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.25,
-      shadowRadius: 10,
-      elevation: 4,
-      padding: spacingY._7,
+    settingText: {
+      gap: spacingY._4,
+      flex: 1,
+      paddingRight: spacingX._10,
     },
-    inputContainer: {
-      gap: spacingY._10,
+    actionButtons: {
+      gap: spacingY._12,
+      marginTop: spacingY._10,
+    },
+    actionButton: {
+      borderRadius: 8,
+      paddingVertical: spacingY._14,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    shareButton: {
+      backgroundColor: colors.primary,
+    },
+
+    deleteButton: {
+      backgroundColor: colors.rose,
     },
   });
-  

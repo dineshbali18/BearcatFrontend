@@ -48,7 +48,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      routeName: "/(modals)/settingsModal",
+      routeName: "/(modals)/privacyModal",
       bgColor: "#059669",
     },
     {
@@ -60,7 +60,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
-      routeName: "/(modals)/privacyModal",
+      routeName: "/(modals)/settingsModal",
       bgColor: colors.neutral600,
     },
     {

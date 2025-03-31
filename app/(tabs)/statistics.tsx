@@ -136,7 +136,7 @@ const Analytics = ({ route }) => {
         labels = getWeeklyLabels();
       } else if (selectedPeriod === "monthly") {
         data = savings.monthly;
-        labels = data.map((_, i) => `Month ${i + 1}`);
+        labels = data.map((_, i) => `Week ${i + 1}`);
       } else {
         data = savings.yearly;
         labels = getMonthlyLabels();
@@ -170,7 +170,7 @@ const Analytics = ({ route }) => {
     } else {
       const breakdown = financialData.monthlyBreakdown;
       const firstEntry = Object.values(breakdown)[0] || [];
-      labels = firstEntry.map((_, index) => `Month ${index + 1}`);
+      labels = firstEntry.map((_, index) => `Week ${index + 1}`);
       data = Object.values(breakdown).map((period) =>
         Object.values(period).reduce((a, b) => a + b, 0)
       );

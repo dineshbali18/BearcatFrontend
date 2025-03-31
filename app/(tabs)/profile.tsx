@@ -122,14 +122,7 @@ const Profile = () => {
           </View>
 
           {/* Name and email */}
-          <View style={styles.nameContainer}>
-            <Typo size={24} fontWeight="600" color={colors.neutral100}>
-              {" "}
-            </Typo>
-            <Typo size={15} color={colors.neutral400}>
-              {"user?.email"}
-            </Typo>
-          </View>
+        
         </View>
 
         {/* Account options */}

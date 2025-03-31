@@ -23,7 +23,6 @@ import Button from "@/components/Button";
 import { Dropdown } from "react-native-element-dropdown";
 import useFetchData from "@/hooks/useFetchData";
 import { TransactionType, WalletType } from "@/types";
-import { useAuth } from "@/contexts/authContext";
 import { orderBy, where } from "firebase/firestore";
 import ImageUpload from "@/components/ImageUpload";
 import { expenseCategories, transactionTypes } from "@/constants/data";
@@ -34,7 +33,6 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const TransactionModal = () => {
-  const { user } = useAuth();
   const router = useRouter();
   type paramType = {
     id: string;

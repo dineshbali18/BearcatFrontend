@@ -1,9 +1,9 @@
-import { auth } from "@/config/firebase";
-import { AuthProvider, useAuth } from "@/contexts/authContext";
+// import { auth } from "@/config/firebase";
+import { AuthProvider} from "@/contexts/authContext";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+// import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Provider } from 'react-redux';
@@ -14,29 +14,6 @@ import store from '@/store'
 
 function StackLayout() {
   const router = useRouter();
-  const { setUser, updateUserData } = useAuth();
-
-  // const [loaded] = useFonts({
-  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  // });
-
-  // useEffect(() => {
-  //   if (loaded) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [loaded]);
-
-  // useEffect(() => {
-  //   logout();
-  // }, []);
-
-  // const logout = async () => {
-  //   await signOut(auth);
-  // };
-
-  // if (!loaded) {
-  //   return null;
-  // }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -77,7 +54,7 @@ function StackLayout() {
 export default function RootLayout() {
   return (
     <Provider store={store}> {/* Wrap with Redux Provider */}
-      <AuthProvider> {/* Wrap with AuthProvider */}
+      <AuthProvider> 
         <StackLayout />
       </AuthProvider>
     </Provider>

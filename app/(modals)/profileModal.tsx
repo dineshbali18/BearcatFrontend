@@ -12,7 +12,6 @@ import ModalWrapper from "@/components/ModalWrapper";
 import Header from "@/components/Header1";
 import Typo from "@/components/Typo";
 import Input from "@/components/Input";
-import { useAuth } from "@/contexts/authContext";
 import { UserDataType, UserType } from "@/types";
 import ImageUpload from "@/components/ImageUpload";
 import Button from "@/components/Button";
@@ -32,15 +31,6 @@ const ProfileModal = () => {
   });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  const { user, updateUserData } = useAuth();
-
-  useEffect(() => {
-    setUserData({
-      name: user?.name || "",
-      image: user?.image || null,
-    });
-  }, [user]);
 
   const onSelectImage = (file: any) => {
     // console.log("file: ", file);

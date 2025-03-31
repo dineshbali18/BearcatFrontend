@@ -17,7 +17,6 @@ import Input from "@/components/Input";
 import ImageUpload from "@/components/ImageUpload";
 import { scale, verticalScale } from "@/utils/styling";
 import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
-import { useAuth } from "@/contexts/authContext";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { TransactionType, WalletType } from "@/types";
 import BackButton from "@/components/BackButton";
@@ -27,34 +26,12 @@ import { orderBy, where } from "firebase/firestore";
 import useFetchData from "@/hooks/useFetchData";
 
 const SearchModal = () => {
-  const { user } = useAuth();
   const [search, setSearch] = useState("");
 
-  const constraints = [where("uid", "==", user?.uid), orderBy("date", "desc")];
-
-  // Use the useFetchData hook with the 'transactions' collection and constraints
-  const {
-    data: allTransactions,
-    loading: transactionsLoading,
-    error,
-  } = useFetchData<TransactionType>("transactions", constraints);
 
   //   const hanldeSearch = (search: string) => {};
   //   const handleTextDebounce = useCallback(debounce(hanldeSearch, 400), []);
 
-  const filteredTransactions = allTransactions.filter((item) => {
-    if (search.length > 1) {
-      if (
-        item?.category?.toLowerCase()?.includes(search?.toLowerCase()) ||
-        item?.type?.toLowerCase()?.includes(search?.toLowerCase()) ||
-        item?.description?.toLowerCase()?.includes(search?.toLowerCase())
-      ) {
-        return true;
-      }
-      return false;
-    }
-    return true;
-  });
 
   return (
     <ModalWrapper style={{ backgroundColor: colors.neutral900 }}>
@@ -77,11 +54,6 @@ const SearchModal = () => {
           </View>
 
           <View>
-            <TransactionList
-              loading={transactionsLoading}
-              data={filteredTransactions}
-              emptyListMessage={"No transactions match your search keywords"}
-            />
           </View>
         </ScrollView>
       </View>

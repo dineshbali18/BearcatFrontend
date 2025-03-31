@@ -12,7 +12,6 @@ import Typo from "@/components/Typo";
 import Header from "@/components/Header1";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { Image } from "expo-image";
-import { useAuth } from "@/contexts/authContext";
 import { scale, verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 import { useRouter } from "expo-router";
@@ -25,8 +24,6 @@ import { getProfileImage } from "@/services/imageService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
-  // Assume that useAuth now provides a custom logout function
-  const { user} = useAuth();
   const router = useRouter();
 
   const accountOptions: accountOptionType[] = [
@@ -51,6 +48,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
+      routeName: "/(modals)/settingsModal",
       bgColor: "#059669",
     },
     {
@@ -62,6 +60,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
+      routeName: "/(modals)/privacyModal",
       bgColor: colors.neutral600,
     },
     {
@@ -73,6 +72,7 @@ const Profile = () => {
           weight="fill"
         />
       ),
+      routeName: "/()/",
       bgColor: "#e11d48",
     },
   ];
@@ -112,21 +112,21 @@ const Profile = () => {
         <View style={styles.userInfo}>
           {/* Avatar */}
           <View>
-            <Image
+            {/* <Image
               style={styles.avatar}
               source={getProfileImage(user?.image)}
               contentFit="cover"
               transition={100}
-            />
+            /> */}
           </View>
 
           {/* Name and email */}
           <View style={styles.nameContainer}>
             <Typo size={24} fontWeight="600" color={colors.neutral100}>
-              {user?.name || " "}
+              {" "}
             </Typo>
             <Typo size={15} color={colors.neutral400}>
-              {user?.email}
+              {"user?.email"}
             </Typo>
           </View>
         </View>

@@ -17,7 +17,6 @@ import Input from "@/components/Input";
 import ImageUpload from "@/components/ImageUpload";
 import { scale, verticalScale } from "@/utils/styling";
 import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
-import { useAuth } from "@/contexts/authContext";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { WalletType } from "@/types";
 import BackButton from "@/components/BackButton";
@@ -28,7 +27,6 @@ const WalletModal = () => {
     name: "",
     image: null,
   });
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const oldWallet: { name: string; image: string; id?: string } =

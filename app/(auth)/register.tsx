@@ -16,7 +16,6 @@ import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
-import { useAuth } from "@/contexts/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from 'expo-constants';
 
@@ -28,7 +27,6 @@ const SignUp = () => {
   const nameRef = useRef("");
   const phoneNumberRef = useRef("");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
 
   const onSubmit = async () => {
     if (

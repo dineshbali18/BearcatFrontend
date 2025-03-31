@@ -8,7 +8,6 @@ import * as Icons from "phosphor-react-native";
 import { useRouter } from "expo-router";
 import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
-import { useAuth } from "@/contexts/authContext";
 import Loading from "@/components/Loading";
 import WalletListItem from "@/components/userBankAccounts/WalletListItem";
 import axios from "axios";
@@ -18,7 +17,6 @@ const API_BASE_URL = "${Constants.expoConfig?.extra?.REACT_APP_API}:3002";
 
 const Wallet = () => {
   const router = useRouter();
-  const { user } = useAuth();
   const { data: wallets, loading, error, refetch } = useFetchData<WalletType>("wallets");
 
   const [isModalVisible, setModalVisible] = useState(false);

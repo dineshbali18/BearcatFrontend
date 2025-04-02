@@ -5,7 +5,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Modal
+  Modal,
+  Alert
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -57,6 +58,38 @@ useEffect(()=>{
   console.log("IN EXPENSE SPENDING LIST....",spendingList)
 },[spendingList])
 
+const fetchBankTransactions = () => {
+  console.log("gvjkbnl");
+
+  fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/sync-transactions/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${userState?.token}`,  
+      'Content-Type': 'application/json',  
+    }
+  })
+    .then(response => {
+      console.log('Response Status:', response.status);  // Log response status
+      return response.text();  // Use .text() instead of .json() to see the raw response
+    })
+    .then(rawData => {
+      console.log('Raw response data:', rawData);  // Log the raw data before parsing
+      // try {
+      //   const data = JSON.parse(rawData);  // Manually parse if it's JSON
+      //   console.log('Parsed response data:', data);
+        Alert.alert("Success", "Transactions fetched!");
+      // } catch (err) {
+      //   console.error('Error parsing JSON:', err);
+      // }
+    })
+    .catch(err => {
+      console.error('Error fetching transactions:', err);
+    });
+};
+
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -80,6 +113,9 @@ useEffect(()=>{
             </View>
           )}
         />
+        <TouchableOpacity onPress={fetchBankTransactions} style={styles.refreshButton}>
+          <Feather name="refresh-cw" size={14} color={Colors.white} />
+        </TouchableOpacity>
         <View style={styles.header}>
             <TouchableOpacity onPress={() => setManageModalVisible(true)}>
               <Feather name="more-vertical" size={24} color={Colors.white} />

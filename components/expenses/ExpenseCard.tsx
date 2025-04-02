@@ -72,12 +72,13 @@ const fetchBankTransactions = () => {
       console.log('Response Status:', response.status);  // Log response status
       return response.text();  // Use .text() instead of .json() to see the raw response
     })
-    .then(rawData => {
+    .then(async(rawData) => {
       console.log('Raw response data:', rawData);  // Log the raw data before parsing
       // try {
       //   const data = JSON.parse(rawData);  // Manually parse if it's JSON
       //   console.log('Parsed response data:', data);
         Alert.alert("Success", "Transactions fetched!");
+        await fetchExpenses();
       // } catch (err) {
       //   console.error('Error parsing JSON:', err);
       // }

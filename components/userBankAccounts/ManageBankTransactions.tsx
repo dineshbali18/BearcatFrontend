@@ -6,12 +6,15 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
+import { useSelector } from "react-redux";
 
-const ManageBankTransactions = ({ onClose }) => {
+const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
+  console.log("999999",savings[0].AccountNumber)
   const [transactions, setTransactions] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newTransaction, setNewTransaction] = useState({ amount: "", type: "", products: [] });
   const [productForms, setProductForms] = useState([{ name: "", price: "" }]);
+  const userData = useSelector((state)=>state.user)
 
   const token = "YOUR_AUTH_TOKEN"; // Replace with actual token
 
@@ -21,17 +24,13 @@ const ManageBankTransactions = ({ onClose }) => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/transactions/123456789`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/transactions/${savings[0].AccountNumber}/offset/0`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch transactions");
-      }
 
       const data = await response.json();
       setTransactions(data.transactions);
@@ -69,7 +68,7 @@ const ManageBankTransactions = ({ onClose }) => {
     };
 
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=1`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +161,7 @@ const ManageBankTransactions = ({ onClose }) => {
         )}
 
 <Text style={styles.transactionHeader}>Transactions</Text>
-
+<ScrollView>
         <FlatList
           data={transactions}
           keyExtractor={(item) => item.TransactionID.toString()}
@@ -179,6 +178,7 @@ const ManageBankTransactions = ({ onClose }) => {
             </View>
           )}
         />
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

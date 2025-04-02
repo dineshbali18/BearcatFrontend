@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   FlatList, StyleSheet, Text, TextInput, 
   TouchableOpacity, View, ScrollView, SafeAreaView, Alert 
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import Constants from 'expo-constants';
 
 const ManageBankTransactions = ({ onClose }) => {
   const [transactions, setTransactions] = useState([]);
@@ -13,6 +14,31 @@ const ManageBankTransactions = ({ onClose }) => {
   const [productForms, setProductForms] = useState([{ name: "", price: "" }]);
 
   const token = "YOUR_AUTH_TOKEN"; // Replace with actual token
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/transactions/123456789`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+
+      const data = await response.json();
+      setTransactions(data.transactions);
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
 
   const addProductForm = () => {
     setProductForms([...productForms, { name: "", price: "" }]);
@@ -36,13 +62,14 @@ const ManageBankTransactions = ({ onClose }) => {
       }));
 
     const transactionData = {
+      userID: 1,
       amount: parseFloat(newTransaction.amount),
       type: newTransaction.type,
       Products: validProducts,
     };
 
     try {
-      const response = await fetch("http://localhost:3001/bank/addTransaction?userID=1", {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=1`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,8 +82,7 @@ const ManageBankTransactions = ({ onClose }) => {
         throw new Error("Failed to add transaction");
       }
 
-      const savedTransaction = await response.json();
-      setTransactions([...transactions, savedTransaction]);
+      await fetchTransactions();
 
       setNewTransaction({ amount: "", type: "", products: [] });
       setProductForms([{ name: "", price: "" }]); 
@@ -71,24 +97,20 @@ const ManageBankTransactions = ({ onClose }) => {
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>💰 Bank Transactions</Text>
+          <Text style={styles.headerText}>💰 Manage Bank Transactions</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
             <Feather name="x" size={24} color="black" />
           </TouchableOpacity>
         </View>
 
-        {/* New Transaction Button */}
         {!showForm && (
           <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
             <Text style={styles.addButtonText}>➕ New Transaction</Text>
           </TouchableOpacity>
         )}
 
-        {/* Transaction Form (Shown only if button is clicked) */}
         {showForm && (
           <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-            <Text style={styles.addTransactionHeader}>Add a New Transaction</Text>
-
             <TextInput
               style={styles.input}
               placeholder="Amount"
@@ -106,8 +128,6 @@ const ManageBankTransactions = ({ onClose }) => {
               <Picker.Item label="Deposit" value="deposit" />
               <Picker.Item label="Withdrawal" value="withdrawal" />
             </Picker>
-
-            <Text style={styles.addTransactionHeader}>Add Products (Optional)</Text>
 
             {productForms.map((product, index) => (
               <View key={index} style={styles.productForm}>
@@ -141,23 +161,18 @@ const ManageBankTransactions = ({ onClose }) => {
           </ScrollView>
         )}
 
-        {/* Transactions List */}
-        <Text style={styles.transactionHeader}>Transactions</Text>
+<Text style={styles.transactionHeader}>Transactions</Text>
 
         <FlatList
           data={transactions}
           keyExtractor={(item) => item.TransactionID.toString()}
           renderItem={({ item }) => (
             <View style={styles.transactionCard}>
-              <Text style={styles.transactionText}>
-                {item.type} - ${item.amount}
-              </Text>
+              <Text style={styles.transactionText}>{item.type} - ${item.amount}</Text>
               {item.Products && item.Products.length > 0 && (
                 <View style={styles.productList}>
                   {item.Products.map((product, index) => (
-                    <Text key={index} style={styles.productDetail}>
-                      📦 {product.name}: ${product.price}
-                    </Text>
+                    <Text key={index} style={styles.productDetail}>📦 {product.name}: ${product.price}</Text>
                   ))}
                 </View>
               )}
@@ -170,6 +185,7 @@ const ManageBankTransactions = ({ onClose }) => {
 };
 
 export default ManageBankTransactions;
+
 
 const styles = StyleSheet.create({
   container: {

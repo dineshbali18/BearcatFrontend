@@ -6,18 +6,22 @@ import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import * as Icons from "phosphor-react-native";
 import { useRouter } from "expo-router";
-import useFetchData from "@/hooks/useFetchData";
 import { WalletType } from "@/types";
 import Loading from "@/components/Loading";
 import WalletListItem from "@/components/userBankAccounts/WalletListItem";
 import axios from "axios";
 import RNPickerSelect from "react-native-picker-select";
+import { useSelector } from "react-redux";
+import Constants from 'expo-constants';
 
-const API_BASE_URL = "${Constants.expoConfig?.extra?.REACT_APP_API}:3002";
+
+const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
 const Wallet = () => {
   const router = useRouter();
-  const { data: wallets, loading, error, refetch } = useFetchData<WalletType>("wallets");
+  // const { data: wallets, loading, error, refetch } = useFetchData<WalletType>("wallets");
+
+  const userData = useSelector((state)=>state.user)
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [banks, setBanks] = useState([]);
@@ -27,6 +31,7 @@ const Wallet = () => {
   const fetchBanks = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/bankDetails`);
+      console.log("AAAAAA",response)
       setBanks(response.data);
     } catch (error) {
       console.error("Error fetching banks:", error);

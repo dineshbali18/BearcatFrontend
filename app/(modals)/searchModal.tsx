@@ -22,7 +22,7 @@ import { TransactionType, WalletType } from "@/types";
 import BackButton from "@/components/BackButton";
 
 import TransactionList from "@/components/expenses/TransactionList";
-import { orderBy, where } from "firebase/firestore";
+// import { orderBy, where } from "firebase/firestore";
 import useFetchData from "@/hooks/useFetchData";
 
 const SearchModal = () => {

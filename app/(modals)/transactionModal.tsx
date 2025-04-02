@@ -21,15 +21,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Button from "@/components/Button";
 
 import { Dropdown } from "react-native-element-dropdown";
-import useFetchData from "@/hooks/useFetchData";
 import { TransactionType, WalletType } from "@/types";
-import { orderBy, where } from "firebase/firestore";
+// import { orderBy, where } from "firebase/firestore";
 import ImageUpload from "@/components/ImageUpload";
 import { expenseCategories, transactionTypes } from "@/constants/data";
-import {
-  createOrUpdateTransaction,
-  deleteTransaction,
-} from "@/services/transactionService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const TransactionModal = () => {
@@ -47,15 +42,6 @@ const TransactionModal = () => {
   };
   const oldTransaction: paramType = useLocalSearchParams();
   // console.log("old transaction: ", oldTransaction);
-
-  const {
-    data: wallets,
-    loading: walletLoading,
-    error,
-  } = useFetchData<WalletType>("wallets", [
-    where("uid", "==", user?.uid),
-    orderBy("created", "desc"),
-  ]);
 
   const [loading, setLoading] = useState(false);
 

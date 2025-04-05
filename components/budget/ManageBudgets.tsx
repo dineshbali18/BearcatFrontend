@@ -145,10 +145,11 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
     if (selectedBudget && selectedBudget !== "new") {
       const budget = budgets.find((b) => b.id === selectedBudget);
       if (budget) {
+        console.log("BBBB",budget)
         setNewBudget({
           name: budget.name,
-          targetAmount: formatNumber(budget.amount || budget.totalAmount),
-          spentAmount: formatNumber(budget.amountSpent),
+          targetAmount: formatNumber(Number(budget.totalAmount)),
+          spentAmount: formatNumber(Number(budget.amount)),
         });
       }
     } else if (selectedBudget === null) {

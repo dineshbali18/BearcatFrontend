@@ -122,9 +122,10 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     if (selectedGoal && selectedGoal !== "new") {
       const goal = savings.find((g) => g.id === selectedGoal);
       if (goal) {
+        console.log("AAAA",goal)
         setNewGoal({
           name: goal.name,
-          amount: goal.amount,
+          amount: String(goal.amount),
           totalAmount: goal.totalAmount,
         });
       }
@@ -168,7 +169,6 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
               style={styles.input}
               placeholder="💵 Current Saved Amount"
               placeholderTextColor="gray"
-              keyboardType="numeric"
               value={newGoal.amount}
               onChangeText={(text) => setNewGoal({ ...newGoal, amount: text })}
             />

@@ -64,13 +64,18 @@ const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
     : "0";
 
   // Generate pieData
-  const pieData = budgetsArray.length > 0 ? [
-    { value: parseFloat(totalSpent), color: Colors.blue },
-    { value: parseFloat(totalBudget) - parseFloat(totalSpent), color: Colors.white },
-  ]:[
-        { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
-        { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
-    ];
+  // const pieData = budgetsArray.length > 0 ? [
+  //   { value: parseFloat(totalSpent), color: Colors.blue },
+  //   { value: parseFloat(totalBudget) - parseFloat(totalSpent), color: Colors.white },
+  // ]:[
+  //       { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
+  //       { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
+  //   ];
+
+const pieData = [
+  { value: Number(percentage), color: Colors.blue },
+  { value: 100 - Number(percentage), color: Colors.white },
+];
 
   return (
     <View style={styles.container}>

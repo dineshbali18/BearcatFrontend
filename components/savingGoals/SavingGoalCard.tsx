@@ -47,6 +47,7 @@ const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
     }
   };
 
+
 // Ensure savings is always an array, even if it's null or undefined
 const savingsArray = savings || [];
 
@@ -72,18 +73,19 @@ const percentage = goalAmount > 0 && totalSavings > 0 && goalAmount > 0
 
 // Generate pieData safely
 // Generate pieData safely
-const pieData = savingsArray.length > 0
-  ? savingsArray.map((goal) => {
-      const goalPercentage = parseFloat(goal.percentage) || 0;
-      return [
-        { value: goalPercentage, color: Colors.blue }, // Display the percentage in blue
-        { value: 100 - goalPercentage, color: Colors.white }, // Remaining percentage in white
-      ];
-    }).flat()
-  : [
-      { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
-      { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
-    ];
+// const goalPercentage = savingsArray.length > 0
+//   ? savingsArray.reduce((total, goal) => total + parseFloat(goal.percentage || 0), 0)
+//   : 0;
+
+//   goalPercentage = 
+
+  // console.log("ggggg",goalPercentage)
+
+const pieData = [
+  { value: Number(percentage), color: Colors.blue },
+  { value: 100 - Number(percentage), color: Colors.white },
+];
+
 
 
 console.log("TTTTSSSS",totalSavings)

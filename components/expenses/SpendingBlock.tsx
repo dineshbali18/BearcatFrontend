@@ -164,7 +164,7 @@ const SpendingBlock = ({spendingList}) => {
       </Text>
       {spendingList.length > 0 ? (
         <>
-        <FlatList data={spendingList} renderItem={renderItem} showsHorizontalScrollIndicator={false} />
+        <FlatList data={spendingList} renderItem={renderItem} showsHorizontalScrollIndicator={false} nestedScrollEnabled={true} />
         </>
       ) : (
         <>

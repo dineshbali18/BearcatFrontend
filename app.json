@@ -40,13 +40,14 @@
       "typedRoutes": true
     },
     "extra": {
-      "REACT_APP_API":"http://192.168.1.11",
+      "REACT_APP_API": "http://192.168.1.11",
       "router": {
         "origin": false
       },
       "eas": {
         "projectId": "b539c10e-7cf8-4e78-8a52-059c5c3ccc9a"
       }
-    }
+    },
+    "owner": "dineshbali18"
   }
 }

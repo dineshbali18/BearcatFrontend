@@ -64,6 +64,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
 
     fetchExpenses();
   }, []);
+  
   const fetchExpenses = async () => {
     try {
       const response = await fetch(
@@ -77,124 +78,68 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
         }
       );
       const data = await response.json();
-  
+
       if (data?.categorizedExpenses) {
+        const expenses = data.categorizedExpenses.flatMap((category: any) =>
+          category.expenses);
         const debits = data.categorizedExpenses.flatMap((category: any) =>
           category.expenses.filter((expense: Expense) => 
             expense.TransactionType && (expense.TransactionType.toLowerCase() === "debit" || expense.TransactionType.toLowerCase() === "withdrawal")
           ));
-  
+        
+        
+
+
+console.log(expenses); 
+
+
+        console.log("EEEEEEEEE",expenses)
+
+        setAllExpenses(expenses)
+
+        console.log("DEBITS:::::",debits)
+        setSpendingList(debits);
+        console.log("AAAAAQQQQQ:::SPENDING",spendingList)
+      }
+
+      if (data?.categorizedExpenses) {
         const credits = data.categorizedExpenses.flatMap((category: any) =>
           category.expenses.filter((expense: Expense) => expense.TransactionType && (expense.TransactionType.toLowerCase() === "credit" || expense.TransactionType.toLowerCase()=="deposit"))
         );
-  
-        // Setting the state after fetching data
-        setSpendingList(debits); // This will trigger re-render of components that depend on spendingList
-        setIncomeList(credits);   // Similarly, this will trigger re-render for incomeList
-        setAllExpenses(data.categorizedExpenses);
-  
-        // Calculate total expenses
+        console.log("credits:::::",credits)
+        setIncomeList(credits);
+        console.log("AAAAAQQQQQ:::INCOME",incomeList)
+      }
+
+      if (data.categorizedExpenses) {
         let total = 0;
         const colors = [
           "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
           "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA",
           "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
         ];
-  
+
         const formattedExpenses = data.categorizedExpenses.map((category, index) => {
           const categoryTotal = parseFloat(category.debitTotal);
           total += categoryTotal;
           return {
             id: category.categoryName,
             name: category.categoryName,
-            amount: category.debitTotal,
+            amount: Number(category.debitTotal)+Number(category.creditTotal),
             color: colors[index % colors.length],
           };
         });
-  
-        setExpenses(formattedExpenses); // Trigger re-render for the expense data
-        setTotalExpenseAmt(total.toFixed(2)); // Set total expense amount
+
+        console.log("FORMAATTED",formattedExpenses)
+
+        setExpenses(formattedExpenses);
+        setTotalExpenseAmt(total.toFixed(2));
+        // setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
-  
-
-//   const fetchExpenses = async () => {
-//     try {
-//       const response = await fetch(
-//         `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
-//         {
-//           method: "GET",
-//           headers: {
-//             Authorization: `Bearer ${userState?.token}`,
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-//       const data = await response.json();
-
-//       if (data?.categorizedExpenses) {
-//         const debits = data.categorizedExpenses.flatMap((category: any) =>
-//           category.expenses.filter((expense: Expense) => 
-//             expense.TransactionType && (expense.TransactionType.toLowerCase() === "debit" || expense.TransactionType.toLowerCase() === "withdrawal")
-//           ));
-        
-//         const expenses = data.categorizedExpenses.flatMap((category: any) =>
-//           category.expenses);
-
-
-// console.log(expenses); // This should give you the correct total of 224.00
-
-
-//         console.log("EEEEEEEEE",expenses)
-
-//         setAllExpenses(expenses)
-
-//         console.log("DEBITS:::::",debits)
-//         setSpendingList(debits);
-//         console.log("AAAAAQQQQQ:::SPENDING",spendingList)
-//       }
-
-//       if (data?.categorizedExpenses) {
-//         const credits = data.categorizedExpenses.flatMap((category: any) =>
-//           category.expenses.filter((expense: Expense) => expense.TransactionType && (expense.TransactionType.toLowerCase() === "credit" || expense.TransactionType.toLowerCase()=="deposit"))
-//         );
-//         console.log("credits:::::",credits)
-//         setIncomeList(credits);
-//         console.log("AAAAAQQQQQ:::INCOME",incomeList)
-//       }
-
-//       if (data.categorizedExpenses) {
-//         let total = 0;
-//         const colors = [
-//           "#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF", "#33FFA8",
-//           "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA",
-//           "#FFD700", "#FF4500", "#00CED1", "#8A2BE2", "#DC143C", "#20B2AA"
-//         ];
-
-//         const formattedExpenses = data.categorizedExpenses.map((category, index) => {
-//           const categoryTotal = parseFloat(category.debitTotal);
-//           total += categoryTotal;
-//           return {
-//             id: category.categoryName,
-//             name: category.categoryName,
-//             amount: category.debitTotal,
-//             color: colors[index % colors.length],
-//           };
-//         });
-
-//         console.log("FORMAATTED",formattedExpenses)
-
-//         setExpenses(formattedExpenses);
-//         setTotalExpenseAmt(total.toFixed(2));
-//         // setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
-//       }
-//     } catch (error) {
-//       console.error("Error fetching expenses:", error);
-//     }
-//   };
 
 
   useEffect(()=>{
@@ -251,21 +196,6 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
           >
             {item.name}
           </Text>
-          <View style={styles.expenseBlock3View}>
-            <Text
-              style={[
-                styles.expenseBlockTxt1,
-                {
-                  color:
-                    item.name === "Food" || item.name === "Saving"
-                      ? Colors.black
-                      : Colors.white,
-                },
-              ]}
-            >
-              {item.percentage || "0"}%
-            </Text>
-          </View>
         </View>
       </TouchableOpacity>
     );
@@ -291,7 +221,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
       {/* Vertical stacking of IncomeBlock and SpendingBlock */}
       {selectedComponent !== null && selectedScreen === "Expenses"?
       <View style={styles.verticalComponents}>
-        <ExpenseScreen expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList} fetchExpenses={fetchExpenses}/>
+        <ExpenseScreen allExpenses={allExpenses} expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList} fetchExpenses={fetchExpenses}/>
         <IncomeBlock incomeList={incomeList} />
         <SpendingBlock spendingList={spendingList} />
       </View>:<></>
@@ -328,14 +258,18 @@ const styles = StyleSheet.create({
   expenseBlock: {
     backgroundColor: Colors.tintColor,
     width: 100,
-    padding: 15,
+    height: 60, // Added height
+    padding: 10,
     borderRadius: 15,
     marginRight: 20,
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    justifyContent: "center", // Center text vertically
+    alignItems: "center",     // Center text horizontally
   },
   expenseBlockTxt1: {
-    fontSize: 14,
+    fontSize: 15,
+    textAlign: "center",
+    flexWrap: "wrap",
+    fontWeight: 700,
   },
   expenseBlock3View: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",

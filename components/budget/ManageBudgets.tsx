@@ -214,6 +214,7 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
             </TouchableOpacity>
           </View>
         )}
+        </ScrollView>
 
         <Text style={styles.sectionHeader}>My Current Budgets</Text>
 
@@ -237,7 +238,7 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
         ) : (
           <Text style={styles.emptyText}>No budgets found. Add a new budget to get started!</Text>
         )}
-      </ScrollView>
+      
     </View>
   );
 };

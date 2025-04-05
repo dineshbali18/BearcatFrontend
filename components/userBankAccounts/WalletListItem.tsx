@@ -11,7 +11,7 @@ import ManageBankTransactions from "./ManageBankTransactions";
 
 const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
-const WalletListItem = () => {
+const WalletListItem = ({check}) => {
   const [userAccounts, setUserAccounts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -23,6 +23,8 @@ const WalletListItem = () => {
   useEffect(() => {
     fetchUserAccounts();
   }, []); // Fetch only once on mount
+
+  
 
   const fetchUserAccounts = async () => {
     try {

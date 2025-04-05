@@ -34,7 +34,7 @@ interface Expense {
 }
 
 
-const ExpensesSection = ({ expen, spendingList, setSpendingList, total, incomeList, setIncomeList, fetchExpenses}) => {
+const ExpensesSection = ({ allExpenses, expen, spendingList, setSpendingList, total, incomeList, setIncomeList, fetchExpenses}) => {
   // const [spendingList, setSpendingList] = useState<Expense[]>([]);
   const [expenses, setExpenses] = useState(expen);
   const [totalExpense, setTotalExpense] = useState("0.00");
@@ -47,6 +47,7 @@ const ExpensesSection = ({ expen, spendingList, setSpendingList, total, incomeLi
 useEffect(()=>{
   console.log("IN EXPENSE....",expen)
   console.log("IN SPENDING LIST",spendingList)
+  setExpenses(expen);
   setTotalExpense(total);
   setPieData(expen.length > 0 ? expen.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })):[
         { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
@@ -79,6 +80,7 @@ const fetchBankTransactions = () => {
       //   console.log('Parsed response data:', data);
         Alert.alert("Success", "Transactions fetched!");
         await fetchExpenses();
+
       // } catch (err) {
       //   console.error('Error parsing JSON:', err);
       // }

@@ -71,6 +71,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     const updateGoal = async () => {
       if (!selectedGoal || !newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
       console.log("SSSSSEEEE",selectedGoal)
+      console.log("000000",newGoal)
       try {
         const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
           method: "PUT",
@@ -81,7 +82,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
           body: JSON.stringify({
             GoalName: newGoal.name,
             TargetAmount: parseFloat(newGoal.totalAmount),
-            currentAmount: parseFloat(newGoal.amount),
+            CurrentAmount: parseFloat(newGoal.amount),
           }),
         });
 

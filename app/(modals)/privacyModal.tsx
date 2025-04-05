@@ -110,7 +110,7 @@ import {
                 </Typo>
               </Button>
               
-              <Button 
+              {/* <Button 
                 onPress={handleDeleteFinancialData}
                 style={[styles.actionButton, styles.deleteButton]}
                 loading={loading}
@@ -118,7 +118,7 @@ import {
                 <Typo color={colors.white} fontWeight="600">
                   Delete All Financial Data
                 </Typo>
-              </Button>
+              </Button> */}
             </View>
           </ScrollView>
         </View>

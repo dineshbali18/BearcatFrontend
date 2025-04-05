@@ -27,11 +27,12 @@ const Wallet = () => {
   const [banks, setBanks] = useState([]);
   const [selectedBank, setSelectedBank] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
+  const [check,setCheck] = useState(0);
 
   const fetchBanks = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/bankDetails`);
-      console.log("AAAAAA",response)
+      console.log("AAAAAA123",response.data)
       setBanks(response.data);
     } catch (error) {
       console.error("Error fetching banks:", error);
@@ -41,11 +42,13 @@ const Wallet = () => {
   const handleAddBankAccount = async () => {
     if (!selectedBank || !accountNumber) return;
 
+    console.log("SSSS1111",selectedBank)
+
     const newAccount = {
-      UserID: user?.id || 1, // Replace with dynamic user ID
-      bankName: selectedBank.label,
+      UserID: userData?.user?.id, // Replace with dynamic user ID
+      bankName: selectedBank?.BankName,
       AccountNumber: accountNumber,
-      BankID: selectedBank.value
+      BankID: selectedBank?.BankID,
     };
 
     try {
@@ -53,7 +56,8 @@ const Wallet = () => {
       setModalVisible(false);
       setAccountNumber("");
       setSelectedBank(null);
-      refetch(); // Refresh wallet list
+      setCheck(1);
+      // refetch(); // Refresh wallet list
     } catch (error) {
       console.error("Error adding bank account:", error);
     }
@@ -76,7 +80,7 @@ const Wallet = () => {
             renderItem={({ item, index }) => <WalletListItem item={item} index={index} />}
             contentContainerStyle={styles.listStyle}
           /> */}
-          <WalletListItem/>
+          <WalletListItem check={check}/>
         </View>
       </View>
 

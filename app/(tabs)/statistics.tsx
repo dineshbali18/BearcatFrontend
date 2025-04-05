@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -7,13 +8,16 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import Header from "@/components/Header1";
 import { LineChart, BarChart } from "react-native-chart-kit";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
+import { useSelector } from "react-redux";
+
 const { width: screenWidth } = Dimensions.get("window");
 
 const Analytics = ({ route }) => {
@@ -22,39 +26,92 @@ const Analytics = ({ route }) => {
   const [financialData, setFinancialData] = useState(null);
   const [budgetsData, setBudgetsData] = useState(null);
   const [savingsData, setSavingsData] = useState(null);
-  const userId = 1; // Assuming userId is passed via route params
+  const [selectedDescriptions, setSelectedDescriptions] = useState({});
+  const userData = useSelector((state)=>state?.user)
+  const userId = userData?.user?.id;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [financialRes, budgetsRes, savingsRes] = await Promise.all([
-          fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
-          fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
-          fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
-        ]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [financialRes, budgetsRes, savingsRes] = await Promise.all([
+  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
+  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
+  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
+  //       ]);
 
-        setFinancialData(financialRes);
-        setBudgetsData(budgetsRes);
-        setSavingsData(savingsRes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       setFinancialData(financialRes);
+  //       setBudgetsData(budgetsRes);
+  //       setSavingsData(savingsRes);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
-  if (loading) {
-    return (
-      <ScreenWrapper>
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      </ScreenWrapper>
-    );
-  }
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+  
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const [financialRes, budgetsRes, savingsRes] = await Promise.all([
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
+          ]);
+  
+          if (isActive) {
+            setFinancialData(financialRes);
+            setBudgetsData(budgetsRes);
+            setSavingsData(savingsRes);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          if (isActive) {
+            setLoading(false);
+          }
+        }
+      };
+  
+      fetchData();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [userId])
+  );
+  
+
+  const generateDescription = (data, title, period) => {
+    if (!data || data.length === 0) return "No data available.";
+
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const avg = data.reduce((a, b) => a + b, 0) / data.length;
+    const sum = data.reduce((a, b) => a + b, 0);
+    const trend = data[0] < data[data.length - 1] ? "increasing" : "decreasing";
+
+    const periodText = {
+      weekly: "this week",
+      monthly: "this month",
+      yearly: "this year",
+    }[period] || "the selected period";
+
+    return `${title} Summary:
+
+• During ${periodText}, the highest recorded amount was $${max}, showing a peak in your financial trend.
+• The lowest amount observed was $${min}, indicating potential areas of underperformance or savings.
+• The average value over this period was $${avg.toFixed(2)}, providing a consistent view of your financial behavior.
+• In total, you've moved $${sum.toFixed(2)} through this category in ${periodText}.
+• The overall trend appears to be ${trend}, suggesting a ${trend === "increasing" ? "growth" : "reduction"} pattern over time.
+• This summary gives you a deeper insight into how your finances are evolving in ${periodText}.`;
+  };
 
   const chartConfig = {
     backgroundGradientFrom: "#1E2923",
@@ -64,7 +121,7 @@ const Analytics = ({ route }) => {
     propsForDots: { r: "6", strokeWidth: "2", stroke: "#ffa726" },
   };
 
-  const renderChart = (data, labels, title, isLineChart = false) => {
+  const renderChart = (data, labels, title, isLineChart = false, id, period) => {
     const chartProps = {
       data: { labels, datasets: [{ data }] },
       width: screenWidth - 40,
@@ -74,40 +131,45 @@ const Analytics = ({ route }) => {
       style: styles.chartStyle,
     };
 
+    const description = selectedDescriptions[id];
+
     return (
-      <View style={styles.chartContainer}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-        {isLineChart ? (
-          <LineChart {...chartProps} bezier />
-        ) : (
-          <BarChart {...chartProps} />
-        )}
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+          const desc = generateDescription(data, title, period);
+          setSelectedDescriptions((prev) => ({ ...prev, [id]: desc }));
+        }}
+      >
+        <View style={styles.chartContainer}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          {isLineChart ? (
+            <LineChart {...chartProps} bezier />
+          ) : (
+            <BarChart {...chartProps} />
+          )}
+          {description && <Text style={styles.descriptionText}>{description}</Text>}
+        </View>
+      </TouchableOpacity>
     );
   };
 
-  const getWeeklyLabels = () => {
-    return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  };
-
-  const getMonthlyLabels = () => {
-    return [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
-  };
+  const getWeeklyLabels = () => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const getMonthlyLabels = () => [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ];
 
   const renderBudgetCharts = () => {
-    if (!budgetsData || !budgetsData.Budgets) return null;
+    if (!budgetsData?.Budgets) return [];
 
     return budgetsData.Budgets.map((budget, index) => {
-      const selectedPeriod = activeIndex === 0 ? "weekly" : activeIndex === 1 ? "monthly" : "yearly";
+      const period = ["weekly", "monthly", "yearly"][activeIndex];
       let data, labels;
 
-      if (selectedPeriod === "weekly") {
+      if (period === "weekly") {
         data = budget.weekly;
         labels = getWeeklyLabels();
-      } else if (selectedPeriod === "monthly") {
+      } else if (period === "monthly") {
         data = budget.monthly;
         labels = data.map((_, i) => `Week ${i + 1}`);
       } else {
@@ -119,22 +181,24 @@ const Analytics = ({ route }) => {
         data,
         labels,
         `Budget ${index + 1} (Target: $${budget.budgetTargetamount})`,
-        activeIndex === 0 // Line chart for weekly, bar chart for others
+        activeIndex === 0,
+        `budget-${index}`,
+        period
       );
     });
   };
 
   const renderSavingsCharts = () => {
-    if (!savingsData || !savingsData.Budgets) return null;
+    if (!savingsData?.Budgets) return [];
 
     return savingsData.Budgets.map((savings, index) => {
-      const selectedPeriod = activeIndex === 0 ? "weekly" : activeIndex === 1 ? "monthly" : "yearly";
+      const period = ["weekly", "monthly", "yearly"][activeIndex];
       let data, labels;
 
-      if (selectedPeriod === "weekly") {
+      if (period === "weekly") {
         data = savings.weekly;
         labels = getWeeklyLabels();
-      } else if (selectedPeriod === "monthly") {
+      } else if (period === "monthly") {
         data = savings.monthly;
         labels = data.map((_, i) => `Week ${i + 1}`);
       } else {
@@ -146,29 +210,30 @@ const Analytics = ({ route }) => {
         data,
         labels,
         `Savings Goal ${index + 1}`,
-        activeIndex === 0 // Line chart for weekly, bar chart for others
+        activeIndex === 0,
+        `savings-${index}`,
+        period
       );
     });
   };
 
   const renderExpensesChart = () => {
-    if (!financialData) return null;
+    if (!financialData) return [];
 
-    const selectedPeriod = activeIndex === 0 ? "weekly" : activeIndex === 1 ? "monthly" : "yearly";
-    let data, labels;
+    const period = ["weekly", "monthly", "yearly"][activeIndex];
+    let data = [], labels = [];
 
-    if (selectedPeriod === "weekly") {
-      const breakdown = financialData.weeklyBreakdown;
-      const latestWeek = Object.keys(breakdown).pop(); // Get the latest week
+    if (period === "weekly") {
+      const breakdown = financialData.weeklyExpenseBreakdown;
+      const latestWeek = Object.keys(breakdown).pop();
       const weekData = breakdown[latestWeek];
       data = Object.values(weekData);
       labels = getWeeklyLabels();
-    } else if (selectedPeriod === "yearly") {
-      const lastYearData = Object.values(financialData.yearlyBreakdown?.["2025"] || {});
-      data = lastYearData;
+    } else if (period === "yearly") {
+      data = Object.values(financialData.yearlyExpenseBreakdown?.["2025"] || {});
       labels = getMonthlyLabels();
     } else {
-      const breakdown = financialData.monthlyBreakdown;
+      const breakdown = financialData.monthlyExpenseBreakdown;
       const firstEntry = Object.values(breakdown)[0] || [];
       labels = firstEntry.map((_, index) => `Week ${index + 1}`);
       data = Object.values(breakdown).map((period) =>
@@ -176,13 +241,63 @@ const Analytics = ({ route }) => {
       );
     }
 
-    return renderChart(
-      data,
-      labels,
-      "Expenses Breakdown",
-      activeIndex === 0 // Line chart for weekly, bar chart for others
-    );
+    return [
+      renderChart(
+        data,
+        labels,
+        "Expenses Breakdown",
+        activeIndex === 0,
+        `expenses-${activeIndex}`,
+        period
+      ),
+    ];
   };
+
+  const renderIncomeChart = () => {
+    if (!financialData) return [];
+
+    const period = ["weekly", "monthly", "yearly"][activeIndex];
+    let data = [], labels = [];
+
+    if (period === "weekly") {
+      const breakdown = financialData.weeklyIncomeBreakdown;
+      const latestWeek = Object.keys(breakdown).pop();
+      const weekData = breakdown[latestWeek];
+      data = Object.values(weekData);
+      labels = getWeeklyLabels();
+    } else if (period === "yearly") {
+      data = Object.values(financialData.yearlyIncomeBreakdown?.["2025"] || {});
+      labels = getMonthlyLabels();
+    } else {
+      const breakdown = financialData.monthlyIncomeBreakdown;
+      const firstEntry = Object.values(breakdown)[0] || [];
+      labels = firstEntry.map((_, index) => `Week ${index + 1}`);
+      data = Object.values(breakdown).map((period) =>
+        Object.values(period).reduce((a, b) => a + b, 0)
+      );
+    }
+
+    return [
+      renderChart(
+        data,
+        labels,
+        "Income Breakdown",
+        activeIndex === 0,
+        `income-${activeIndex}`,
+        period
+      ),
+    ];
+  };
+
+  if (loading) {
+    return (
+      <ScreenWrapper>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </ScreenWrapper>
+    );
+  }
 
   return (
     <ScreenWrapper>
@@ -191,17 +306,29 @@ const Analytics = ({ route }) => {
         <SegmentedControl
           values={["Weekly", "Monthly", "Yearly"]}
           selectedIndex={activeIndex}
-          onChange={(event) => setActiveIndex(event.nativeEvent.selectedSegmentIndex)}
+          onChange={(event) =>
+            setActiveIndex(event.nativeEvent.selectedSegmentIndex)
+          }
           style={styles.segmentedControl}
         />
         <ScrollView>
           <Text style={styles.text}>Expenses:</Text>
           <FlatList
-            data={[renderExpensesChart()]}
+            data={renderExpensesChart()}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => `expense-${index}`}
+            renderItem={({ item }) => item}
+          />
+
+<Text style={styles.text}>Income:</Text>
+          <FlatList
+            data={renderIncomeChart()}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, index) => `expense-${index}`}
             renderItem={({ item }) => item}
           />
 
@@ -211,19 +338,19 @@ const Analytics = ({ route }) => {
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => `budget-${index}`}
             renderItem={({ item }) => item}
           />
 
           <Text style={styles.text}>Savings Goals:</Text>
           <FlatList
             data={renderSavingsCharts()}
-            style={{ marginBottom: 100 }}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => `savings-${index}`}
             renderItem={({ item }) => item}
+            contentContainerStyle={{ marginBottom: 100 }}
           />
         </ScrollView>
       </View>
@@ -261,6 +388,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  descriptionText: {
+    marginTop: spacingY._10,
+    color: colors.neutral100,
+    fontSize: 14,
+    backgroundColor: colors.neutral800,
+    padding: 12,
+    borderRadius: 10,
+    textAlign: "left",
+    lineHeight: 20,
   },
 });
 

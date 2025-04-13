@@ -32,7 +32,7 @@ const Login = () => {
       console.log(`Àaaaaa ${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`)
       const apiUrl = String(Constants.manifest?.extra?.REACT_APP_API)+":3002/user/login";
       console.log(apiUrl)
-      Alert.alert(`Àaaaaa ${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`)
+      // Alert.alert(`Àaaaaa ${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`)
       const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,7 +43,7 @@ const Login = () => {
       });
 
       const res = await response.json();
-      Alert.alert(res)
+      // Alert.alert(res)
 
       console.log("Response:", res);
       setLoading(false);

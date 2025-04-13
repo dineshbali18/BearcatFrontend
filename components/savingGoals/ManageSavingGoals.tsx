@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -15,114 +14,111 @@ import { useSelector } from "react-redux";
 
 const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) => {
 
-  console.log("SSSAAAAAA",savings)
+  console.log("SSSAAAAAA", savings)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ name: "", amount: "", totalAmount: "" });
-    const userState = useSelector((state) => state.user);
-    const userId = userState?.user?.id;
-    const token = userState?.token;
+  const userState = useSelector((state) => state.user);
+  const userId = userState?.user?.id;
+  const token = userState?.token;
 
+  const addGoal = async () => {
+    if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
 
-    const addGoal = async () => {
-      if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
+    console.log("AMAMAM", newGoal.amount)
 
-      console.log("AMAMAM",newGoal.amount)
-    
-      const newEntry = {
-        id: Number(Math.random()*10),
-        name: newGoal.name,
-        amount: newGoal.amount,
-        totalAmount: newGoal.totalAmount,
-        percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
-      };
-    
-      try {
-        const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            UserID: userId, 
-            GoalName: newGoal.name,
-            TargetAmount: parseFloat(newGoal.totalAmount),
-            CurrentAmount: newGoal.amount,
-            Deadline: "2024-12-31", 
-          }),
-        });
-
-        console.log("RESS::::",response)
-    
-        if (!response.ok) {
-          throw new Error("Failed to add savings goal");
-        }
-    
-        await fetchSaving();
-    
-        // setSavings(result);
-        setNewGoal({ name: "", amount: "", totalAmount: "" });
-        setSelectedGoal(null);
-      } catch (error) {
-        console.error("Error adding savings goal:", error);
-      }
+    const newEntry = {
+      id: Number(Math.random() * 10),
+      name: newGoal.name,
+      amount: newGoal.amount,
+      totalAmount: newGoal.totalAmount,
+      percentage: ((parseFloat(newGoal.amount) / parseFloat(newGoal.totalAmount)) * 100).toFixed(0),
     };
 
-    const updateGoal = async () => {
-      if (!selectedGoal || !newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-      console.log("SSSSSEEEE",selectedGoal)
-      console.log("000000",newGoal)
-      try {
-        const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            GoalName: newGoal.name,
-            TargetAmount: parseFloat(newGoal.totalAmount),
-            CurrentAmount: parseFloat(newGoal.amount),
-          }),
-        });
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserID: userId,
+          GoalName: newGoal.name,
+          TargetAmount: parseFloat(newGoal.totalAmount),
+          CurrentAmount: newGoal.amount,
+          Deadline: "2024-12-31",
+        }),
+      });
 
-        console.log("qqqqqq",response)
-  
-        if (!response.ok) throw new Error("Failed to update savings goal");
-  
-        await fetchSaving();
-        
-        setNewGoal({ name: "", amount: "", totalAmount: "" });
-        setSelectedGoal(null);
-      } catch (error) {
-        console.error("Error updating savings goal:", error);
+      console.log("RESS::::", response)
+
+      if (!response.ok) {
+        throw new Error("Failed to add savings goal");
       }
-    };
+
+      await fetchSaving();
+
+      setNewGoal({ name: "", amount: "", totalAmount: "" });
+      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error adding savings goal:", error);
+    }
+  };
+
+  const updateGoal = async () => {
+    if (!selectedGoal || !newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
+    console.log("SSSSSEEEE", selectedGoal)
+    console.log("000000", newGoal)
+    try {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          GoalName: newGoal.name,
+          TargetAmount: parseFloat(newGoal.totalAmount),
+          CurrentAmount: parseFloat(newGoal.amount),
+        }),
+      });
+
+      console.log("qqqqqq", response)
+
+      if (!response.ok) throw new Error("Failed to update savings goal");
+
+      await fetchSaving();
+
+      setNewGoal({ name: "", amount: "", totalAmount: "" });
+      setSelectedGoal(null);
+    } catch (error) {
+      console.error("Error updating savings goal:", error);
+    }
+  };
 
   const deleteGoal = async (id) => {
     try {
-      console.log("ISDDDDDD",id)
+      console.log("ISDDDDDD", id)
       const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
-      
+
       if (!response.ok) throw new Error("Failed to delete savings goal");
-      
+
       await fetchSaving();
     } catch (error) {
       console.error("Error deleting savings goal:", error);
     }
   };
 
-
   React.useEffect(() => {
     if (selectedGoal && selectedGoal !== "new") {
       const goal = savings.find((g) => g.id === selectedGoal);
       if (goal) {
-        console.log("AAAA",goal)
+        console.log("AAAA", goal)
         setNewGoal({
           name: goal.name,
           amount: String(goal.amount),
@@ -143,7 +139,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <View style={styles.content}>
         <Picker
           selectedValue={selectedGoal}
           style={styles.picker}
@@ -192,7 +188,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
           </View>
         )}
 
-        <Text style={{fontWeight:"800",fontSize:20,margin:20}}>My Current Goals</Text>
+        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>My Current Goals</Text>
 
         <FlatList
           data={savings}
@@ -209,7 +205,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
           )}
           contentContainerStyle={styles.listContainer}
         />
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -226,7 +222,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     margin: 25,
     marginTop: 55,
-    borderWidth: 7
+    borderWidth: 7,
   },
   header: {
     flexDirection: "row",
@@ -272,7 +268,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  picker:{
-    margin: 20
-  }
+  picker: {
+    margin: 20,
+  },
 });

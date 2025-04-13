@@ -150,6 +150,7 @@ const IncomeBlock = ({incomeList}) => {
         </View>
         <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
         <Text style={styles.description}>{item.Description}</Text>
+        <Text style={styles.description}>{item.Date.split('T')[0]}</Text>
       </View>
     );
   };

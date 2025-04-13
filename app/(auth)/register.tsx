@@ -39,6 +39,8 @@ const SignUp = () => {
       return;
     }
 
+    console.log("PPPP",phoneNumberRef.current)
+
     setLoading(true);
     try {
       const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/register`, {

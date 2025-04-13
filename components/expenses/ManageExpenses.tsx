@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  FlatList,
   StyleSheet,
   Text,
   TextInput,
@@ -31,7 +30,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Ensure authToken is defined
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             Description: newExpense.name,
@@ -39,19 +38,14 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
           }),
         }
       );
-
-      console.log("EEEEEEE",response)
   
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
   
       await fetchExpenses();
-  
-      // Reset input fields
       setNewExpense({ name: "", amount: "" });
       setSelectedExpense(null);
-  
       console.log("Expense updated successfully");
     } catch (error) {
       console.error("Failed to update expense:", error);
@@ -69,7 +63,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Ensure authToken is defined
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -79,7 +73,6 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
       }
   
       await fetchExpenses();
-
       console.log("Expense deleted successfully");
     } catch (error) {
       console.error("Failed to delete expense:", error);
@@ -102,92 +95,83 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
   return (
     <View style={styles.container}>
       <View style={styles.internalContainer}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>💸 Manage Expenses</Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-          <Feather name="x" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>💸 Manage Expenses</Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
+            <Feather name="x" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Picker
-          selectedValue={selectedExpense}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSelectedExpense(itemValue)}
-        >
-          <Picker.Item label="🔽 Select an existing expense" value={null} color="black" />
-          {allExpenses.map((expense) => (
-            <Picker.Item key={expense.id} label={expense.CategoryName.concat(" - "+expense.Description)} value={expense.ExpenseID} color="black" />
-          ))}
-          {/* <Picker.Item label="➕ Add New Expense" value="new" color="red" /> */}
-        </Picker>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Picker
+            selectedValue={selectedExpense}
+            style={styles.picker}
+            onValueChange={(itemValue) => setSelectedExpense(itemValue)}
+          >
+            <Picker.Item label="🔽 Select an existing expense" value={null} color="black" />
+            {allExpenses.map((expense) => (
+              <Picker.Item key={expense.id} label={expense.CategoryName.concat(" - "+expense.Description)} value={expense.ExpenseID} color="black" />
+            ))}
+          </Picker>
 
-        {(selectedExpense === "new" || selectedExpense) && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="📌 Expense Name"
-              placeholderTextColor="gray"
-              value={newExpense.name}
-              onChangeText={(text) => setNewExpense({ ...newExpense, name: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="💰 Amount Spent"
-              placeholderTextColor="gray"
-              keyboardType="numeric"
-              value={newExpense.amount}
-              onChangeText={(text) => setNewExpense({ ...newExpense, amount: text })}
-            />
+          {(selectedExpense === "new" || selectedExpense) && (
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="📌 Expense Name"
+                placeholderTextColor="gray"
+                value={newExpense.name}
+                onChangeText={(text) => setNewExpense({ ...newExpense, name: text })}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="💰 Amount Spent"
+                placeholderTextColor="gray"
+                keyboardType="numeric"
+                value={newExpense.amount}
+                onChangeText={(text) => setNewExpense({ ...newExpense, amount: text })}
+              />
 
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={selectedExpense === "new" ? addExpense : updateExpense}
-            >
-              <Text style={styles.addButtonText}>
-                {selectedExpense === "new" ? "✅ Add Expense" : "🔄 Update Expense"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={selectedExpense === "new" ? addExpense : updateExpense}
+              >
+                <Text style={styles.addButtonText}>
+                  {selectedExpense === "new" ? "✅ Add Expense" : "🔄 Update Expense"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>My Expenses</Text>
+          <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>My Expenses</Text>
 
-        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Debits</Text>
-        <FlatList
-          data={expenses}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.expenseCard}>
+          <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Debits</Text>
+          {expenses.map((item) => (
+            <View key={item.ExpenseID} style={styles.expenseCard}>
               <Text style={styles.expenseText}>💳 {item.CategoryName} - {item.Description}: ${item.Amount}</Text>
               <TouchableOpacity onPress={() => deleteExpense(item.ExpenseID)} style={styles.deleteButton}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>
-          )}
-          contentContainerStyle={styles.listContainer}
-        />
-        <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Credits</Text>
-        <FlatList
-          data={cred}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.expenseCard}>
+          ))}
+
+          <Text style={{ fontWeight: "800", fontSize: 20, margin: 20 }}>Credits</Text>
+          {cred.map((item) => (
+            <View key={item.ExpenseID} style={styles.expenseCard}>
               <Text style={styles.expenseText}>💳 {item.Description} - {item.CategoryName}: ${item.Amount}</Text>
               <TouchableOpacity onPress={() => deleteExpense(item.ExpenseID)} style={styles.deleteButton}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>
-          )}
-          contentContainerStyle={styles.listContainer}
-        />
-      </ScrollView>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
 };
 
 export default ManageExpenses;
+
 
 const styles = StyleSheet.create({
   container: {

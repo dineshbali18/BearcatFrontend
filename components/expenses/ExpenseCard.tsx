@@ -27,7 +27,8 @@ interface Expense {
   TransactionType: string;
   Merchandise: string;
   Date: string;
-}interface ExpenseSectionProps{
+}
+interface ExpenseSectionProps{
   expen: Expense;
   spendingList: [];
   setSpendingList: Object;

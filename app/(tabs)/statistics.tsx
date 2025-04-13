@@ -27,35 +27,21 @@ const Analytics = ({ route }) => {
   const [budgetsData, setBudgetsData] = useState(null);
   const [savingsData, setSavingsData] = useState(null);
   const [selectedDescriptions, setSelectedDescriptions] = useState({});
-  const userData = useSelector((state)=>state?.user)
+  const userData = useSelector((state) => state?.user);
   const userId = userData?.user?.id;
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [financialRes, budgetsRes, savingsRes] = await Promise.all([
-  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
-  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
-  //         fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
-  //       ]);
-
-  //       setFinancialData(financialRes);
-  //       setBudgetsData(budgetsRes);
-  //       setSavingsData(savingsRes);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  const processChartData = (data) => {
+    if (!Array.isArray(data)) return [0];
+    return data.map(value => {
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    });
+  };
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-  
+
       const fetchData = async () => {
         setLoading(true);
         try {
@@ -64,7 +50,7 @@ const Analytics = ({ route }) => {
             fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
             fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
           ]);
-  
+
           if (isActive) {
             setFinancialData(financialRes);
             setBudgetsData(budgetsRes);
@@ -78,24 +64,26 @@ const Analytics = ({ route }) => {
           }
         }
       };
-  
+
       fetchData();
-  
+
       return () => {
         isActive = false;
       };
     }, [userId])
   );
-  
 
   const generateDescription = (data, title, period) => {
-    if (!data || data.length === 0) return "No data available.";
+    const processedData = processChartData(data);
+    if (!processedData || processedData.length === 0 || processedData.every(val => val === 0)) {
+      return `No data available for ${title} in this period.`;
+    }
 
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const avg = data.reduce((a, b) => a + b, 0) / data.length;
-    const sum = data.reduce((a, b) => a + b, 0);
-    const trend = data[0] < data[data.length - 1] ? "increasing" : "decreasing";
+    const max = Math.max(...processedData);
+    const min = Math.min(...processedData);
+    const avg = processedData.reduce((a, b) => a + b, 0) / processedData.length;
+    const sum = processedData.reduce((a, b) => a + b, 0);
+    const trend = processedData[0] < processedData[processedData.length - 1] ? "increasing" : "decreasing";
 
     const periodText = {
       weekly: "this week",
@@ -122,8 +110,10 @@ const Analytics = ({ route }) => {
   };
 
   const renderChart = (data, labels, title, isLineChart = false, id, period) => {
+    const processedData = processChartData(data);
+    
     const chartProps = {
-      data: { labels, datasets: [{ data }] },
+      data: { labels, datasets: [{ data: processedData }] },
       width: screenWidth - 40,
       height: 220,
       yAxisLabel: "$",
@@ -136,7 +126,7 @@ const Analytics = ({ route }) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          const desc = generateDescription(data, title, period);
+          const desc = generateDescription(processedData, title, period);
           setSelectedDescriptions((prev) => ({ ...prev, [id]: desc }));
         }}
       >
@@ -164,23 +154,24 @@ const Analytics = ({ route }) => {
 
     return budgetsData.Budgets.map((budget, index) => {
       const period = ["weekly", "monthly", "yearly"][activeIndex];
-      let data, labels;
+      let data = [], labels = [];
 
       if (period === "weekly") {
-        data = budget.weekly;
+        data = budget.weekly || [];
         labels = getWeeklyLabels();
       } else if (period === "monthly") {
-        data = budget.monthly;
-        labels = data.map((_, i) => `Week ${i + 1}`);
+        const monthly = budget.monthly || {};
+        data = Object.values(monthly);
+        labels = data.map((_, index) => `Week ${index + 1}`);
       } else {
-        data = budget.yearly;
+        data = budget.yearly || [];
         labels = getMonthlyLabels();
       }
 
       return renderChart(
         data,
         labels,
-        `Budget ${index + 1} (Target: $${budget.budgetTargetamount})`,
+        `Budget ${index + 1} (Target: $${budget.budgetTargetamount || 0})`,
         activeIndex === 0,
         `budget-${index}`,
         period
@@ -193,16 +184,17 @@ const Analytics = ({ route }) => {
 
     return savingsData.Budgets.map((savings, index) => {
       const period = ["weekly", "monthly", "yearly"][activeIndex];
-      let data, labels;
+      let data = [], labels = [];
 
       if (period === "weekly") {
-        data = savings.weekly;
+        data = savings.weekly || [];
         labels = getWeeklyLabels();
       } else if (period === "monthly") {
-        data = savings.monthly;
-        labels = data.map((_, i) => `Week ${i + 1}`);
+        const monthly = savings.monthly || {};
+        data = Object.values(monthly);
+        labels = data.map((_, index) => `Week ${index + 1}`);
       } else {
-        data = savings.yearly;
+        data = savings.yearly || [];
         labels = getMonthlyLabels();
       }
 
@@ -223,22 +215,26 @@ const Analytics = ({ route }) => {
     const period = ["weekly", "monthly", "yearly"][activeIndex];
     let data = [], labels = [];
 
-    if (period === "weekly") {
-      const breakdown = financialData.weeklyExpenseBreakdown;
-      const latestWeek = Object.keys(breakdown).pop();
-      const weekData = breakdown[latestWeek];
-      data = Object.values(weekData);
-      labels = getWeeklyLabels();
-    } else if (period === "yearly") {
-      data = Object.values(financialData.yearlyExpenseBreakdown?.["2025"] || {});
-      labels = getMonthlyLabels();
-    } else {
-      const breakdown = financialData.monthlyExpenseBreakdown;
-      const firstEntry = Object.values(breakdown)[0] || [];
-      labels = firstEntry.map((_, index) => `Week ${index + 1}`);
-      data = Object.values(breakdown).map((period) =>
-        Object.values(period).reduce((a, b) => a + b, 0)
-      );
+    try {
+      if (period === "weekly") {
+        const breakdown = financialData.weeklyExpenseBreakdown || {};
+        const latestWeek = Object.keys(breakdown).pop();
+        const weekData = breakdown[latestWeek] || {};
+        data = Object.values(weekData);
+        labels = getWeeklyLabels();
+      } else if (period === "yearly") {
+        const currentYear = new Date().getFullYear().toString();
+        data = Object.values(financialData.yearlyExpenseBreakdown?.[currentYear] || {});
+        labels = getMonthlyLabels();
+      } else {
+        const breakdown = financialData.monthlyExpenseBreakdown || {};
+        const weeklyArrays = Object.values(breakdown);
+        data = weeklyArrays.flat().map(val => Number(val) || 0);
+        labels = data.map((_, index) => `Week ${index + 1}`);
+      }
+    } catch (error) {
+      console.error("Error processing expense data:", error);
+      data = [0];
     }
 
     return [
@@ -259,22 +255,26 @@ const Analytics = ({ route }) => {
     const period = ["weekly", "monthly", "yearly"][activeIndex];
     let data = [], labels = [];
 
-    if (period === "weekly") {
-      const breakdown = financialData.weeklyIncomeBreakdown;
-      const latestWeek = Object.keys(breakdown).pop();
-      const weekData = breakdown[latestWeek];
-      data = Object.values(weekData);
-      labels = getWeeklyLabels();
-    } else if (period === "yearly") {
-      data = Object.values(financialData.yearlyIncomeBreakdown?.["2025"] || {});
-      labels = getMonthlyLabels();
-    } else {
-      const breakdown = financialData.monthlyIncomeBreakdown;
-      const firstEntry = Object.values(breakdown)[0] || [];
-      labels = firstEntry.map((_, index) => `Week ${index + 1}`);
-      data = Object.values(breakdown).map((period) =>
-        Object.values(period).reduce((a, b) => a + b, 0)
-      );
+    try {
+      if (period === "weekly") {
+        const breakdown = financialData.weeklyIncomeBreakdown || {};
+        const latestWeek = Object.keys(breakdown).pop();
+        const weekData = breakdown[latestWeek] || {};
+        data = Object.values(weekData);
+        labels = getWeeklyLabels();
+      } else if (period === "yearly") {
+        const currentYear = new Date().getFullYear().toString();
+        data = Object.values(financialData.yearlyIncomeBreakdown?.[currentYear] || {});
+        labels = getMonthlyLabels();
+      } else {
+        const breakdown = financialData.monthlyIncomeBreakdown || {};
+        const weeklyArrays = Object.values(breakdown);
+        data = weeklyArrays.flat().map(val => Number(val) || 0);
+        labels = data.map((_, index) => `Week ${index + 1}`);
+      }
+    } catch (error) {
+      console.error("Error processing income data:", error);
+      data = [0];
     }
 
     return [
@@ -322,13 +322,13 @@ const Analytics = ({ route }) => {
             renderItem={({ item }) => item}
           />
 
-<Text style={styles.text}>Income:</Text>
+          <Text style={styles.text}>Income:</Text>
           <FlatList
             data={renderIncomeChart()}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(_, index) => `expense-${index}`}
+            keyExtractor={(_, index) => `income-${index}`}
             renderItem={({ item }) => item}
           />
 

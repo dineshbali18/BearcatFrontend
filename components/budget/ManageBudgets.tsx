@@ -215,30 +215,30 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
             </TouchableOpacity>
           </View>
         )}
-        </ScrollView>
+
 
         <Text style={styles.sectionHeader}>My Current Budgets</Text>
 
         {budgets.length > 0 ? (
-          <FlatList
-            data={budgets}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.goalCard}>
-                <Text style={styles.goalText}>
-                  🎯 {item.name}: ${formatNumber(item.amount)} / ${formatNumber(item.AmountSpent || item.totalAmount)} (
-                  {item.percentage ? `${item.percentage}%` : '0%'})
-                </Text>
-                <TouchableOpacity onPress={() => deleteBudget(item.id)} style={styles.deleteButton}>
-                  <Feather name="trash" size={20} color="red" />
-                </TouchableOpacity>
-              </View>
-            )}
-            contentContainerStyle={styles.listContainer}
-          />
-        ) : (
-          <Text style={styles.emptyText}>No budgets found. Add a new budget to get started!</Text>
-        )}
+      <View style={styles.listContainer}>
+        {budgets.map((item) => (
+          <View key={item.id} style={styles.goalCard}>
+            <Text style={styles.goalText}>
+              🎯 {item.name}: ${formatNumber(item.amount)} / ${formatNumber(item.AmountSpent || item.totalAmount)} (
+              {item.percentage ? `${item.percentage}%` : '0%'})
+            </Text>
+            <TouchableOpacity onPress={() => deleteBudget(item.id)} style={styles.deleteButton}>
+              <Feather name="trash" size={20} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+    ) : (
+      <Text style={styles.emptyText}>No budgets found. Add a new budget to get started!</Text>
+    )}
+
+</ScrollView>
+
       
     </View>
   );

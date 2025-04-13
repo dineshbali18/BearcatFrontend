@@ -28,8 +28,8 @@ const ResetPasswordScreen = () => {
         body: JSON.stringify({ email }),
       });
       const generateOtpData = await generateOtpResponse.json();
-      // console.log("!!!!!!!!",generateOtpData.message)
-      if (generateOtpData.message !== "OTP updated successfully." && generateOtpData.message !== "OTP generated and saved successfully.") {
+      console.log("!!!!!!!!",generateOtpData.message)
+      if (generateOtpData.message !== "OTP updated successfully." && generateOtpData.message !== "OTP generated and saved successfully." && generateOtpData.message !== "OTP generated or updated successfully.") {
         throw new Error("Failed to generate OTP.");
       }
       

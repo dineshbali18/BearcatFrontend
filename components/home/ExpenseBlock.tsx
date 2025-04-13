@@ -98,6 +98,7 @@ console.log(expenses);
         setAllExpenses(expenses)
 
         console.log("DEBITS:::::",debits)
+        debits.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime())
         setSpendingList(debits);
         console.log("AAAAAQQQQQ:::SPENDING",spendingList)
       }
@@ -107,6 +108,7 @@ console.log(expenses);
           category.expenses.filter((expense: Expense) => expense.TransactionType && (expense.TransactionType.toLowerCase() === "credit" || expense.TransactionType.toLowerCase()=="deposit"))
         );
         console.log("credits:::::",credits)
+        credits.sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime());
         setIncomeList(credits);
         console.log("AAAAAQQQQQ:::INCOME",incomeList)
       }

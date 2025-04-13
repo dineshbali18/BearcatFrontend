@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  FlatList,
-  ListRenderItem,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,6 +7,7 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
@@ -16,7 +15,6 @@ import { useSelector } from "react-redux";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
 
-// Define types
 interface Expense {
   ExpenseID: number;
   CategoryID: number;
@@ -33,11 +31,9 @@ interface Budget {
   BudgetName: string;
 }
 
-
 const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
-const SpendingBlock = ({spendingList}) => {
-  // const [spendingList, setSpendingList] = useState<Expense[]>([]);
+const SpendingBlock = ({ spendingList }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSpending, setSelectedSpending] = useState<Expense | null>(null);
@@ -45,44 +41,14 @@ const SpendingBlock = ({spendingList}) => {
   const [selectedBudget, setSelectedBudget] = useState<number | null>(null);
   const [isLoadingBudgets, setIsLoadingBudgets] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  
+
   const userState = useSelector((state) => state.user);
   const userId = userState?.user?.id;
   const token = userState?.token;
 
-  // useEffect(() => {
-  //   fetchExpenses();
-  // }, []);
-
-  // const fetchExpenses = async () => {
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = await response.json();
-  //     if (data?.categorizedExpenses) {
-  //       const debits = data.categorizedExpenses.flatMap((category: any) =>
-  //         category.expenses.filter((expense: Expense) => expense.TransactionType === "Debit")
-  //       );
-  //       setSpendingList(debits);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching expenses:", error);
-  //     Alert.alert("Error", "Failed to load transactions.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-  useEffect(()=>{
-    console.log("My Spending ---- ",spendingList)
-  })
+  useEffect(() => {
+    console.log("My Spending ---- ", spendingList);
+  }, [spendingList]);
 
   const fetchBudgets = async () => {
     setIsLoadingBudgets(true);
@@ -94,13 +60,8 @@ const SpendingBlock = ({spendingList}) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await response.json();
-      if (Array.isArray(data)) {
-        setBudgets(data);
-      } else {
-        setBudgets([]);
-      }
+      setBudgets(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching budgets:", error);
       Alert.alert("Error", "Failed to load budgets.");
@@ -140,86 +101,102 @@ const SpendingBlock = ({spendingList}) => {
   };
 
   const openModal = (expense: Expense) => {
-    console.log("Opening modal for:", expense);
     setSelectedSpending(expense);
     setModalVisible(true);
     fetchBudgets();
   };
 
-  const renderItem: ListRenderItem<Expense> = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.expenseName}>{item.CategoryName}</Text>
-        <Feather name="more-horizontal" size={20} color={Colors.white} />
-      </View>
-      <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
-      <Text style={styles.description}>{item.Description}</Text>
-    </TouchableOpacity>
-  );
+  // Function to group spending by date
+  const groupSpendingByDate = (spendingList: Expense[]) => {
+    const grouped: { [key: string]: Expense[] } = {};
+
+    spendingList.forEach((item: Expense) => {
+      const date = item.Date.split("T")[0]; // Use the date part (YYYY-MM-DD)
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(item);
+    });
+
+    return grouped;
+  };
+
+  const groupedSpending = groupSpendingByDate(spendingList);
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>
         My <Text style={styles.boldText}>Spending</Text>
       </Text>
-      {spendingList.length > 0 ? (
-        <>
-        <FlatList data={spendingList} renderItem={renderItem} showsHorizontalScrollIndicator={false} nestedScrollEnabled={true} />
-        </>
-      ) : (
-        <>
-        <Text style={styles.noSpendingText}>No debit transactions found.</Text>
-        </>
-      )}
 
-<Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      
-      {selectedSpending && (
-        <>
-          <Text style={styles.modalTitle}>Transaction Details</Text>
-          <Text style={styles.modalText}>Category: {selectedSpending.CategoryName}</Text>
-          <Text style={styles.modalText}>Amount: ${parseFloat(selectedSpending.Amount).toFixed(2)}</Text>
-          <Text style={styles.modalText}>Description: {selectedSpending.Description}</Text>
-
-          {/* Budget Picker */}
-          <Text style={styles.modalTitle}>Select a Budget</Text>
-          {isLoadingBudgets ? (
-            <ActivityIndicator size="small" color={Colors.blue} />
-          ) : (
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedBudget}
-                onValueChange={(itemValue) => setSelectedBudget(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Select a Budget" value={null} />
-                {budgets.map((budget) => (
-                  <Picker.Item key={budget.BudgetID} label={budget.BudgetName} value={budget.BudgetID} />
-                ))}
-              </Picker>
+      {Object.keys(groupedSpending).length > 0 ? (
+        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+          {Object.keys(groupedSpending).map((date) => (
+            <View key={date} style={styles.dateGroup}>
+              <Text style={styles.dateHeader}>{date}</Text>
+              {groupedSpending[date].map((item: Expense) => (
+                <TouchableOpacity
+                  key={item.ExpenseID}
+                  style={styles.card}
+                  onPress={() => openModal(item)}
+                >
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.expenseName}>{item.CategoryName}</Text>
+                    <Feather name="more-horizontal" size={20} color={Colors.white} />
+                  </View>
+                  <Text style={styles.amountText}>${parseFloat(item.Amount).toFixed(2)}</Text>
+                  <Text style={styles.description}>{item.Description}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
-
-          )}
-
-          {/* Button Section */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
-              <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-
-        </>
+          ))}
+        </ScrollView>
+      ) : (
+        <Text style={styles.noSpendingText}>No debit transactions found.</Text>
       )}
-    </View>
-  </View>
-</Modal>
 
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {selectedSpending && (
+              <>
+                <Text style={styles.modalTitle}>Transaction Details</Text>
+                <Text style={styles.modalText}>Category: {selectedSpending.CategoryName}</Text>
+                <Text style={styles.modalText}>Amount: ${parseFloat(selectedSpending.Amount).toFixed(2)}</Text>
+                <Text style={styles.modalText}>Description: {selectedSpending.Description}</Text>
+
+                <Text style={styles.modalTitle}>Select a Budget</Text>
+                {isLoadingBudgets ? (
+                  <ActivityIndicator size="small" color={Colors.blue} />
+                ) : (
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={selectedBudget}
+                      onValueChange={(itemValue) => setSelectedBudget(itemValue)}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Select a Budget" value={null} />
+                      {budgets.map((budget) => (
+                        <Picker.Item key={budget.BudgetID} label={budget.BudgetName} value={budget.BudgetID} />
+                      ))}
+                    </Picker>
+                  </View>
+                )}
+
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
+                    <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.buttonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -227,6 +204,15 @@ const SpendingBlock = ({spendingList}) => {
 export default SpendingBlock;
 
 const styles = StyleSheet.create({
+  dateGroup: {
+    marginBottom: 20,
+  },
+  dateHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: Colors.white,
+    marginBottom: 10,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",

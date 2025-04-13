@@ -15,9 +15,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff" 
       },
-      "package": "com.dineshbali18.expensetrackerapp"
+      "package": "com.dineshbali18.expensetrackerapp",
+      "usesCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",

@@ -67,7 +67,7 @@ const SignUp = () => {
        // await AsyncStorage.setItem("userData", JSON.stringify(res.user));
         Alert.alert("Register", "Registration successful!");
         // Optionally, navigate to another screen:
-        router.replace({ pathname: "/(auth)/mfa_register", params: { email: emailRef.current } });
+        router.replace(`/(auth)/mfa_register?email=${encodeURIComponent(emailRef.current)}`);
       }
     } catch (error) {
       Alert.alert("Register", "An error occurred during registration.");

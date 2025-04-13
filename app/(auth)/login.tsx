@@ -64,7 +64,9 @@ const Login = () => {
         Alert.alert("Login", "Login successful!");
 
         // Optionally, navigate to another screen
-        router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
+        router.replace(`/(auth)/mfa?email=${encodeURIComponent(emailRef.current)}`);
+
+        // router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
       }
     } catch (error) {
       setLoading(false);

@@ -1,0 +1,5 @@
+appId: com.dineshbali18.expensetrackerapp
+---
+- launchApp
+- tapOn: "Get Started"
+- assertVisible: "Welcome"

@@ -10,12 +10,13 @@
     "newArchEnabled": true,
     "entryPoint": "App.tsx",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dineshbali18.expensetrackerapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff" 
+        "backgroundColor": "#ffffff"
       },
       "package": "com.dineshbali18.expensetrackerapp",
       "usesCleartextTraffic": true

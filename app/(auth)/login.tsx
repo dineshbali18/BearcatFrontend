@@ -96,16 +96,20 @@ const Login = () => {
             Login now to track all your expenses
           </Typo>
           <Input
-            icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-            placeholder="Enter your email"
-            onChangeText={(value) => (emailRef.current = value)}
-          />
-          <Input
-            icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-            placeholder="Enter your password"
-            secureTextEntry
-            onChangeText={(value) => (passwordRef.current = value)}
-          />
+          testID="emailInput"
+          icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+          placeholder="Enter your email"
+          onChangeText={(value) => (emailRef.current = value)}
+        />
+
+        <Input
+          testID="passwordInput"
+          icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+          placeholder="Enter your password"
+          secureTextEntry
+          onChangeText={(value) => (passwordRef.current = value)}
+        />
+
           <View>
             <Pressable onPress={() => router.replace("/(auth)/resetPassword")}>
               <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
@@ -115,11 +119,12 @@ const Login = () => {
           </View>
 
           {/* button */}
-          <Button loading={loading} onPress={onSubmit}>
+          <Button testID="loginButton" loading={loading} onPress={onSubmit}>
             <Typo fontWeight={"700"} color={colors.black} size={21}>
               Login
             </Typo>
           </Button>
+
         </View>
 
         {/* footer */}

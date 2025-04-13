@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useSelector } from "react-redux"; // Assuming Redux for user data
+import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
 const MFAScreen = () => {
-  const { email } = useLocalSearchParams(); // Get the email passed from previous screen
+  const { email } = useLocalSearchParams(); // From login/register
   const router = useRouter();
-  const [otp, setOtp] = useState(""); // State for OTP input
-  const user = useSelector((state) => state.user.user); // Get the user data from Redux store
+  const [otp, setOtp] = useState("");
+  const user = useSelector((state) => state.user.user);
 
-  // Function to handle OTP verification
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
       Alert.alert("❌ Error", "Please enter a valid 6-digit OTP.");
@@ -18,35 +17,27 @@ const MFAScreen = () => {
     }
 
     try {
-      // Send OTP verification request to backend
       const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email, // Email from the local search params
-          Otp: otp, // OTP entered by the user
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, Otp: otp }),
       });
 
       const result = await response.json();
-      console.log("QQQQQQQQQQ",result)
+      console.log("OTP Verification Response:", result);
 
-      if (result.message == "OTP verified successfully." && result.error == undefined) {
-        // If OTP is verified successfully, navigate to home
+      if (result.message === "OTP verified successfully." && !result.error) {
         Alert.alert("✅ Success", "OTP Verified Successfully!", [
           {
             text: "OK",
-            onPress: () => router.replace("/(tabs)"), // Navigate to home screen (replace with your home screen path)
+            onPress: () => router.replace("/(tabs)"),
           },
         ]);
       } else {
-        // Handle error if OTP is incorrect
-        Alert.alert("❌ Error", result.error|| "Invalid OTP. Please try again.");
+        Alert.alert("❌ Error", result.error || "Invalid OTP. Please try again.");
       }
     } catch (error) {
-      console.error("OTP Verification error:", error);
+      console.error("OTP Verification Error:", error);
       Alert.alert("❌ Error", "An error occurred during OTP verification.");
     }
   };
@@ -59,6 +50,7 @@ const MFAScreen = () => {
 
       {/* Email (Non-editable) */}
       <TextInput
+        testID="emailDisplay"
         style={{
           width: "100%",
           padding: 15,
@@ -74,6 +66,7 @@ const MFAScreen = () => {
 
       {/* OTP Input */}
       <TextInput
+        testID="otpInput"
         style={{
           width: "100%",
           padding: 15,
@@ -94,6 +87,7 @@ const MFAScreen = () => {
 
       {/* Verify Button */}
       <TouchableOpacity
+        testID="verifyOtpButton"
         onPress={handleVerifyOTP}
         style={{
           marginTop: 20,

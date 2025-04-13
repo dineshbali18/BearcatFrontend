@@ -17,9 +17,13 @@ const WelcomePage = () => {
       <View style={styles.container}>
         {/* Login & Image */}
         <View>
-          <TouchableOpacity onPress={() => router.push("/(auth)/login")} style={styles.loginButton}>
-            <Text style={[styles.signInText, { fontWeight: "500" }]}>Sign in</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+  onPress={() => router.push("/(auth)/login")}
+  style={styles.loginButton}
+  testID="signInButton"
+>
+  <Text style={[styles.signInText, { fontWeight: "500" }]}>Sign in</Text>
+</TouchableOpacity>
 
           <Animated.Image
             entering={FadeIn.duration(500)}
@@ -59,11 +63,14 @@ const WelcomePage = () => {
             entering={FadeInDown.duration(1000).delay(200).springify().damping(12)}
             style={styles.buttonContainer}
           >
-            <Button onPress={() => router.push("/(auth)/register")}>
-              <Text style={[styles.buttonText, { fontSize: 22, fontWeight: "600" }]}>
-                Get Started
-              </Text>
-            </Button>
+            <Button
+  onPress={() => router.push("/(auth)/register")}
+  testID="getStartedButton"
+>
+  <Text style={[styles.buttonText, { fontSize: 22, fontWeight: "600" }]}>
+    Get Started
+  </Text>
+</Button>
           </Animated.View>
         </View>
       </View>

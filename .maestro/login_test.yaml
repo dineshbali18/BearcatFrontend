@@ -1,0 +1,19 @@
+appId: com.dineshbali18.expensetrackerapp
+---
+- launchApp
+- tapOn:
+    id: "signInButton"  # if you navigate from welcome
+- assertVisible: "Enter your email"
+
+- inputText:
+    id: "emailInput"
+    text: "dineshbali45@gmail.com"
+
+- inputText:
+    id: "passwordInput"
+    text: "gamer45"
+
+- tapOn:
+    id: "loginButton"
+
+- assertVisible: "Enter 6-digit OTP"

@@ -97,56 +97,40 @@ const SignUp = () => {
             Create an account to track your expenses
           </Typo>
           <Input
-            icon={
-              <Icons.User
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
-            placeholder="Enter your name"
-            onChangeText={(value) => (nameRef.current = value)}
-          />
-          <Input
-            icon={
-              <Icons.At
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
-            placeholder="Enter your email"
-            onChangeText={(value) => (emailRef.current = value)}
-          />
-          <Input
-            icon={
-              <Icons.Phone
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
-            placeholder="Enter your phone number"
-            onChangeText={(value) => (phoneNumberRef.current = value)}
-          />
-          <Input
-            icon={
-              <Icons.Lock
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
-              />
-            }
-            placeholder="Enter your password"
-            secureTextEntry
-            onChangeText={(value) => (passwordRef.current = value)}
-          />
-          {/* Button */}
-          <Button loading={loading} onPress={onSubmit}>
-            <Typo fontWeight={"700"} color={colors.black} size={21}>
-              Sign Up
-            </Typo>
-          </Button>
+  testID="nameInput"
+  icon={<Icons.User size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+  placeholder="Enter your name"
+  onChangeText={(value) => (nameRef.current = value)}
+/>
+
+<Input
+  testID="emailInput"
+  icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+  placeholder="Enter your email"
+  onChangeText={(value) => (emailRef.current = value)}
+/>
+
+<Input
+  testID="phoneInput"
+  icon={<Icons.Phone size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+  placeholder="Enter your phone number"
+  onChangeText={(value) => (phoneNumberRef.current = value)}
+/>
+
+<Input
+  testID="passwordInput"
+  icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+  placeholder="Enter your password"
+  secureTextEntry
+  onChangeText={(value) => (passwordRef.current = value)}
+/>
+
+<Button testID="signUpButton" loading={loading} onPress={onSubmit}>
+  <Typo fontWeight={"700"} color={colors.black} size={21}>
+    Sign Up
+  </Typo>
+</Button>
+
         </View>
 
         {/* Footer */}

@@ -1,0 +1,22 @@
+appId: com.dineshbali18.expensetrackerapp
+---
+- launchApp
+- tapOn: "Sign in"
+
+- inputText:
+    id: "emailInput"
+    text: "dineshbali45@gmail.com"
+- inputText:
+    id: "passwordInput"
+    text: "gamer45"
+
+- tapOn: "Login"
+- assertVisible: "🔐 Two-Factor Authentication"
+
+- inputText:
+    id: "otpInput"
+    text: "123456"
+
+- tapOn:
+    id: "verifyOtpButton"
+- assertVisible: "Dashboard"

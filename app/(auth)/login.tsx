@@ -32,6 +32,7 @@ const Login = () => {
       console.log(`Àaaaaa ${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`)
       const apiUrl = String(Constants.expoConfig?.extra?.REACT_APP_API)+":3002/user/login";
       console.log(apiUrl)
+      Alert.alert(`Àaaaaa ${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`)
       const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,6 +43,8 @@ const Login = () => {
       });
 
       const res = await response.json();
+      Alert.alert(res)
+
       console.log("Response:", res);
       setLoading(false);
 

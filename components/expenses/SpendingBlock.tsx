@@ -31,7 +31,7 @@ interface Budget {
   BudgetName: string;
 }
 
-const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
+const API_BASE_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002`;
 
 const SpendingBlock = ({ spendingList }) => {
   const [loading, setLoading] = useState<boolean>(true);

@@ -47,7 +47,7 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
     if (!newBudget.name || !newBudget.targetAmount) return;
   
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +79,7 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
     if (!newBudget.name || !newBudget.targetAmount || !selectedBudget) return;
   
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets/${selectedBudget}`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets/${selectedBudget}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +108,7 @@ const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
 
   const deleteBudget = async (id) => {
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/budgets/${id}`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

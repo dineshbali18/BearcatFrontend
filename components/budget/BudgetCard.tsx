@@ -8,7 +8,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user`; // Base URL for the API
+const API_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/user`; // Base URL for the API
 
 const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
   const [budgets, setBudgets] = useState([]);

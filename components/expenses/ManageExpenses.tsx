@@ -25,7 +25,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
       console.log("Updating Expense ID:", selectedExpense);
   
       const response = await fetch(
-        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/${selectedExpense}`,
+        `${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/expenses/${selectedExpense}`,
         {
           method: "PUT",
           headers: {
@@ -58,7 +58,7 @@ const ManageExpenses = ({ cred, setCred, expenses, setExpenses, onClose, fetchEx
       console.log("Deleting Expense ID:", id);
   
       const response = await fetch(
-        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/${id}`,
+        `${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/expenses/${id}`,
         {
           method: "DELETE",
           headers: {

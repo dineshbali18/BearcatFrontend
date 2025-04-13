@@ -35,7 +35,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     };
 
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -70,7 +70,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     console.log("SSSSSEEEE", selectedGoal)
     console.log("000000", newGoal)
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -99,7 +99,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
   const deleteGoal = async (id) => {
     try {
       console.log("ISDDDDDD", id)
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

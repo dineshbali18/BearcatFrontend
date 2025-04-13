@@ -33,7 +33,7 @@ interface SavingGoal {
   GoalName: string;
 }
 
-const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
+const API_BASE_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002`;
 
 const IncomeBlock = ({incomeList}) => {
   // const [incomeList, setIncomeList] = useState<Expense[]>([]);

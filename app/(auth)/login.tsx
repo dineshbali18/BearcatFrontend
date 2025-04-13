@@ -29,11 +29,11 @@ const Login = () => {
 
     setLoading(true);
     try {
-      console.log(`Àaaaaa ${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`)
-      const apiUrl = String(Constants.expoConfig?.extra?.REACT_APP_API)+":3002/user/login";
+      console.log(`Àaaaaa ${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`)
+      const apiUrl = String(Constants.manifest?.extra?.REACT_APP_API)+":3002/user/login";
       console.log(apiUrl)
-      Alert.alert(`Àaaaaa ${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`)
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/login`, {
+      Alert.alert(`Àaaaaa ${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`)
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

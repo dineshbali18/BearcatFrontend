@@ -63,7 +63,7 @@ useEffect(()=>{
 const fetchBankTransactions = () => {
   console.log("gvjkbnl");
 
-  fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/sync-transactions/${userId}`, {
+  fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/sync-transactions/${userId}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${userState?.token}`,  

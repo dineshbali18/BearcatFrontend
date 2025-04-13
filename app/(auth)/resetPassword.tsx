@@ -20,7 +20,7 @@ const ResetPasswordScreen = () => {
 
     try {
       // First request: generate OTP
-      const generateOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/generateotp`, {
+      const generateOtpResponse = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3000/api/user/generateotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +35,7 @@ const ResetPasswordScreen = () => {
       
 
       // Second request: send OTP
-      const sendOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/sendotp`, {
+      const sendOtpResponse = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3000/api/user/sendotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const ResetPasswordScreen = () => {
 
     try {
       // Third request: verify OTP
-      const verifyOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
+      const verifyOtpResponse = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,7 @@ const ResetPasswordScreen = () => {
     try {
       // Final request: update password
       console.log("QQQQQQ")
-      const resetPasswordResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update`, {
+      const resetPasswordResponse = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/user/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

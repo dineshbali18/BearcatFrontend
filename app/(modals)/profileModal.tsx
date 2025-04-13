@@ -74,7 +74,7 @@ const ProfileModal = () => {
     setLoading(true);
   
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update/profile`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/user/update/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/transactions/${savings[0].AccountNumber}/offset/0`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3001/bank/transactions/${savings[0].AccountNumber}/offset/0`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
     };
 
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

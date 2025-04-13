@@ -29,7 +29,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/category`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/category`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${userState?.token}`,
@@ -59,7 +59,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
     };
 
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/create/expenses`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/create/expenses`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${userState?.token}`,

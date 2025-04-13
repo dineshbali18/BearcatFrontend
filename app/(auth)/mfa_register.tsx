@@ -18,7 +18,7 @@ const MFARegisterScreen = () => {
 
     try {
       // Send OTP verification request to backend
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
+      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

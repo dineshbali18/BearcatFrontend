@@ -68,7 +68,7 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
   const fetchExpenses = async () => {
     try {
       const response = await fetch(
-        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
+        `${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
         {
           method: "GET",
           headers: {

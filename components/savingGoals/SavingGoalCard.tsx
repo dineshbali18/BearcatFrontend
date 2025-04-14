@@ -8,17 +8,14 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-const API_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal/user`; // Base URL for the API
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/user`;
 
 const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
-
-  console.log("EEEEQQQ",expenses)
-
   const [savings, setSavings] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [isSavingGoalExpenseVisibel, setIsSavingGoalExpenseVisible] = useState(false);
-  const userState = useSelector((state) => state.user); // Assume user is a JSON string
-  const userId = userState.user.id; // Dynamic User ID
+  const userState = useSelector((state) => state.user);
+  const userId = userState.user.id;
   const GoalID = useRef(0);
 
   useEffect(() => {
@@ -32,7 +29,6 @@ const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
         headers: { Authorization: `Bearer ${userState.token}` },
       });
 
-      // Process the data from API response
       const formattedData = response.data.map((goal) => ({
         id: goal.GoalID.toString(),
         name: goal.GoalName,
@@ -47,61 +43,37 @@ const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
     }
   };
 
+  const savingsArray = savings || [];
+  const completedGoals = savingsArray.filter((goal) => parseInt(goal.percentage) >= 100);
+  const currentGoals = savingsArray.filter((goal) => parseInt(goal.percentage) < 100);
 
-// Ensure savings is always an array, even if it's null or undefined
-const savingsArray = savings || [];
+  const totalSavings = savings.length > 0 
+    ? savings.reduce((acc, goal) => acc + (parseFloat(goal.amount) || 0), 0) 
+    : 0;
 
-console.log("SSSS",savings)
-// Filter completed and current goals
-const completedGoals = savingsArray.filter((goal) => parseInt(goal.percentage) >= 100);
-const currentGoals = savingsArray.filter((goal) => parseInt(goal.percentage) < 100);
+  const goalAmount = savings.length > 0 
+    ? savings.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0) 
+    : 0;
 
-console.log("ZZZZZZZ",savingsArray)
-// Calculate totalSavings and goalAmount safely
-const totalSavings = savings.length > 0 
-  ? savings.reduce((acc, goal) => acc + (parseFloat(goal.amount) || 0), 0) 
-  : 0;
+  const percentage = goalAmount > 0 && totalSavings > 0 && goalAmount > 0 
+    ? ((parseFloat(totalSavings) / parseFloat(goalAmount)) * 100).toFixed(0) 
+    : 0;
 
-const goalAmount = savings.length > 0 
-  ? savings.reduce((acc, goal) => acc + (parseFloat(goal.totalAmount) || 0), 0) 
-  : 0;
+  const pieData = [
+    { value: Number(percentage), color: Colors.blue },
+    { value: 100 - Number(percentage), color: Colors.white },
+  ];
 
-// Calculate percentage safely (avoid division by zero)
-const percentage = goalAmount > 0 && totalSavings > 0 && goalAmount > 0 
-  ? ((parseFloat(totalSavings) / parseFloat(goalAmount)) * 100).toFixed(0) 
-  : 0;
-
-// Generate pieData safely
-// Generate pieData safely
-// const goalPercentage = savingsArray.length > 0
-//   ? savingsArray.reduce((total, goal) => total + parseFloat(goal.percentage || 0), 0)
-//   : 0;
-
-//   goalPercentage = 
-
-  // console.log("ggggg",goalPercentage)
-
-const pieData = [
-  { value: Number(percentage), color: Colors.blue },
-  { value: 100 - Number(percentage), color: Colors.white },
-];
-
-
-
-console.log("TTTTSSSS",totalSavings)
-console.log("GoalAmt",goalAmount)
-console.log("perrrr",percentage)
-console.log("pieData",pieData)
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={styles.container} testID="savingGoalsContainer">
+      <View style={styles.header} testID="savingGoalsHeader">
         <Text style={styles.headerText}>My Total Savings</Text>
-        <TouchableOpacity onPress={() => setManageModalVisible(true)}>
+        <TouchableOpacity onPress={() => setManageModalVisible(true)} testID="openManageGoalsModal">
           <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.expenseAmountText}>${totalSavings} / ${goalAmount} </Text>
-      <View style={styles.pieChartContainer}>
+      <Text style={styles.expenseAmountText} testID="totalSavingsText">${totalSavings} / ${goalAmount} </Text>
+      <View style={styles.pieChartContainer} testID="savingsPieChart">
         <PieChart
           data={pieData}
           donut
@@ -113,58 +85,58 @@ console.log("pieData",pieData)
           innerCircleColor={Colors.black}
           centerLabelComponent={() => (
             <View style={styles.centerLabel}>
-              <Text style={styles.centerLabelText}>{percentage}%</Text>
+              <Text style={styles.centerLabelText} testID="savingsPercentageText">{percentage}%</Text>
             </View>
           )}
         />
       </View>
       <Text style={styles.sectionHeader}>Current Goals</Text>
-      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
+      <FlatList data={currentGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal testID="currentGoalsList" />
       <Text style={styles.sectionHeader}>Completed Goals</Text>
-      <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal />
+      <FlatList data={completedGoals} renderItem={({ item }) => <GoalItem item={item} allExpenses={expenses} GoalID={GoalID} setIsSavingGoalExpenseVisibel={setIsSavingGoalExpenseVisible} />} keyExtractor={(item) => item.id} horizontal testID="completedGoalsList" />
       <Modal visible={isManageModalVisible} animationType="slide">
         <ManageSavingGoals savings={savings} setSavings={setSavings} fetchSaving={fetchSavingGoals} onClose={() => setManageModalVisible(false)} />
       </Modal>
       <Modal visible={isSavingGoalExpenseVisibel} animationType="slide" transparent>
-            <View style={styles.modalBackground}>
-              <View style={styles.expensesModal}>
-                <TouchableOpacity style={styles.closeButton} onPress={() => {setIsSavingGoalExpenseVisible(false)}}>
-                  <Feather name="x" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.modalHeader}>Expenses</Text>
-                <FlatList
-                  data={expenses.filter(expense => expense.GoalID === GoalID.current)}
-                  renderItem={({ item }) => (
-                    <View style={styles.expenseItem}>
-                      <Text style={styles.expenseDescription}>{item.Description}</Text>
-                      <Text style={styles.expenseAmount}>${item.Amount}</Text>
-                    </View>
-                  )}
-                  keyExtractor={(item) => item.ExpenseID.toString()}
-                />
-              </View>
-            </View>
-        </Modal>
+        <View style={styles.modalBackground} testID="savingGoalExpensesModal">
+          <View style={styles.expensesModal}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => {setIsSavingGoalExpenseVisible(false)}} testID="closeExpensesModal">
+              <Feather name="x" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.modalHeader}>Expenses</Text>
+            <FlatList
+              data={expenses.filter(expense => expense.GoalID === GoalID.current)}
+              renderItem={({ item }) => (
+                <View style={styles.expenseItem} testID={`goalExpense-${item.ExpenseID}`}>
+                  <Text style={styles.expenseDescription}>{item.Description}</Text>
+                  <Text style={styles.expenseAmount}>${item.Amount}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.ExpenseID.toString()}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const GoalItem = ({ item, expenses, GoalID, setIsSavingGoalExpenseVisibel }) => (
   <View>
-  <TouchableOpacity onPress={() => { GoalID.current=Number(item.id); setIsSavingGoalExpenseVisibel(true); }}>
-  <View style={styles.goalCard}>
-    <View style={styles.goalHeader}>
-      <Text style={styles.savingName}>{item.name}</Text>
-    </View>
-    <View style={styles.progressBarWrapper}>
-      <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />
-    </View>
-    <View style={styles.goalDetails}>
-      <Text style={styles.percentageText}>{item.percentage}%</Text>
-      <Text style={styles.savingAmount}>${item.amount} / ${item.totalAmount}</Text>
-    </View>
-  </View>
-  </TouchableOpacity>
+    <TouchableOpacity onPress={() => { GoalID.current=Number(item.id); setIsSavingGoalExpenseVisibel(true); }} testID={`goalItem-${item.id}`}>
+      <View style={styles.goalCard}>
+        <View style={styles.goalHeader}>
+          <Text style={styles.savingName}>{item.name}</Text>
+        </View>
+        <View style={styles.progressBarWrapper}>
+          <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />
+        </View>
+        <View style={styles.goalDetails}>
+          <Text style={styles.percentageText}>{item.percentage}%</Text>
+          <Text style={styles.savingAmount}>${item.amount} / ${item.totalAmount}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   </View>
 );
 

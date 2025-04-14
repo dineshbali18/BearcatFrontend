@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 import ManageBankTransactions from "./ManageBankTransactions";
 
-const API_BASE_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002`;
+const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
 const WalletListItem = ({check}) => {
   const [userAccounts, setUserAccounts] = useState([]);
@@ -24,14 +24,11 @@ const WalletListItem = ({check}) => {
     fetchUserAccounts();
   }, []); // Fetch only once on mount
 
-  
-
   const fetchUserAccounts = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/userBankAccount`, {
         headers: { Authorization: `Bearer ${userState?.token}` },
       });
-      // console.log("SSSS",response.data)
       setUserAccounts(response.data);
     } catch (error) {
       console.error("Error fetching user accounts:", error);
@@ -65,9 +62,10 @@ const WalletListItem = ({check}) => {
       <TouchableOpacity 
         onPress={() => handleCardClick(item)}
         style={styles.cardContainer}
+        testID={`walletCard-${item.AccountID}`}
       >
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
+          <View style={styles.cardHeader} testID="walletCardHeader">
             <FontAwesome name="bank" size={30} color={colors.white} style={styles.cardIcon} />
             <View style={styles.cardInfo}>
               <Typo size={20} weight="bold" color={colors.white}>{item.BankName || "Unknown Bank"}</Typo>
@@ -95,7 +93,7 @@ const WalletListItem = ({check}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="walletListContainer">
       {loading ? (
         <Typo size={14} color={colors.neutral500}>Loading...</Typo>
       ) : error ? (
@@ -106,6 +104,7 @@ const WalletListItem = ({check}) => {
           renderItem={renderItem}
           keyExtractor={(item) => item.AccountID?.toString() || item.AccountNumber}
           contentContainerStyle={styles.listContent}
+          testID="walletCardList"
         />
       ) : (
         <Typo size={14} color={colors.neutral500}>No accounts found.</Typo>
@@ -113,9 +112,9 @@ const WalletListItem = ({check}) => {
 
       {/* ManageBankTransactions Modal */}
       {modalVisible && selectedAccount && (
-        <View style={styles.overlay}>
-          <View style={styles.modal}>
-            <TouchableOpacity onPress={handleModalClose} style={styles.closeButton}>
+        <View style={styles.overlay} testID="manageBankTransactionOverlay">
+          <View style={styles.modal} testID="manageBankTransactionModal">
+            <TouchableOpacity onPress={handleModalClose} style={styles.closeButton} testID="closeManageBankModal">
               <Typo size={20} color={colors.white}>X</Typo>
             </TouchableOpacity>
             <ManageBankTransactions 

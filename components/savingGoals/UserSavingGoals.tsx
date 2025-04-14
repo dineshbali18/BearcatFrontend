@@ -21,7 +21,7 @@ import Constants from 'expo-constants';
 const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
   const renderItem: ListRenderItem<IncomeType> = ({ item }) => {
     console.log("Itemmmmmm:::", item);
-    
+
     // Select the correct icon source based on item name
     let iconSource = DollarIcon;
     if (item.name === "Freelancing") {
@@ -34,20 +34,20 @@ const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
     const amount = item.amount.split(".");
 
     return (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <View style={styles.iconWrapper}>
+      <View style={styles.card} testID={`incomeCard-${item.name}`}>
+        <View style={styles.cardHeader} testID={`incomeCardHeader-${item.name}`}>
+          <View style={styles.iconWrapper} testID={`incomeIcon-${item.name}`}>
             <Image
               source={iconSource}
               style={{ width: 22, height: 22, tintColor: Colors.white }}
               resizeMode="contain"
             />
           </View>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {}} testID={`incomeMoreButton-${item.name}`}>
             <Feather name="more-horizontal" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
-        <Text style={styles.amountText}>
+        <Text style={styles.amountText} testID={`incomeAmount-${item.name}`}>
           ${amount[0]}.
           <Text style={styles.centsText}>{amount[1]}</Text>
         </Text>
@@ -56,7 +56,7 @@ const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="userSavingGoalsContainer">
       {/* <Text style={styles.headerText}>
         My <Text style={styles.boldText}>Saving Goals</Text>
       </Text> */}
@@ -65,6 +65,7 @@ const UserSavingGoals = ({ incomeList }: { incomeList: IncomeType[] }) => {
         renderItem={renderItem}
         horizontal
         showsHorizontalScrollIndicator={false}
+        testID="incomeList"
       /> */}
     </View>
   );

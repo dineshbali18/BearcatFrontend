@@ -11,7 +11,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { FlashList } from "@shopify/flash-list";
 import Constants from 'expo-constants';
 
-const API_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/expenses/user/`;
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/`;
 
 const TransactionList = ({ title, emptyListMessage }: TransactionListType) => {
   const router = useRouter();
@@ -24,7 +24,6 @@ const TransactionList = ({ title, emptyListMessage }: TransactionListType) => {
       try {
         setLoading(true);
 
-        // Retrieve userId and token from AsyncStorage
         const userId = await AsyncStorage.getItem("userId");
         const token = await AsyncStorage.getItem("token");
 
@@ -57,72 +56,39 @@ const TransactionList = ({ title, emptyListMessage }: TransactionListType) => {
   }, []);
 
   const handleClick = (item: TransactionType) => {
-    console.log(item)
-    // router.push({
-    //   pathname: "/(modals)/transactionModal",
-    //   params: {
-    //     id: item.ExpenseID,
-    //     amount: item.Amount.toString(),
-    //     category: item.CategoryID,
-    //     date: new Date(item.Date).toISOString(),
-    //     description: item.Description || "",
-    //     uid: item.UserID,
-    //   },
-    // });
+    console.log(item);
   };
 
   return (
-    <View style={styles.container}>
-      {title && <Typo fontWeight="500" size={20}>{title}</Typo>}
+    <View style={styles.container} testID="transactionListContainer">
+      {title && <Typo fontWeight="500" size={20} testID="transactionListTitle">{title}</Typo>}
 
-      <View style={styles.list}>
+      <View style={styles.list} testID="transactionList">
         <FlashList
           data={data}
           renderItem={({ item, index }) => (
-            // <TransactionItem handleClick={handleClick} item={item} index={index} />
-            <><Text>HIII</Text></>
+            <View testID={`transactionItem-${item.ExpenseID}`}><Text>HIII</Text></View>
           )}
           estimatedItemSize={60}
         />
       </View>
 
       {!loading && data.length === 0 && (
-        <Typo size={15} color={colors.neutral400} style={{ textAlign: "center", marginTop: spacingY._15 }}>
+        <Typo size={15} color={colors.neutral400} style={{ textAlign: "center", marginTop: spacingY._15 }} testID="emptyListMessage">
           {emptyListMessage}
         </Typo>
       )}
 
       {loading && (
-        <View style={{ top: verticalScale(100) }}>
+        <View style={{ top: verticalScale(100) }} testID="loadingIndicator">
           <Loading />
         </View>
       )}
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={styles.errorText} testID="errorText">{error}</Text>}
     </View>
   );
 };
-
-// const TransactionItem = ({ item, index, handleClick }: { item: TransactionType; index: number; handleClick: (item: TransactionType) => void }) => {
-//   const date = new Date(item.Date).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-
-//   return (
-//     <Animated.View entering={FadeInDown.delay(index * 50).springify().damping(14)}>
-//       <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>
-//         <View style={styles.categoryDes}>
-//           <Typo size={17}>{`Category: ${item.CategoryID}`}</Typo>
-//           <Typo size={12} color={colors.neutral400} textProps={{ numberOfLines: 1 }}>
-//             {item.Description || "No description"}
-//           </Typo>
-//         </View>
-//         <View style={styles.amountDate}>
-//           <Typo fontWeight="500" color={colors.rose}>{`- $${item.Amount}`}</Typo>
-//           <Typo size={13} color={colors.neutral400}>{date}</Typo>
-//         </View>
-//       </TouchableOpacity>
-//     </Animated.View>
-//   );
-// };
 
 export default TransactionList;
 

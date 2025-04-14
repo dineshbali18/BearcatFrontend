@@ -28,3 +28,33 @@ appId: com.dineshbali18.expensetrackerapp
 
 # Assert OTP screen appears
 - assertVisible: "Login successful!"
+
+- tapOn: "OK"
+
+
+- inputText:
+    id: "otpInput"
+    text: "123456"
+
+- tapOn:
+    id: "verifyOtpButton"
+- assertVisible: "Saving Goal"
+
+- tapOn: "Expenses"
+
+- tapOn:
+    id: "addExpenseButton"
+- assertVisible: "Add Expense"
+- inputText:
+    text: "100"
+- inputText:
+    text: "Groceries"
+- inputText:
+    text: "Debit"
+- inputText:
+    text: "2024-04-14"
+
+# Submit
+- tapOn: "Add Expense"
+- assertVisible: "Expense added successfully!"
+- tapOn: "OK"

@@ -31,7 +31,7 @@ interface Budget {
   BudgetName: string;
 }
 
-const API_BASE_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002`;
+const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
 const SpendingBlock = ({ spendingList }) => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,39 +106,35 @@ const SpendingBlock = ({ spendingList }) => {
     fetchBudgets();
   };
 
-  // Function to group spending by date
   const groupSpendingByDate = (spendingList: Expense[]) => {
     const grouped: { [key: string]: Expense[] } = {};
-
     spendingList.forEach((item: Expense) => {
-      const date = item.Date.split("T")[0]; // Use the date part (YYYY-MM-DD)
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
+      const date = item.Date.split("T")[0];
+      if (!grouped[date]) grouped[date] = [];
       grouped[date].push(item);
     });
-
     return grouped;
   };
 
   const groupedSpending = groupSpendingByDate(spendingList);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>
+    <View style={styles.container} testID="spendingBlock">
+      <Text style={styles.headerText} testID="spendingHeader">
         My <Text style={styles.boldText}>Spending</Text>
       </Text>
 
       {Object.keys(groupedSpending).length > 0 ? (
-        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 20 }} testID="spendingScroll">
           {Object.keys(groupedSpending).map((date) => (
-            <View key={date} style={styles.dateGroup}>
+            <View key={date} style={styles.dateGroup} testID={`spendingDateGroup-${date}`}>
               <Text style={styles.dateHeader}>{date}</Text>
               {groupedSpending[date].map((item: Expense) => (
                 <TouchableOpacity
                   key={item.ExpenseID}
                   style={styles.card}
                   onPress={() => openModal(item)}
+                  testID={`spendingItem-${item.ExpenseID}`}
                 >
                   <View style={styles.cardHeader}>
                     <Text style={styles.expenseName}>{item.CategoryName}</Text>
@@ -152,11 +148,11 @@ const SpendingBlock = ({ spendingList }) => {
           ))}
         </ScrollView>
       ) : (
-        <Text style={styles.noSpendingText}>No debit transactions found.</Text>
+        <Text style={styles.noSpendingText} testID="noSpendingText">No debit transactions found.</Text>
       )}
 
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
+        <View style={styles.modalContainer} testID="spendingModal">
           <View style={styles.modalContent}>
             {selectedSpending && (
               <>
@@ -174,6 +170,7 @@ const SpendingBlock = ({ spendingList }) => {
                       selectedValue={selectedBudget}
                       onValueChange={(itemValue) => setSelectedBudget(itemValue)}
                       style={styles.picker}
+                      testID="budgetPicker"
                     >
                       <Picker.Item label="Select a Budget" value={null} />
                       {budgets.map((budget) => (
@@ -184,11 +181,11 @@ const SpendingBlock = ({ spendingList }) => {
                 )}
 
                 <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving}>
+                  <TouchableOpacity style={styles.addButton} onPress={handleAddToBudget} disabled={isSaving} testID="addToBudgetButton">
                     <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Budget"}</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)} testID="closeBudgetModal">
                     <Text style={styles.buttonText}>Close</Text>
                   </TouchableOpacity>
                 </View>

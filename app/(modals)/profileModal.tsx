@@ -37,7 +37,7 @@ const ProfileModal = () => {
 
   let [userData, setUserData] = useState<UserDataType>({
     id: userCurrentData?.user?.id,
-    name: userCurrentData?.user?.name,
+    name: userCurrentData?.user?.username,
     email: userCurrentData?.user?.email,
     phoneNumber: userCurrentData?.user?.phoneNumber,
     image: null,
@@ -74,7 +74,7 @@ const ProfileModal = () => {
     setLoading(true);
   
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/user/update/profile`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ const ProfileModal = () => {
         {/* form */}
         <ScrollView contentContainerStyle={styles.form}>
           {/* form */}
-          <View style={styles.avatarContainer}>
+          {/* <View style={styles.avatarContainer}>
             <Image
               style={styles.avatar}
               source={getProfileImage(userData.image)}
@@ -158,7 +158,7 @@ const ProfileModal = () => {
                 color={colors.neutral800}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={styles.inputContainer}>
             <Typo color={colors.neutral200}>Name</Typo>
             <Input

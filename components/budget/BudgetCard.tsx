@@ -8,9 +8,9 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-const API_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/user`; // Base URL for the API
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user`;
 
-const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
+const BudgetCard = ({ expenses, setExpenses, fetchExpenses }) => {
   const [budgets, setBudgets] = useState([]);
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [isBudgetExpenseVisible, setIsBudgetExpenseVisible] = useState(false);
@@ -22,9 +22,9 @@ const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
     fetchExpenses();
   }, [isBudgetExpenseVisible]);
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchBudgets();
-  },[])
+  }, []);
 
   const fetchBudgets = async () => {
     try {
@@ -32,7 +32,6 @@ const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
         headers: { Authorization: `Bearer ${userState.token}` },
       });
 
-      // Process the data from API response
       const formattedData = response.data.map((budget) => ({
         id: budget.BudgetID.toString(),
         name: budget.BudgetName,
@@ -47,46 +46,28 @@ const BudgetCard = ({expenses, setExpenses, fetchExpenses}) => {
     }
   };
 
-  // Ensure budgets is always an array
   const budgetsArray = budgets || [];
-
-  // Filter completed and current budgets
   const completedBudgets = budgetsArray.filter((budget) => parseInt(budget.percentage) >= 100);
   const currentBudgets = budgetsArray.filter((budget) => parseInt(budget.percentage) < 100);
-
-  // Calculate totals safely
   const totalSpent = budgetsArray.reduce((acc, budget) => acc + parseFloat(budget.amount), 0).toFixed(2);
   const totalBudget = budgetsArray.reduce((acc, budget) => acc + (parseFloat(budget.totalAmount) || 0), 0).toFixed(2);
+  const percentage = totalBudget > 0 ? ((parseFloat(totalSpent) / parseFloat(totalBudget)) * 100).toFixed(0) : "0";
 
-  // Calculate percentage safely
-  const percentage = totalBudget > 0 
-    ? ((parseFloat(totalSpent) / parseFloat(totalBudget)) * 100).toFixed(0) 
-    : "0";
-
-  // Generate pieData
-  // const pieData = budgetsArray.length > 0 ? [
-  //   { value: parseFloat(totalSpent), color: Colors.blue },
-  //   { value: parseFloat(totalBudget) - parseFloat(totalSpent), color: Colors.white },
-  // ]:[
-  //       { value: 0, color: Colors.blue },  // Fallback dummy data, 0% blue
-  //       { value: 100, color: Colors.white }, // Fallback dummy data, 0% white
-  //   ];
-
-const pieData = [
-  { value: Number(percentage), color: Colors.blue },
-  { value: 100 - Number(percentage), color: Colors.white },
-];
+  const pieData = [
+    { value: Number(percentage), color: Colors.blue },
+    { value: 100 - Number(percentage), color: Colors.white },
+  ];
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="budgetCardContainer">
       <View style={styles.header}>
         <Text style={styles.headerText}>My Total Budgets</Text>
-        <TouchableOpacity onPress={() => setManageModalVisible(true)}>
+        <TouchableOpacity testID="openManageBudgetsButton" onPress={() => setManageModalVisible(true)}>
           <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
       <Text style={styles.expenseAmountText}>${totalSpent} / ${totalBudget}</Text>
-      <View style={styles.pieChartContainer}>
+      <View style={styles.pieChartContainer} testID="budgetPieChart">
         <PieChart
           data={pieData}
           donut
@@ -103,27 +84,56 @@ const pieData = [
           )}
         />
       </View>
+
       <Text style={styles.sectionHeader}>Current Budgets</Text>
       <FlatList 
         data={currentBudgets} 
-        renderItem={({ item }) => <BudgetItem item={item} allExpenses={expenses} BudgetID={BudgetID} setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} />} 
+        renderItem={({ item }) => (
+          <BudgetItem 
+            item={item} 
+            allExpenses={expenses} 
+            BudgetID={BudgetID} 
+            setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} 
+          />
+        )} 
         keyExtractor={(item) => item.id} 
         horizontal 
+        testID="currentBudgetsList"
       />
+
       <Text style={styles.sectionHeader}>Completed Budgets</Text>
       <FlatList 
         data={completedBudgets} 
-        renderItem={({ item }) => <BudgetItem item={item} allExpenses={expenses} BudgetID={BudgetID} setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} />} 
+        renderItem={({ item }) => (
+          <BudgetItem 
+            item={item} 
+            allExpenses={expenses} 
+            BudgetID={BudgetID} 
+            setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} 
+          />
+        )} 
         keyExtractor={(item) => item.id} 
         horizontal 
+        testID="completedBudgetsList"
       />
+
       <Modal visible={isManageModalVisible} animationType="slide">
-        <ManageBudgets budgets={budgets} setBudgets={setBudgets} fetchBudgets={fetchBudgets} onClose={() => setManageModalVisible(false)} />
+        <ManageBudgets 
+          budgets={budgets} 
+          setBudgets={setBudgets} 
+          fetchBudgets={fetchBudgets} 
+          onClose={() => setManageModalVisible(false)} 
+        />
       </Modal>
+
       <Modal visible={isBudgetExpenseVisible} animationType="slide" transparent>
         <View style={styles.modalBackground}>
-          <View style={styles.expensesModal}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => {setIsBudgetExpenseVisible(false)}}>
+          <View style={styles.expensesModal} testID="budgetExpenseModal">
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsBudgetExpenseVisible(false)}
+              testID="closeBudgetExpenseModal"
+            >
               <Feather name="x" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.modalHeader}>Expenses</Text>
@@ -136,6 +146,7 @@ const pieData = [
                 </View>
               )}
               keyExtractor={(item) => item.ExpenseID.toString()}
+              testID="budgetExpenseList"
             />
           </View>
         </View>
@@ -146,7 +157,13 @@ const pieData = [
 
 const BudgetItem = ({ item, allExpenses, BudgetID, setIsBudgetExpenseVisible }) => (
   <View>
-    <TouchableOpacity onPress={() => { BudgetID.current = Number(item.id); setIsBudgetExpenseVisible(true); }}>
+    <TouchableOpacity
+      testID={`budgetItem-${item.id}`}
+      onPress={() => {
+        BudgetID.current = Number(item.id);
+        setIsBudgetExpenseVisible(true);
+      }}
+    >
       <View style={styles.goalCard}>
         <View style={styles.goalHeader}>
           <Text style={styles.savingName}>{item.name}</Text>

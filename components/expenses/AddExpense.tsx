@@ -12,7 +12,6 @@ import { Picker } from "@react-native-picker/picker";
 import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-
 const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -29,7 +28,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/category`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/category`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${userState?.token}`,
@@ -59,7 +58,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
     };
 
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/create/expenses`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/create/expenses`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${userState?.token}`,
@@ -68,11 +67,10 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
         body: JSON.stringify(expenseData),
       });
 
-      console.log("RESSSS",response.json())
+      console.log("RESSSS", await response.json());
 
       if (response.ok) {
         alert("Expense added successfully!");
-        // onExpenseAdded();
         onClose();
       } else {
         alert("Failed to add expense");
@@ -84,9 +82,9 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+      <View style={styles.modalContainer} testID="expenseModalContainer">
+        <View style={styles.modalContent} testID="expenseModalContent">
+          <TouchableOpacity style={styles.closeButton} onPress={onClose} testID="closeExpenseModal">
             <Text style={styles.closeButtonText}>❌</Text>
           </TouchableOpacity>
 
@@ -98,12 +96,14 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
             keyboardType="numeric"
             value={amount}
             onChangeText={setAmount}
+            testID="expenseAmountInput"
           />
 
           <Picker
             selectedValue={selectedCategory}
             onValueChange={(itemValue) => setSelectedCategory(itemValue)}
             style={styles.input}
+            testID="expenseCategoryPicker"
           >
             <Picker.Item label="Select Category" value="" />
             {categories.map((category) => (
@@ -116,12 +116,15 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
             placeholder="Description"
             value={description}
             onChangeText={setDescription}
+            testID="expenseDescriptionInput"
           />
+
           <TextInput
             style={styles.input}
             placeholder="Transaction Type"
             value={transactionType}
             onChangeText={setTransactionType}
+            testID="expenseTransactionTypeInput"
           />
 
           <TextInput
@@ -129,9 +132,10 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
             placeholder="Date (YYYY-MM-DD)"
             value={date}
             onChangeText={setDate}
+            testID="expenseDateInput"
           />
 
-          <Button title="Add Expense" onPress={handleAddExpense} />
+          <Button title="Add Expense" onPress={handleAddExpense} testID="addExpenseSubmitButton" />
         </View>
       </View>
     </Modal>

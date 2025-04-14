@@ -1,248 +1,184 @@
-import React, { useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  ScrollView,
-} from "react-native";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, Modal } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import Colors from "@/constants/Colors";
+import { PieChart } from "react-native-gifted-charts";
+import ManageBudgets from "./ManageBudgets";
+import axios from "axios";
+import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-const ManageBudgets = ({ budgets = [], setBudgets, fetchBudgets, onClose }) => {
-  const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
-  const [newBudget, setNewBudget] = useState({ 
-    name: "", 
-    targetAmount: "",  // The total budget amount (goal)
-    spentAmount: ""   // The amount already spent
-  });
-  
+const API_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/budget/user`;
+
+const BudgetCard = ({ expenses, setExpenses, fetchExpenses }) => {
+  const [budgets, setBudgets] = useState([]);
+  const [isManageModalVisible, setManageModalVisible] = useState(false);
+  const [isBudgetExpenseVisible, setIsBudgetExpenseVisible] = useState(false);
   const userState = useSelector((state) => state.user);
-  const userId = userState?.user?.id;
-  const token = userState?.token;
+  const userId = userState.user.id;
+  const BudgetID = useRef(0);
 
-  // Helper functions for number handling
-  const formatNumber = (value) => {
-    if (value === null || value === undefined) return "0.00";
-    const num = parseFloat(value);
-    return isNaN(num) ? "0.00" : num.toFixed(2);
-  };
+  useEffect(() => {
+    fetchExpenses();
+  }, [isBudgetExpenseVisible]);
 
-  const parseNumberInput = (value) => {
-    // Remove any non-numeric characters except decimal point
-    const cleaned = value.replace(/[^0-9.]/g, '');
-    // Ensure only one decimal point
-    const parts = cleaned.split('.');
-    if (parts.length > 2) {
-      return parts[0] + '.' + parts.slice(1).join('');
-    }
-    return cleaned;
-  };
+  useEffect(() => {
+    fetchBudgets();
+  }, []);
 
-  const addBudget = async () => {
-    if (!newBudget.name || !newBudget.targetAmount) return;
-  
+  const fetchBudgets = async () => {
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          BudgetName: newBudget.name,
-          UserID: userId,
-          Amount: parseFloat(newBudget.targetAmount) || 0,
-          AmountSpent: parseFloat(newBudget.spentAmount) || 0,
-          StartDate: new Date().toISOString().split("T")[0],
-          EndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0],
-        }),
+      const response = await axios.get(`${API_URL}/${userId}/budgets`, {
+        headers: { Authorization: `Bearer ${userState.token}` },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add budget");
-      }
-  
-      await fetchBudgets();
-      setNewBudget({ name: "", targetAmount: "", spentAmount: "" });
-      setSelectedBudget(null);
+      const formattedData = response.data.map((budget) => ({
+        id: budget.BudgetID.toString(),
+        name: budget.BudgetName,
+        amount: budget.AmountSpent,
+        totalAmount: budget.Amount,
+        percentage: ((parseFloat(budget.AmountSpent) / parseFloat(budget.Amount)) * 100).toFixed(0),
+      }));
+
+      setBudgets(formattedData);
     } catch (error) {
-      console.error("Error adding budget:", error);
+      console.error("Error fetching budgets:", error);
     }
   };
 
-  const updateBudget = async () => {
-    if (!newBudget.name || !newBudget.targetAmount || !selectedBudget) return;
-  
-    try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets/${selectedBudget}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          BudgetName: newBudget.name,
-          Amount: parseFloat(newBudget.targetAmount) || 0,
-          AmountSpent: parseFloat(newBudget.spentAmount) || 0,
-          StartDate: new Date().toISOString().split("T")[0],
-          EndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0],
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to update budget");
-      }
-  
-      await fetchBudgets();
-      setNewBudget({ name: "", targetAmount: "", spentAmount: "" });
-      setSelectedBudget(null);
-    } catch (error) {
-      console.error("Error updating budget:", error);
-    }
-  };
+  const budgetsArray = budgets || [];
+  const completedBudgets = budgetsArray.filter((budget) => parseInt(budget.percentage) >= 100);
+  const currentBudgets = budgetsArray.filter((budget) => parseInt(budget.percentage) < 100);
+  const totalSpent = budgetsArray.reduce((acc, budget) => acc + parseFloat(budget.amount), 0).toFixed(2);
+  const totalBudget = budgetsArray.reduce((acc, budget) => acc + (parseFloat(budget.totalAmount) || 0), 0).toFixed(2);
+  const percentage = totalBudget > 0 ? ((parseFloat(totalSpent) / parseFloat(totalBudget)) * 100).toFixed(0) : "0";
 
-  const deleteBudget = async (id) => {
-    try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/budget/budgets/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to delete budget");
-      }
-      if(budgets.length > 0 ){
-      // After deletion, reset the form if we deleted the currently selected budget
-      if (selectedBudget === id) {
-        setNewBudget({ name: "", targetAmount: "", spentAmount: "" });
-        setSelectedBudget(null);
-      }
-      
-
-      // Update local state by removing the deleted budget
-      const updatedBudgets = budgets.filter((budget) => budget.id !== id);
-      setBudgets(updatedBudgets);
-      
-      // If we just deleted the last budget, reset the form completely
-      if (updatedBudgets.length === 0) {
-        setNewBudget({ name: "", targetAmount: "", spentAmount: "" });
-        setSelectedBudget(null);
-      }
-    }
-    } catch (error) {
-      console.error("Error deleting budget:", error);
-    }
-  };
-
-  React.useEffect(() => {
-    if (selectedBudget && selectedBudget !== "new") {
-      const budget = budgets.find((b) => b.id === selectedBudget);
-      if (budget) {
-        console.log("BBBB",budget)
-        setNewBudget({
-          name: budget.name,
-          targetAmount: formatNumber(Number(budget.totalAmount)),
-          spentAmount: formatNumber(Number(budget.amount)),
-        });
-      }
-    } else if (selectedBudget === null) {
-      setNewBudget({ name: "", targetAmount: "", spentAmount: "" });
-    }
-  }, [selectedBudget, budgets]);
+  const pieData = [
+    { value: Number(percentage), color: Colors.blue },
+    { value: 100 - Number(percentage), color: Colors.white },
+  ];
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="budgetCardContainer">
       <View style={styles.header}>
-        <Text style={styles.headerText}>💰 Manage Budgets</Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-          <Feather name="x" size={24} color="black" />
+        <Text style={styles.headerText}>My Total Budgets</Text>
+        <TouchableOpacity testID="openManageBudgetsButton" onPress={() => setManageModalVisible(true)}>
+          <Feather name="more-vertical" size={24} color={Colors.white} />
         </TouchableOpacity>
       </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        <Picker
-          selectedValue={selectedBudget}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSelectedBudget(itemValue)}
-        >
-          <Picker.Item label="🔽 Select an existing budget" value={null} color="black" />
-          {budgets.map((budget) => (
-            <Picker.Item key={budget.id} label={budget.name} value={budget.id} color="black" />
-          ))}
-          <Picker.Item label="➕ Add New Budget" value="new" color="green" />
-        </Picker>
-
-        {(selectedBudget === "new" || selectedBudget) && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="🏆 Budget Name"
-              placeholderTextColor="gray"
-              value={newBudget.name}
-              onChangeText={(text) => setNewBudget({ ...newBudget, name: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="🎯 Total Budget Amount"
-              placeholderTextColor="gray"
-              keyboardType="numeric"
-              value={newBudget.targetAmount}
-              onChangeText={(text) => setNewBudget({ ...newBudget, targetAmount: parseNumberInput(text) })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="💵 Amount Spent So Far"
-              placeholderTextColor="gray"
-              keyboardType="numeric"
-              value={newBudget.spentAmount}
-              onChangeText={(text) => setNewBudget({ ...newBudget, spentAmount: parseNumberInput(text) })}
-            />
-
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={selectedBudget === "new" ? addBudget : updateBudget}
-            >
-              <Text style={styles.addButtonText}>
-                {selectedBudget === "new" ? "✅ Add Budget" : "🔄 Update Budget"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-
-        <Text style={styles.sectionHeader}>My Current Budgets</Text>
-
-        {budgets.length > 0 ? (
-      <View style={styles.listContainer}>
-        {budgets.map((item) => (
-          <View key={item.id} style={styles.goalCard}>
-            <Text style={styles.goalText}>
-              🎯 {item.name}: ${formatNumber(item.amount)} / ${formatNumber(item.AmountSpent || item.totalAmount)} (
-              {item.percentage ? `${item.percentage}%` : '0%'})
-            </Text>
-            <TouchableOpacity onPress={() => deleteBudget(item.id)} style={styles.deleteButton}>
-              <Feather name="trash" size={20} color="red" />
-            </TouchableOpacity>
-          </View>
-        ))}
+      <Text style={styles.expenseAmountText}>${totalSpent} / ${totalBudget}</Text>
+      <View style={styles.pieChartContainer} testID="budgetPieChart">
+        <PieChart
+          data={pieData}
+          donut
+          showGradient
+          sectionAutoFocus
+          focusOnPress
+          radius={70}
+          innerRadius={55}
+          innerCircleColor={Colors.black}
+          centerLabelComponent={() => (
+            <View style={styles.centerLabel}>
+              <Text style={styles.centerLabelText}>{percentage}%</Text>
+            </View>
+          )}
+        />
       </View>
-    ) : (
-      <Text style={styles.emptyText}>No budgets found. Add a new budget to get started!</Text>
-    )}
 
-</ScrollView>
+      <Text style={styles.sectionHeader}>Current Budgets</Text>
+      <FlatList 
+        data={currentBudgets} 
+        renderItem={({ item }) => (
+          <BudgetItem 
+            item={item} 
+            allExpenses={expenses} 
+            BudgetID={BudgetID} 
+            setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} 
+          />
+        )} 
+        keyExtractor={(item) => item.id} 
+        horizontal 
+        testID="currentBudgetsList"
+      />
 
-      
+      <Text style={styles.sectionHeader}>Completed Budgets</Text>
+      <FlatList 
+        data={completedBudgets} 
+        renderItem={({ item }) => (
+          <BudgetItem 
+            item={item} 
+            allExpenses={expenses} 
+            BudgetID={BudgetID} 
+            setIsBudgetExpenseVisible={setIsBudgetExpenseVisible} 
+          />
+        )} 
+        keyExtractor={(item) => item.id} 
+        horizontal 
+        testID="completedBudgetsList"
+      />
+
+      <Modal visible={isManageModalVisible} animationType="slide">
+        <ManageBudgets 
+          budgets={budgets} 
+          setBudgets={setBudgets} 
+          fetchBudgets={fetchBudgets} 
+          onClose={() => setManageModalVisible(false)} 
+        />
+      </Modal>
+
+      <Modal visible={isBudgetExpenseVisible} animationType="slide" transparent>
+        <View style={styles.modalBackground} testID="budgetExpenseModalWrapper">
+          <View style={styles.expensesModal} testID="budgetExpenseModal">
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsBudgetExpenseVisible(false)}
+              testID="closeBudgetExpenseModal"
+            >
+              <Feather name="x" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.modalHeader}>Expenses</Text>
+            <FlatList
+              data={expenses.filter(expense => expense.BudgetID === BudgetID.current)}
+              renderItem={({ item }) => (
+                <View style={styles.expenseItem} testID={`budgetExpenseItem-${item.ExpenseID}`}>
+                  <Text style={styles.expenseDescription}>{item.Description}</Text>
+                  <Text style={styles.expenseAmount}>${item.Amount}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.ExpenseID.toString()}
+              testID="budgetExpenseList"
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
+
+const BudgetItem = ({ item, allExpenses, BudgetID, setIsBudgetExpenseVisible }) => (
+  <View>
+    <TouchableOpacity
+      testID={`budgetItem-${item.id}`}
+      onPress={() => {
+        BudgetID.current = Number(item.id);
+        setIsBudgetExpenseVisible(true);
+      }}
+    >
+      <View style={styles.goalCard}>
+        <View style={styles.goalHeader}>
+          <Text style={styles.savingName}>{item.name}</Text>
+        </View>
+        <View style={styles.progressBarWrapper}>
+          <View style={{ ...styles.progressBar, width: `${item.percentage}%` }} />
+        </View>
+        <View style={styles.goalDetails}>
+          <Text style={styles.percentageText}>{item.percentage}%</Text>
+          <Text style={styles.savingAmount}>${item.amount} / ${item.totalAmount}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {

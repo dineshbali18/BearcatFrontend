@@ -16,7 +16,6 @@ import { useSelector } from "react-redux";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
 
-// Define types
 interface Expense {
   ExpenseID: number;
   CategoryID: number;
@@ -33,10 +32,9 @@ interface SavingGoal {
   GoalName: string;
 }
 
-const API_BASE_URL = `${Constants.manifest?.extra?.REACT_APP_API}:3002`;
+const API_BASE_URL = `${Constants.expoConfig?.extra?.REACT_APP_API}:3002`;
 
-const IncomeBlock = ({incomeList}) => {
-  // const [incomeList, setIncomeList] = useState<Expense[]>([]);
+const IncomeBlock = ({ incomeList }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<Expense | null>(null);
@@ -44,39 +42,10 @@ const IncomeBlock = ({incomeList}) => {
   const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
   const [isLoadingGoals, setIsLoadingGoals] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  
+
   const userState = useSelector((state) => state.user);
   const userId = userState?.user?.id;
   const token = userState?.token;
-
-  // useEffect(() => {
-  //   fetchExpenses();
-  // }, []);
-
-  // const fetchExpenses = async () => {
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/expense/expenses/user/${userId}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = await response.json();
-  //     if (data?.categorizedExpenses) {
-  //       const credits = data.categorizedExpenses.flatMap((category: any) =>
-  //         category.expenses.filter((expense: Expense) => expense.TransactionType === "Credit")
-  //       );
-  //       setIncomeList(credits);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching expenses:", error);
-  //     Alert.alert("Error", "Failed to load transactions.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const fetchSavingGoals = async () => {
     setIsLoadingGoals(true);
@@ -141,10 +110,10 @@ const IncomeBlock = ({incomeList}) => {
 
   const renderItem: ListRenderItem<Expense> = ({ item }) => {
     return (
-      <View style={styles.card}>
+      <View style={styles.card} testID={`incomeItem-${item.ExpenseID}`}>
         <View style={styles.cardHeader}>
           <Text style={styles.incomeName}>{item.CategoryName}</Text>
-          <TouchableOpacity onPress={() => openModal(item)}>
+          <TouchableOpacity onPress={() => openModal(item)} testID={`openModal-${item.ExpenseID}`}>
             <Feather name="more-horizontal" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
@@ -156,37 +125,36 @@ const IncomeBlock = ({incomeList}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>
+    <View style={styles.container} testID="incomeBlock">
+      <Text style={styles.headerText} testID="incomeHeader">
         My <Text style={styles.boldText}>Income </Text>
       </Text>
       {incomeList.length > 0 ? (
-        <FlatList data={incomeList} renderItem={renderItem} horizontal showsHorizontalScrollIndicator={false} />
+        <FlatList testID="incomeList" data={incomeList} renderItem={renderItem} horizontal showsHorizontalScrollIndicator={false} />
       ) : (
-        <Text style={styles.noIncomeText}>No credit transactions found.</Text>
+        <Text style={styles.noIncomeText} testID="noIncomeText">No credit transactions found.</Text>
       )}
 
-      {/* Modal for transaction details */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)} testID="incomeModal">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             {selectedIncome && (
               <>
-                <Text style={styles.modalTitle}>Transaction Details</Text>
+                <Text style={styles.modalTitle} testID="transactionDetailsTitle">Transaction Details</Text>
                 <Text style={styles.modalText}>Category: {selectedIncome.CategoryName}</Text>
                 <Text style={styles.modalText}>Amount: ${parseFloat(selectedIncome.Amount).toFixed(2)}</Text>
                 <Text style={styles.modalText}>Description: {selectedIncome.Description}</Text>
                 <Text style={styles.modalText}>Date: {selectedIncome.Date}</Text>
 
-                {/* Saving Goals Picker */}
                 <Text style={styles.modalTitle}>Select a Saving Goal</Text>
                 {isLoadingGoals ? (
-                  <ActivityIndicator size="small" color={Colors.primary} />
+                  <ActivityIndicator size="small" color={Colors.primary} testID="loadingGoalsIndicator" />
                 ) : (
                   <Picker
                     selectedValue={selectedGoal}
                     onValueChange={(itemValue) => setSelectedGoal(itemValue)}
                     style={styles.picker}
+                    testID="goalPicker"
                   >
                     <Picker.Item label="Select a Goal" value={null} />
                     {savingGoals.map((goal) => (
@@ -195,11 +163,11 @@ const IncomeBlock = ({incomeList}) => {
                   </Picker>
                 )}
 
-                <TouchableOpacity style={styles.addButton} onPress={handleAddToSavingGoal} disabled={isSaving}>
+                <TouchableOpacity style={styles.addButton} onPress={handleAddToSavingGoal} disabled={isSaving} testID="addToGoalButton">
                   <Text style={styles.buttonText}>{isSaving ? "Saving..." : "Add to Savings Goal"}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)} testID="closeModalButton">
                   <Text style={styles.buttonText}>Close</Text>
                 </TouchableOpacity>
               </>
@@ -214,116 +182,21 @@ const IncomeBlock = ({incomeList}) => {
 export default IncomeBlock;
 
 const styles = StyleSheet.create({
-  container: { 
-    paddingHorizontal: 10 
-  },
-  headerText: { 
-    color: Colors.white, 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    marginBottom: 20 
-  },
-  boldText: { 
-    fontWeight: "700" 
-  },
-  card: {
-    backgroundColor: Colors.grey,
-    padding: 20,
-    borderRadius: 20,
-    marginRight: 15,
-    width: 180,
-    gap: 10,
-  },
-  cardHeader: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center" 
-  },
-  incomeName: { 
-    color: Colors.white, 
-    fontSize: 16, 
-    fontWeight: "600" 
-  },
-  amountText: { 
-    color: Colors.white, 
-    fontSize: 18, 
-    fontWeight: "600" 
-  },
-  description: { 
-    color: Colors.white, 
-    fontSize: 14, 
-    marginTop: 5 
-  },
-  noIncomeText: { 
-    color: Colors.white, 
-    fontSize: 14, 
-    textAlign: "center", 
-    marginTop: 20 
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: 20,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    width: "90%",
-    alignItems: "center",
-    elevation: 5, // Adds shadow on Android
-    shadowColor: "#000", // Adds shadow on iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: Colors.black,
-    textAlign: "center",
-  },
-  modalText: {
-    fontSize: 16,
-    color: Colors.black,
-    marginBottom: 5,
-    textAlign: "center",
-  },
-  picker: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#f8f8f8",
-    borderRadius: 8,
-    color: Colors.black,
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  addButton: {
-    backgroundColor: Colors.blue,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 15,
-    width: "100%",
-    alignItems: "center",
-  },
-  closeButton: {
-    backgroundColor: Colors.black,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
+  container: { paddingHorizontal: 10 },
+  headerText: { color: Colors.white, fontSize: 18, fontWeight: "bold", marginBottom: 20 },
+  boldText: { fontWeight: "700" },
+  card: { backgroundColor: Colors.grey, padding: 20, borderRadius: 20, marginRight: 15, width: 180, gap: 10 },
+  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  incomeName: { color: Colors.white, fontSize: 16, fontWeight: "600" },
+  amountText: { color: Colors.white, fontSize: 18, fontWeight: "600" },
+  description: { color: Colors.white, fontSize: 14, marginTop: 5 },
+  noIncomeText: { color: Colors.white, fontSize: 14, textAlign: "center", marginTop: 20 },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", paddingHorizontal: 20 },
+  modalContent: { backgroundColor: "white", padding: 20, borderRadius: 10, width: "90%", alignItems: "center", elevation: 5, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: Colors.black, textAlign: "center" },
+  modalText: { fontSize: 16, color: Colors.black, marginBottom: 5, textAlign: "center" },
+  picker: { width: "100%", height: 50, backgroundColor: "#f8f8f8", borderRadius: 8, color: Colors.black, marginVertical: 10, borderWidth: 1, borderColor: "#ccc" },
+  addButton: { backgroundColor: Colors.blue, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 5, marginTop: 15, width: "100%", alignItems: "center" },
+  closeButton: { backgroundColor: Colors.black, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 5, marginTop: 10, width: "100%", alignItems: "center" },
+  buttonText: { color: Colors.white, fontSize: 16, fontWeight: "600", textAlign: "center" },
 });

@@ -46,9 +46,9 @@ const Analytics = ({ route }) => {
         setLoading(true);
         try {
           const [financialRes, budgetsRes, savingsRes] = await Promise.all([
-            fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
-            fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
-            fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/${userId}`).then((res) => res.json()),
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/budgets/${userId}`).then((res) => res.json()),
+            fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/financial/user/savinggoal/${userId}`).then((res) => res.json()),
           ]);
 
           if (isActive) {

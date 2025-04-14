@@ -13,8 +13,6 @@ import Constants from 'expo-constants';
 import { useSelector } from "react-redux";
 
 const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) => {
-
-  console.log("SSSAAAAAA", savings)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({ name: "", amount: "", totalAmount: "" });
   const userState = useSelector((state) => state.user);
@@ -23,8 +21,6 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
 
   const addGoal = async () => {
     if (!newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-
-    console.log("AMAMAM", newGoal.amount)
 
     const newEntry = {
       id: Number(Math.random() * 10),
@@ -35,7 +31,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     };
 
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -50,14 +46,9 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
         }),
       });
 
-      console.log("RESS::::", response)
-
-      if (!response.ok) {
-        throw new Error("Failed to add savings goal");
-      }
+      if (!response.ok) throw new Error("Failed to add savings goal");
 
       await fetchSaving();
-
       setNewGoal({ name: "", amount: "", totalAmount: "" });
       setSelectedGoal(null);
     } catch (error) {
@@ -67,10 +58,9 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
 
   const updateGoal = async () => {
     if (!selectedGoal || !newGoal.name || !newGoal.amount || !newGoal.totalAmount) return;
-    console.log("SSSSSEEEE", selectedGoal)
-    console.log("000000", newGoal)
+
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${selectedGoal}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -83,12 +73,9 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
         }),
       });
 
-      console.log("qqqqqq", response)
-
       if (!response.ok) throw new Error("Failed to update savings goal");
 
       await fetchSaving();
-
       setNewGoal({ name: "", amount: "", totalAmount: "" });
       setSelectedGoal(null);
     } catch (error) {
@@ -98,8 +85,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
 
   const deleteGoal = async (id) => {
     try {
-      console.log("ISDDDDDD", id)
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/savingGoal/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -118,7 +104,6 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
     if (selectedGoal && selectedGoal !== "new") {
       const goal = savings.find((g) => g.id === selectedGoal);
       if (goal) {
-        console.log("AAAA", goal)
         setNewGoal({
           name: goal.name,
           amount: String(goal.amount),
@@ -131,19 +116,20 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
   }, [selectedGoal]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={styles.container} testID="manageSavingGoalsContainer">
+      <View style={styles.header} testID="savingGoalsHeader">
         <Text style={styles.headerText}>💰 Manage Savings Goals</Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
+        <TouchableOpacity onPress={onClose} style={styles.closeIcon} testID="closeSavingGoals">
           <Feather name="x" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.content}>
+      <View style={styles.content} testID="savingGoalsContent">
         <Picker
           selectedValue={selectedGoal}
           style={styles.picker}
           onValueChange={(itemValue) => setSelectedGoal(itemValue)}
+          testID="savingGoalPicker"
         >
           <Picker.Item label="🔽 Select an existing goal" value={null} color="black" />
           {savings.map((goal) => (
@@ -153,13 +139,14 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
         </Picker>
 
         {(selectedGoal === "new" || selectedGoal) && (
-          <View style={styles.inputContainer}>
+          <View style={styles.inputContainer} testID="savingGoalForm">
             <TextInput
               style={styles.input}
               placeholder="🏆 Goal Name"
               placeholderTextColor="gray"
               value={newGoal.name}
               onChangeText={(text) => setNewGoal({ ...newGoal, name: text })}
+              testID="goalNameInput"
             />
             <TextInput
               style={styles.input}
@@ -167,6 +154,7 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
               placeholderTextColor="gray"
               value={newGoal.amount}
               onChangeText={(text) => setNewGoal({ ...newGoal, amount: text })}
+              testID="currentAmountInput"
             />
             <TextInput
               style={styles.input}
@@ -175,11 +163,13 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
               keyboardType="numeric"
               value={newGoal.totalAmount}
               onChangeText={(text) => setNewGoal({ ...newGoal, totalAmount: text })}
+              testID="totalGoalInput"
             />
 
             <TouchableOpacity
               style={styles.addButton}
               onPress={selectedGoal === "new" ? addGoal : updateGoal}
+              testID="submitGoalButton"
             >
               <Text style={styles.addButtonText}>
                 {selectedGoal === "new" ? "✅ Add Goal" : "🔄 Update Goal"}
@@ -194,16 +184,17 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
           data={savings}
           keyExtractor={(item) => item.GoalID}
           renderItem={({ item }) => (
-            <View style={styles.goalCard}>
+            <View style={styles.goalCard} testID={`goalCard-${item.GoalID}`}>
               <Text style={styles.goalText}>
                 🎯 {item.name}: ${item.amount} / ${item.totalAmount} ({item.percentage}%)
               </Text>
-              <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton}>
+              <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton} testID={`deleteGoal-${item.GoalID}`}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>
           )}
           contentContainerStyle={styles.listContainer}
+          testID="goalList"
         />
       </View>
     </View>

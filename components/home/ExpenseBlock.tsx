@@ -21,7 +21,6 @@ import UserSavingGoals from "@/components/savingGoals/UserSavingGoals"
 import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
 
-// // Correctly referencing the components
 const ExpensesComponent = () => <ExpenseScreen />;
 const SavingGoalComponent = () => <SavingScreen />;
 const BudgetComponent = () => <BudgetScreen />;
@@ -30,7 +29,6 @@ interface ExpenseBlockProps {
   expenseList: ExpenseType[];
 }
 
-// Define types
 interface Expense {
   ExpenseID: number;
   CategoryID: number;
@@ -43,32 +41,25 @@ interface Expense {
 }
 
 const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
-  console.log("MENU",expenseList)
-
   const [allExpenses,setAllExpenses] = useState([])
-
   const [expenses, setExpenses] = useState([]);
   const [incomeList,setIncomeList] = useState([]);
   const [spendingList,setSpendingList] = useState([]);
   const [totalExpenseAmt,setTotalExpenseAmt] = useState("");
-
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
-
   const [selectedScreen, setSelectedScreen] = useState("")
 
   const userState = useSelector((state) => state?.user);
   const userId = userState?.user?.id;
 
   useEffect(() => {
-    console.log("FETCH EXPENSES.....")
-
     fetchExpenses();
   }, []);
-  
+
   const fetchExpenses = async () => {
     try {
       const response = await fetch(
-        `${Constants.manifest?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3002/expense/expenses/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -86,31 +77,17 @@ const ExpenseBlock = ({ expenseList }: ExpenseBlockProps) => {
           category.expenses.filter((expense: Expense) => 
             expense.TransactionType && (expense.TransactionType.toLowerCase() === "debit" || expense.TransactionType.toLowerCase() === "withdrawal")
           ));
-        
-        
-
-
-console.log(expenses); 
-
-
-        console.log("EEEEEEEEE",expenses)
-
-        setAllExpenses(expenses)
-
-        console.log("DEBITS:::::",debits)
-        debits.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime())
+        setAllExpenses(expenses);
+        debits.sort((a,b)=> new Date(b.Date).getTime() - new Date(a.Date).getTime());
         setSpendingList(debits);
-        console.log("AAAAAQQQQQ:::SPENDING",spendingList)
       }
 
       if (data?.categorizedExpenses) {
         const credits = data.categorizedExpenses.flatMap((category: any) =>
           category.expenses.filter((expense: Expense) => expense.TransactionType && (expense.TransactionType.toLowerCase() === "credit" || expense.TransactionType.toLowerCase()=="deposit"))
         );
-        console.log("credits:::::",credits)
         credits.sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime());
         setIncomeList(credits);
-        console.log("AAAAAQQQQQ:::INCOME",incomeList)
       }
 
       if (data.categorizedExpenses) {
@@ -132,28 +109,15 @@ console.log(expenses);
           };
         });
 
-        console.log("FORMAATTED",formattedExpenses)
-
         setExpenses(formattedExpenses);
         setTotalExpenseAmt(total.toFixed(2));
-        // setPieData(formattedExpenses.map(exp => ({ value: parseFloat(exp.amount), color: exp.color })));
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
 
-
-  useEffect(()=>{
-    console.log("CHANGES IN SPENDING BLOCK.........")
-    console.log(spendingList)
-    // setSpendingList([])
-  },[spendingList])
-
   const handleItemPress = (name: string) => {
-    console.log("Tapped on:", name);
-    
-
     if (name === "Expenses") {
       setSelectedComponent(<ExpensesComponent />);
       setSelectedScreen("Expenses")
@@ -171,7 +135,7 @@ console.log(expenses);
 
   const renderItem: ListRenderItem<ExpenseType> = ({ item }) => {
     return (
-      <TouchableOpacity onPress={() => handleItemPress(item.name)} key={item.id}>
+      <TouchableOpacity onPress={() => handleItemPress(item.name)} key={item.id} testID={`menu-${item.name}`}>
         <View
           style={[
             styles.expenseBlock,
@@ -204,8 +168,7 @@ console.log(expenses);
   };
 
   return (
-    <View style={styles.container}>
-      {/* Horizontal scrolling expense items  -- for menu buttons..... */}
+    <View style={styles.container} testID="expenseBlockContainer">
       <FlatList
         data={expenseList}
         renderItem={renderItem}
@@ -213,40 +176,33 @@ console.log(expenses);
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id.toString()}
         style={styles.horizontalListContainer}
+        testID="expenseMenuList"
       />
 
-      {/* Display the selected component */}
-      {/* {selectedComponent !== null && (
-        <View style={styles.detailWrapper}>{selectedComponent}</View>
-      )} */}
-      
-      {/* Vertical stacking of IncomeBlock and SpendingBlock */}
-      {selectedComponent !== null && selectedScreen === "Expenses"?
-      <View style={styles.verticalComponents}>
-        <ExpenseScreen allExpenses={allExpenses} expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList} fetchExpenses={fetchExpenses}/>
-        <IncomeBlock incomeList={incomeList} />
-        <SpendingBlock spendingList={spendingList} />
-      </View>:<></>
-      }
+      {selectedComponent !== null && selectedScreen === "Expenses" && (
+        <View style={styles.verticalComponents} testID="expensesScreenBlock">
+          <ExpenseScreen allExpenses={allExpenses} expen={expenses} spendingList={spendingList} setSpendingList={setSpendingList} total={totalExpenseAmt} incomeList={incomeList} setIncomeList={setIncomeList} fetchExpenses={fetchExpenses}/>
+          <IncomeBlock incomeList={incomeList} />
+          <SpendingBlock spendingList={spendingList} />
+        </View>
+      )}
 
-      {selectedComponent !== null && selectedScreen === "Budgets"?
-      <View style={styles.verticalComponents}>
-        <BudgetScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
-        <UserBudgets incomeList={incomeList} />
-      </View>:<></>
-      }
+      {selectedComponent !== null && selectedScreen === "Budgets" && (
+        <View style={styles.verticalComponents} testID="budgetScreenBlock">
+          <BudgetScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
+          <UserBudgets incomeList={incomeList} />
+        </View>
+      )}
 
-      {selectedComponent !== null && selectedScreen === "Saving Goal"?
-      <View style={styles.verticalComponents}>
-        <SavingScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
-        <UserSavingGoals incomeList={incomeList}/>
-        {/* <SpendingBlock spendingList={spendingList} /> */}
-      </View>:<></>
-      }
+      {selectedComponent !== null && selectedScreen === "Saving Goal" && (
+        <View style={styles.verticalComponents} testID="savingGoalScreenBlock">
+          <SavingScreen expenses={allExpenses} setExpenses={setAllExpenses} fetchExpenses={fetchExpenses}/>
+          <UserSavingGoals incomeList={incomeList}/>
+        </View>
+      )}
     </View>
   );
-}
-// };
+};
 
 export default ExpenseBlock;
 
@@ -260,18 +216,18 @@ const styles = StyleSheet.create({
   expenseBlock: {
     backgroundColor: Colors.tintColor,
     width: 100,
-    height: 60, // Added height
+    height: 60,
     padding: 10,
     borderRadius: 15,
     marginRight: 20,
-    justifyContent: "center", // Center text vertically
-    alignItems: "center",     // Center text horizontally
+    justifyContent: "center",
+    alignItems: "center",
   },
   expenseBlockTxt1: {
     fontSize: 15,
     textAlign: "center",
     flexWrap: "wrap",
-    fontWeight: 700,
+    fontWeight: "700",
   },
   expenseBlock3View: {
     backgroundColor: "rgba(255, 255, 255, 0.2)",

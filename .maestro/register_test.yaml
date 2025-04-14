@@ -1,23 +1,27 @@
 appId: com.dineshbali18.expensetrackerapp
 ---
 - launchApp
-- tapOn:
-    id: "getStartedButton"
+- tapOn: "Get Started"
 - assertVisible: "Enter your name"
-
+- tapOn:
+    id: "nameInput"
 - inputText:
     id: "nameInput"
     text: "Dinesh Bali"
+- tapOn:
+    id: "emailInput"
 - inputText:
     id: "emailInput"
-    text: "dineshbali45@gmail.com"
+    text: "dineshbali41@gmail.com"
+- tapOn:
+    id: "phoneInput"
 - inputText:
     id: "phoneInput"
     text: "1234567890"
+- tapOn:
+    id: "passwordInput"
 - inputText:
     id: "passwordInput"
     text: "gamer45"
-
-- tapOn:
-    id: "signUpButton"
-- assertVisible: "Enter 6-digit OTP"
+- tapOn: "Sign Up"
+- assertVisible: "User already exists"

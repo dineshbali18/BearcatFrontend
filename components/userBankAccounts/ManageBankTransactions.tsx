@@ -24,7 +24,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3001/bank/transactions/${savings[0].AccountNumber}/offset/0`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/transactions/${savings[0].AccountNumber}/offset/0`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
     };
 
     try {
-      const response = await fetch(`${Constants.manifest?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,35 +93,37 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <SafeAreaView style={styles.safeContainer} testID="manageBankTransactionsScreen">
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={styles.header} testID="transactionsHeader">
           <Text style={styles.headerText}>💰 Manage Bank Transactions</Text>
-          <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
+          <TouchableOpacity onPress={onClose} style={styles.closeIcon} testID="closeManageTransaction">
             <Feather name="x" size={24} color="black" />
           </TouchableOpacity>
         </View>
 
         {!showForm && (
-          <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
+          <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)} testID="showTransactionForm">
             <Text style={styles.addButtonText}>➕ New Transaction</Text>
           </TouchableOpacity>
         )}
 
         {showForm && (
-          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" testID="transactionForm">
             <TextInput
               style={styles.input}
               placeholder="Amount"
               keyboardType="numeric"
               value={newTransaction.amount}
               onChangeText={(text) => setNewTransaction({ ...newTransaction, amount: text })}
+              testID="amountInput"
             />
 
             <Picker
               selectedValue={newTransaction.type}
               style={styles.picker}
               onValueChange={(itemValue) => setNewTransaction({ ...newTransaction, type: itemValue })}
+              testID="typePicker"
             >
               <Picker.Item label="Select Type" value="" />
               <Picker.Item label="Deposit" value="deposit" />
@@ -129,12 +131,13 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
             </Picker>
 
             {productForms.map((product, index) => (
-              <View key={index} style={styles.productForm}>
+              <View key={index} style={styles.productForm} testID={`productForm-${index}`}>
                 <TextInput
                   style={styles.input}
                   placeholder="Product Name"
                   value={product.name}
                   onChangeText={(text) => updateProduct(index, "name", text)}
+                  testID={`productName-${index}`}
                 />
                 <TextInput
                   style={styles.input}
@@ -142,42 +145,43 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
                   keyboardType="numeric"
                   value={product.price}
                   onChangeText={(text) => updateProduct(index, "price", text)}
+                  testID={`productPrice-${index}`}
                 />
               </View>
             ))}
 
-            <TouchableOpacity style={styles.addButton} onPress={addProductForm}>
+            <TouchableOpacity style={styles.addButton} onPress={addProductForm} testID="addProductButton">
               <Text style={styles.addButtonText}>➕ Add Another Product</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.addButton} onPress={addTransaction}>
+            <TouchableOpacity style={styles.addButton} onPress={addTransaction} testID="submitTransaction">
               <Text style={styles.addButtonText}>✅ Add Transaction</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowForm(false)}>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setShowForm(false)} testID="cancelTransaction">
               <Text style={styles.cancelButtonText}>❌ Cancel</Text>
             </TouchableOpacity>
           </ScrollView>
         )}
 
-<Text style={styles.transactionHeader}>Transactions</Text>
-<ScrollView>
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.TransactionID.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.transactionCard}>
-              <Text style={styles.transactionText}>{item.type} - ${item.amount}</Text>
-              {item.Products && item.Products.length > 0 && (
-                <View style={styles.productList}>
-                  {item.Products.map((product, index) => (
-                    <Text key={index} style={styles.productDetail}>📦 {product.name}: ${product.price}</Text>
-                  ))}
-                </View>
-              )}
-            </View>
-          )}
-        />
+        <Text style={styles.transactionHeader}>Transactions</Text>
+        <ScrollView testID="transactionList">
+          <FlatList
+            data={transactions}
+            keyExtractor={(item) => item.TransactionID.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.transactionCard} testID={`transactionCard-${item.TransactionID}`}>
+                <Text style={styles.transactionText}>{item.type} - ${item.amount}</Text>
+                {item.Products && item.Products.length > 0 && (
+                  <View style={styles.productList}>
+                    {item.Products.map((product, index) => (
+                      <Text key={index} style={styles.productDetail} testID={`product-${item.TransactionID}-${index}`}>📦 {product.name}: ${product.price}</Text>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+          />
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -30,7 +30,7 @@ const UserBudgets = ({ incomeList }: { incomeList: IncomeType[] }) => {
     }
 
     // Split the amount for formatting
-    const amount = item.amount.split(".");
+    // const amount = item.amount.split(".");
 
     return (
       <View style={styles.card}>

@@ -7,6 +7,10 @@ import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Constants from 'expo-constants';
 import { useSelector } from "react-redux";
+import CryptoJS from "crypto-js";
+
+const key = "gdpteam3bearcatfinanceapp00000000";
+
 
 const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
   console.log("999999",savings[0].AccountNumber)
@@ -17,6 +21,11 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
   const userData = useSelector((state)=>state.user)
 
   const token = "YOUR_AUTH_TOKEN"; // Replace with actual token
+
+  const decryptPayload = (encryptedPayload) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedPayload, key);
+    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  };
 
   useEffect(() => {
     fetchTransactions();
@@ -33,10 +42,19 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
       });
 
       const data = await response.json();
-      setTransactions(data.transactions);
+      if (data.payload) {
+        const decryptedTransactions = decryptPayload(data.payload);
+        setTransactions(decryptedTransactions);
+      } else {
+        Alert.alert("Error", "No payload found in response");
+      }
     } catch (error) {
       Alert.alert("Error", error.message);
     }
+  };
+
+  const encryptData = (data) => {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
   };
 
   const addProductForm = () => {
@@ -51,7 +69,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
 
   const addTransaction = async () => {
     if (!newTransaction.amount || !newTransaction.type) return;
-
+  
     const validProducts = productForms
       .filter((p) => p.name && p.price)
       .map((p, index) => ({
@@ -59,38 +77,43 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
         name: p.name,
         price: parseFloat(p.price),
       }));
-
+  
     const transactionData = {
       userID: 1,
       amount: parseFloat(newTransaction.amount),
       type: newTransaction.type,
       Products: validProducts,
     };
-
+  
+    const encryptedPayload = encryptData(transactionData);
+  
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(transactionData),
-      });
-
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3001/bank/addTransaction?userID=${userData?.user?.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ payload: encryptedPayload }), // 🔐 Encrypted data
+        }
+      );
+  
       if (!response.ok) {
         throw new Error("Failed to add transaction");
       }
-
+  
       await fetchTransactions();
-
       setNewTransaction({ amount: "", type: "", products: [] });
-      setProductForms([{ name: "", price: "" }]); 
-      setShowForm(false); 
+      setProductForms([{ name: "", price: "" }]);
+      setShowForm(false);
       Alert.alert("Success", "Transaction added successfully!");
     } catch (error) {
       Alert.alert("Error", error.message);
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.safeContainer} testID="manageBankTransactionsScreen">

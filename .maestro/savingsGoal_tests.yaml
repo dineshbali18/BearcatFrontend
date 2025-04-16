@@ -2,57 +2,44 @@ appId: com.dineshbali18.expensetrackerapp
 ---
 - launchApp
 
-# Navigate to Sign In
 - tapOn: "Sign in"
 
-# Enter Email
 - tapOn:
     id: "emailInput"
 - inputText:
     id: "emailInput"
     text: "dineshbali45@gmail.com"
 
-# Enter Password
 - tapOn:
     id: "passwordInput"
 - inputText:
     id: "passwordInput"
     text: "gamer45"
 
-# Submit Login
 - tapOn: "Login"
 
-# Confirm Login
 - tapOn: "OK"
 
-# Assert MFA screen is visible
 - assertVisible: "🔐 Two-Factor Authentication"
 
-# Enter OTP
 - tapOn:
     id: "otpInput"
 - inputText:
     id: "otpInput"
     text: "123456"
 
-# Submit OTP
 - tapOn:
     id: "verifyOtpButton"
 
-# Confirm OTP
 - tapOn: "Ok"
 
-# Check if dashboard is visible
 - assertVisible: "Saving Goal"
 
-# Navigate to Saving Goals
 - tapOn: "Saving Goal"
 
-# Open Manage Goals Modal
 - tapOn:
     id: "openManageGoalsModal"
 
-# Add New Goal
 - tapOn:
     id: "savingGoalPicker"
 
@@ -79,7 +66,6 @@ appId: com.dineshbali18.expensetrackerapp
 - assertVisible: "✅ Add Goal"
 - tapOn: "✅ Add Goal"
 
-# Assert Goal Appears in List
 - assertVisible: "🎯 Vacation: $500 / $2000.00 (25%)"
 
 - tapOn:
@@ -87,7 +73,6 @@ appId: com.dineshbali18.expensetrackerapp
 
 - tapOn: "Vacation"
 
-# Update the Goal
 - tapOn: "Vacation"
 
 - tapOn:
@@ -110,20 +95,15 @@ appId: com.dineshbali18.expensetrackerapp
 - assertVisible: "🔄 Update Goal"
 - tapOn: "🔄 Update Goal"
 
-# Assert Update is Reflected
 - assertVisible: "🎯 Trip: $1000 / $2000.00 (50%)"
 
 
-
-# Delete the Goal
 - tapOn:
     id: "deleteGoal-69"
 - assertVisible: "🔄 Update Goal"
 - tapOn: "🔄 Update Goal"
 
-# Assert Goal is Deleted
 - assertNotVisible: "Trip"
 
-# Close Modal
 - tapOn:
     id: "closeSavingGoals"

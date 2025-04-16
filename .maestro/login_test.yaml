@@ -5,25 +5,20 @@ appId: com.dineshbali18.expensetrackerapp
 - tapOn:
     id: "signInButton"
 
-# Assert login screen is visible
 - assertVisible: "Enter your email"
 
-# Email input
 - tapOn:
     id: "emailInput"
 - inputText:
     id: "emailInput"
     text: "dineshbali45@gmail.com"
 
-# Password input
 - tapOn:
     id: "passwordInput"
 - inputText:
     id: "passwordInput"
     text: "gamer45"
 
-# Submit login
 - tapOn: "Login"
 
-# Assert OTP screen appears
 - assertVisible: "Login successful!"

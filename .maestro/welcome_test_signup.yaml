@@ -2,6 +2,5 @@ appId: com.dineshbali18.expensetrackerapp
 ---
 - launchApp
 - assertVisible: "Get Started"
-- tapOn:
-    id: "getStartedButton"
+- tapOn: "Get Started"
 - assertVisible: "Enter your name"

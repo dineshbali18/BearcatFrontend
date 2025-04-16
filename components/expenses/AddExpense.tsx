@@ -54,7 +54,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
       CategoryID: parseInt(selectedCategory),
       TransactionType: transactionType,
       Description: description,
-      date,
+      Date: date,
     };
 
     try {
@@ -135,7 +135,14 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
             testID="expenseDateInput"
           />
 
-          <Button title="Add Expense" onPress={handleAddExpense} testID="addExpenseSubmitButton" />
+        <TouchableOpacity
+          onPress={handleAddExpense}
+          style={styles.submitButton}
+          testID="addExpenseSubmitButton"
+        >
+          <Text style={styles.submitButtonText}>Add Expense</Text>
+        </TouchableOpacity>
+
         </View>
       </View>
     </Modal>
@@ -151,4 +158,17 @@ const styles = StyleSheet.create({
   input: { borderBottomWidth: 1, marginBottom: 10, padding: 8 },
   closeButton: { alignSelf: "flex-end" },
   closeButtonText: { fontSize: 18 },
+  submitButton: {
+    backgroundColor: "#4CAF50",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  submitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  
 });

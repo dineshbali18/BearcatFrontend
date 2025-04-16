@@ -3,7 +3,7 @@ import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/userSlice"; // Ensure this path is correct
+import { setUser } from "@/store/userSlice"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
@@ -43,7 +43,6 @@ const Login = () => {
       });
 
       const res = await response.json();
-      // Alert.alert(res)
 
       console.log("Response:", res);
       setLoading(false);
@@ -51,22 +50,18 @@ const Login = () => {
       if (res.error) {
         Alert.alert("Login", res.error);
       } else {
-        // Dispatch action to store user data in Redux store
         dispatch(setUser({
           user: res.user,
           token: res.token,
           message: res.message,
         }));
 
-        // Store user data locally using AsyncStorage
         await AsyncStorage.setItem("userData", JSON.stringify(res.user));
 
         Alert.alert("Login", "Login successful!");
 
-        // Optionally, navigate to another screen
         router.replace(`/(auth)/mfa?email=${encodeURIComponent(emailRef.current)}`);
 
-        // router.replace({ pathname: "/(auth)/mfa", params: { email: emailRef.current } });
       }
     } catch (error) {
       setLoading(false);
@@ -80,7 +75,6 @@ const Login = () => {
       <StatusBar style="light" />
       <View style={styles.container}>
         <BackButton iconSize={28} />
-        {/* welcome */}
         <View style={{ gap: 5, marginTop: spacingY._20 }}>
           <Typo size={30} fontWeight={"800"}>
             Hey,
@@ -90,7 +84,6 @@ const Login = () => {
           </Typo>
         </View>
 
-        {/* form */}
         <View style={styles.form}>
           <Typo size={16} color={colors.textLighter}>
             Login now to track all your expenses
@@ -118,7 +111,6 @@ const Login = () => {
             </Pressable>
           </View>
 
-          {/* button */}
           <Button testID="loginButton" loading={loading} onPress={onSubmit}>
             <Typo fontWeight={"700"} color={colors.black} size={21}>
               Login
@@ -127,7 +119,6 @@ const Login = () => {
 
         </View>
 
-        {/* footer */}
         <View style={styles.footer}>
           <Typo size={15}>Don't have an account?</Typo>
           <Pressable onPress={() => router.navigate("/(auth)/register")}>

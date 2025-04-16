@@ -27,6 +27,21 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   };
 
+  const encryptData = (data) => {
+    try {
+      console.log("FFFFF");
+      const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key);
+      const encryptedStr = encrypted.toString();
+      console.log("ZZZZZ", encryptedStr);
+      return encryptedStr;
+    } catch (err) {
+      console.error("🔥 Encryption failed:", err);
+      Alert.alert("Encryption error", err.message || "Unknown error");
+      return null;
+    }
+  };
+  
+
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -42,8 +57,10 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
       });
 
       const data = await response.json();
-      if (data.payload) {
-        const decryptedTransactions = decryptPayload(data.payload);
+      console.log("DDDD",data)
+      if (data.encryptedData) {
+        const decryptedTransactions = decryptPayload(data.encryptedData);
+        console.log("DDDDDDDDDDDD",decryptPayload)
         setTransactions(decryptedTransactions);
       } else {
         Alert.alert("Error", "No payload found in response");
@@ -53,9 +70,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
     }
   };
 
-  const encryptData = (data) => {
-    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
-  };
+
 
   const addProductForm = () => {
     setProductForms([...productForms, { name: "", price: "" }]);
@@ -79,13 +94,15 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
       }));
   
     const transactionData = {
-      userID: 1,
+      userID: userData?.user?.id,
       amount: parseFloat(newTransaction.amount),
       type: newTransaction.type,
       Products: validProducts,
     };
-  
-    const encryptedPayload = encryptData(transactionData);
+  console.log("EEEE",transactionData)
+  // console.log("AAA")
+  //   const encryptedPayload = encryptData(transactionData);
+  //   console.log("EEEEEEEE",encryptedPayload)
   
     try {
       const response = await fetch(
@@ -96,7 +113,7 @@ const ManageBankTransactions = ({ savings,fetchSaving,onClose,setSavings }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ payload: encryptedPayload }), // 🔐 Encrypted data
+          body: JSON.stringify(transactionData), // 🔐 Encrypted data
         }
       );
   

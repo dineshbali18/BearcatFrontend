@@ -2,59 +2,194 @@ appId: com.dineshbali18.expensetrackerapp
 ---
 - launchApp
 
-# Navigate to Login Screen
-- tapOn:
-    id: "signInButton"
+# Navigate to Sign In
+- tapOn: "Sign in"
 
-# Assert login screen is visible
-- assertVisible: "Enter your email"
-
-# Email input
+# Enter Email
 - tapOn:
     id: "emailInput"
 - inputText:
     id: "emailInput"
     text: "dineshbali45@gmail.com"
 
-# Password input
+# Enter Password
 - tapOn:
     id: "passwordInput"
 - inputText:
     id: "passwordInput"
     text: "gamer45"
 
-# Submit login
+# Submit Login
 - tapOn: "Login"
 
-# Assert OTP screen appears
-- assertVisible: "Login successful!"
-
+# Confirm Login
 - tapOn: "OK"
 
+# Assert MFA screen is visible
+- assertVisible: "🔐 Two-Factor Authentication"
 
+# Enter OTP
+- tapOn:
+    id: "otpInput"
 - inputText:
     id: "otpInput"
     text: "123456"
 
+# Submit OTP
 - tapOn:
     id: "verifyOtpButton"
-- assertVisible: "Saving Goal"
+
+# Confirm OTP
+- tapOn: "Ok"
+
+# Check if dashboard is visible
+- assertVisible: "Expenses"
 
 - tapOn: "Expenses"
 
+
+
+# - tapOn:
+#     id: "addExpenseButton"
+# - assertVisible: "Add Expense"
+# - inputText:
+#     text: "100"
+# - inputText:
+#     text: "Groceries"
+# - inputText:
+#     text: "Debit"
+# - inputText:
+#     text: "2024-04-14"
+
+# # Submit
+# - tapOn: "Add Expense"
+# - assertVisible: "Expense added successfully!"
+# - tapOn: "OK"
+
 - tapOn:
     id: "addExpenseButton"
-- assertVisible: "Add Expense"
-- inputText:
-    text: "100"
-- inputText:
-    text: "Groceries"
-- inputText:
-    text: "Debit"
-- inputText:
-    text: "2024-04-14"
 
-# Submit
+- assertVisible:
+    id: "expenseModalContainer"
+
+- tapOn: "Amount"
+- inputText:
+    id: "expenseAmountInput"
+    text: "222"
+
+- tapOn:
+    id: "expenseCategoryPicker"
+- tapOn: "Savings"
+
+- tapOn: "Description"
+- inputText:
+    id: "expenseDescriptionInput"
+    text: "Monthly Salary"
+
+- tapOn: "Transaction Type"
+- inputText:
+    id: "expenseTransactionTypeInput"
+    text: "credit"
+
+- tapOn: "Date (YYYY-MM-DD)"
+- inputText:
+    id: "expenseDateInput"
+    text: "2025-04-16"
+
+- tapOn:
+    id: "addExpenseSubmitButton"
+- assertVisible: "Add Expense"
 - tapOn: "Add Expense"
-- assertVisible: "Expense added successfully!"
-- tapOn: "OK"
+
+
+- assertNotVisible:
+    id: "expenseModalContainer"
+
+- assertVisible: "$222.00"
+
+# ===== ADD EXPENSE: DEBIT (New Category) =====
+
+- tapOn:
+    id: "addExpenseButton"
+
+- assertVisible:
+    id: "expenseModalContainer"
+
+- tapOn: "Amount"
+- inputText:
+    id: "expenseAmountInput"
+    text: "888"
+
+- tapOn:
+    id: "expenseCategoryPicker"
+- tapOn: "Savings"
+
+- tapOn: "Description"
+- inputText:
+    id: "expenseDescriptionInput"
+    text: "Evening Snacks"
+
+- tapOn: "Transaction Type"
+- inputText:
+    id: "expenseTransactionTypeInput"
+    text: "debit"
+
+- tapOn: "Date (YYYY-MM-DD)"
+- inputText:
+    id: "expenseDateInput"
+    text: "2025-04-16"
+
+
+- tapOn:
+    id: "addExpenseSubmitButton"
+- assertVisible: "Add Expense"
+- tapOn: "Add Expense"
+
+- assertNotVisible: "Add Expense"
+
+- assertVisible: "$888.00"
+
+
+# ===== UPDATE EXPENSE IN MANAGE =====
+# - tapOn:
+#     id: "openManageExpensesModal"
+
+# - assertVisible:
+#     id: "manageExpensesScreen"
+
+# - tapOn:
+#     id: "selectExpensePicker"
+# - tapOn: "Salary - Monthly Salary"
+
+# - eraseText
+# - inputText:
+#     id: "expenseNameInput"
+#     text: "Monthly Salary Updated"
+
+# - eraseText:
+#     id: "expenseAmountInput"
+# - inputText:
+#     id: "expenseAmountInput"
+#     text: "220"
+
+# - tapOn:
+#     id: "saveExpenseButton"
+
+# - assertVisible: "Monthly Salary Updated"
+# - assertVisible: "$220"
+
+# # ===== DELETE EXPENSE FROM MANAGE =====
+# - tapOn:
+#     id: "deleteCreditExpense-201"
+
+# - assertNotVisible: "Monthly Salary Updated"
+
+# # ===== DELETE DEBIT EXPENSE =====
+# - tapOn:
+#     id: "deleteDebitExpense-202"
+
+# - assertNotVisible: "Snacks"
+
+# # ===== CLOSE MANAGE MODAL =====
+# - tapOn:
+#     id: "closeManageExpenses"

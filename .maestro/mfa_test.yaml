@@ -38,5 +38,7 @@ appId: com.dineshbali18.expensetrackerapp
 - tapOn:
     id: "verifyOtpButton"
 
+- tapOn: "Ok"
+
 # Final screen check (replace with actual identifier of your dashboard/home page)
-- assertVisible: "Incorrect OTP."
+- assertVisible: "Saving Goal"

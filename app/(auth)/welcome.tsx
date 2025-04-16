@@ -15,7 +15,6 @@ const WelcomePage = () => {
     <ScreenWrapper>
       <StatusBar style="light" />
       <View style={styles.container}>
-        {/* Login & Image */}
         <View>
         <TouchableOpacity
   onPress={() => router.push("/(auth)/login")}

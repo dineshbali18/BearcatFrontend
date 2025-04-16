@@ -182,13 +182,13 @@ const ManageSavingGoals = ({ savings, setSavings, onClose, fetchSaving }: any) =
 
         <FlatList
           data={savings}
-          keyExtractor={(item) => item.GoalID}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.goalCard} testID={`goalCard-${item.GoalID}`}>
+            <View style={styles.goalCard} testID={`goalCard-${item.id}`}>
               <Text style={styles.goalText}>
                 🎯 {item.name}: ${item.amount} / ${item.totalAmount} ({item.percentage}%)
               </Text>
-              <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton} testID={`deleteGoal-${item.GoalID}`}>
+              <TouchableOpacity onPress={() => deleteGoal(item.id)} style={styles.deleteButton} testID={`deleteGoal-${item.id}`}>
                 <Feather name="trash" size={20} color="red" />
               </TouchableOpacity>
             </View>

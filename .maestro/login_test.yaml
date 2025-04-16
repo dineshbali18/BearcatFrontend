@@ -2,7 +2,6 @@ appId: com.dineshbali18.expensetrackerapp
 ---
 - launchApp
 
-# Navigate to Login Screen
 - tapOn:
     id: "signInButton"
 

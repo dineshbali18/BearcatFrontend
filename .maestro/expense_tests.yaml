@@ -75,7 +75,7 @@ appId: com.dineshbali18.expensetrackerapp
 - tapOn: "Amount"
 - inputText:
     id: "expenseAmountInput"
-    text: "222"
+    text: "2000"
 
 - tapOn:
     id: "expenseCategoryPicker"
@@ -98,14 +98,16 @@ appId: com.dineshbali18.expensetrackerapp
 
 - tapOn:
     id: "addExpenseSubmitButton"
-- assertVisible: "Add Expense"
-- tapOn: "Add Expense"
 
+- tapOn:
+    id: "addExpenseSubmitButton"
 
-- assertNotVisible:
-    id: "expenseModalContainer"
+- tapOn: "OK"
+
 
 - assertVisible: "$222.00"
+
+- assertVisible: "$16230"
 
 # ===== ADD EXPENSE: DEBIT (New Category) =====
 
@@ -116,25 +118,29 @@ appId: com.dineshbali18.expensetrackerapp
     id: "expenseModalContainer"
 
 - tapOn: "Amount"
+- eraseText
 - inputText:
     id: "expenseAmountInput"
     text: "888"
 
 - tapOn:
     id: "expenseCategoryPicker"
-- tapOn: "Savings"
+- tapOn: "Dining Out"
 
 - tapOn: "Description"
+- eraseText
 - inputText:
     id: "expenseDescriptionInput"
     text: "Evening Snacks"
 
 - tapOn: "Transaction Type"
+- eraseText
 - inputText:
     id: "expenseTransactionTypeInput"
     text: "debit"
 
 - tapOn: "Date (YYYY-MM-DD)"
+- eraseText
 - inputText:
     id: "expenseDateInput"
     text: "2025-04-16"
@@ -142,8 +148,11 @@ appId: com.dineshbali18.expensetrackerapp
 
 - tapOn:
     id: "addExpenseSubmitButton"
-- assertVisible: "Add Expense"
-- tapOn: "Add Expense"
+
+- tapOn:
+    id: "addExpenseSubmitButton"
+
+- tapOn: "OK"
 
 - assertNotVisible: "Add Expense"
 

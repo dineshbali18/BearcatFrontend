@@ -1,0 +1,46 @@
+appId: com.dineshbali18.expensetrackerapp
+---
+- launchApp
+
+# Navigate to Sign In
+- tapOn: "Sign in"
+
+# Enter Email
+- tapOn:
+    id: "emailInput"
+- inputText:
+    id: "emailInput"
+    text: "dineshbali45@gmail.com"
+
+# Enter Password
+- tapOn:
+    id: "passwordInput"
+- inputText:
+    id: "passwordInput"
+    text: "gamer45"
+
+# Submit Login
+- tapOn: "Login"
+
+# Confirm Login
+- tapOn: "OK"
+
+# Assert MFA screen is visible
+- assertVisible: "🔐 Two-Factor Authentication"
+
+# Enter OTP
+- tapOn:
+    id: "otpInput"
+- inputText:
+    id: "otpInput"
+    text: "123456"
+
+# Submit OTP
+- tapOn:
+    id: "verifyOtpButton"
+
+# Confirm OTP
+- tapOn: "Ok"
+
+# Check if dashboard is visible
+- assertVisible: "Budgets"

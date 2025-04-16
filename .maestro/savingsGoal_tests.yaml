@@ -118,6 +118,8 @@ appId: com.dineshbali18.expensetrackerapp
 # Delete the Goal
 - tapOn:
     id: "deleteGoal-69"
+- assertVisible: "🔄 Update Goal"
+- tapOn: "🔄 Update Goal"
 
 # Assert Goal is Deleted
 - assertNotVisible: "Trip"

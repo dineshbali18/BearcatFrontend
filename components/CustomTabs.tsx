@@ -9,6 +9,7 @@ import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { scale, verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 import { colors, spacingY } from "@/constants/theme";
+
 function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
   const tabbarIcons: any = {
     index: (isFocused: boolean) => (
@@ -73,10 +74,10 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
           });
         };
 
-        // console.log("route.name: ", route.name);
         return (
           <TouchableOpacity
             key={route.name}
+            testID={`tab-${route.name}`} // ✅ This line enables Maestro to find the tab
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
@@ -97,17 +98,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     height: Platform.OS == "ios" ? verticalScale(73) : verticalScale(55),
-    // paddingHorizontal: scale(10),
     backgroundColor: colors.neutral800,
     justifyContent: "space-around",
     alignItems: "center",
-    // shadowColor: colors.white,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 20,
-    // },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 20,
     borderTopColor: colors.neutral700,
     borderTopWidth: 1,
   },

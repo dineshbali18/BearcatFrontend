@@ -139,8 +139,10 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }) => {
           onPress={handleAddExpense}
           style={styles.submitButton}
           testID="addExpenseSubmitButton"
+          accessible={true}
+  accessibilityLabel="addExpenseSubmitButton"
         >
-          <Text style={styles.submitButtonText}>Add Expense</Text>
+          <Text style={styles.submitButtonText}>ADD EXPENSE</Text>
         </TouchableOpacity>
 
         </View>

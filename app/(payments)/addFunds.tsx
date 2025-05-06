@@ -127,6 +127,7 @@ export default function FundsManager() {
             {mode === 'add' && amount.trim() && upiId.trim() && (
               <View style={styles.qrWrapper}>
                 <QRCode value={`upi://pay?pa=${upiId}&am=${amount}`} size={180} />
+                <Text style={{color:'white',margin:10,fontWeight:900}}>Make payment using the QR code and click on completed payment</Text>
               </View>
             )}
           </>
@@ -134,7 +135,7 @@ export default function FundsManager() {
 
         {mode === 'verify' && (
           <>
-            <Text style={styles.label}>UPI Reference No.</Text>
+            <Text style={styles.label}>UTR Reference No.</Text>
             <TextInput
               placeholder="UPI1234567890"
               placeholderTextColor="#aaa"
@@ -142,6 +143,7 @@ export default function FundsManager() {
               onChangeText={setUpiRef}
               style={styles.input}
             />
+            <Text style={{color:'white',margin:10,fontWeight:600}}>Check in your Payment App you will find the number with UTR: XXXXXXXXXXXXX</Text>
             <Text style={styles.label}>Amount Paid</Text>
             <TextInput
               placeholder="0.00"

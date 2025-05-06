@@ -15,7 +15,7 @@ const BudgetCard = ({ expenses, setExpenses, fetchExpenses }) => {
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [isBudgetExpenseVisible, setIsBudgetExpenseVisible] = useState(false);
   const userState = useSelector((state) => state.user);
-  const userId = userState.user.id;
+  const userId = 12345;
   const BudgetID = useRef(0);
 
   useEffect(() => {

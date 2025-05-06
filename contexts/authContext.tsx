@@ -21,7 +21,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (token!=null && token != undefined) {
         router.replace("/(tabs)");
       } else {
-        router.replace("/(auth)/welcome");
+        // router.replace("/(auth)/welcome");
+        router.replace("/(tabs)/home")
       }
     },[]);
 

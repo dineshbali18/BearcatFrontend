@@ -18,7 +18,7 @@ const WalletListItem = ({check}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userState = useSelector((state) => state.user);
-  const userId = userState.user.id;
+  const userId = 12345;
 
   useEffect(() => {
     fetchUserAccounts();

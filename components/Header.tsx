@@ -1,49 +1,63 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Colors from "@/constants/Colors";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "@/store/userSlice";
 import { useRouter } from "expo-router";
-import { useSelector } from "react-redux";
-
+import { getWalletAmount } from "@/helper/Home";
+import Colors from "@/constants/Colors";
 
 const Header = () => {
   const dispatch = useDispatch();
-  const router = useRouter()
-  const userState = useSelector((state) => state.user); 
-  const userId = userState.user.id
+  const router = useRouter();
+  const [walletAmt, setWalletAmt] = useState(0);
 
   const handleSignOut = () => {
-    console.log("INNNN")
-    // Clear user data from Redux store
     dispatch(clearUser());
-
-    // Navigate to the login screen
     router.replace({ pathname: "/(auth)/login" });
   };
+
+  const fetchWalletBalance = async () => {
+    try {
+      const res = await getWalletAmount();
+      setWalletAmt(res.wallet_balance);
+    } catch (err) {
+      console.log("Failed to fetch wallet balance", err);
+    }
+  };
+
+  const handleAddFunds = () => {
+    router.push('/(payments)/addFunds');
+  };
+
+  useEffect(() => {
+    fetchWalletBalance();
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View
-        style={styles.wrapper}
-      >
-        <View style={styles.userInfoWrapper}>
-          <View style={styles.userTxtWrapper}>
-            <Text style={[styles.userText, { fontSize: 12 }]}>Hi, {userState.user.username}</Text>
-            <Text style={[styles.userText, { fontSize: 16 }]}>
-              My <Text style={styles.boldText}>Finance</Text>
-            </Text>
-          </View>
-        </View>
-        <TouchableOpacity
-          onPress={() => {handleSignOut()}}
-          style={styles.btnWrapper}
-        >
-          <Text style={styles.btnText}>
-            Sign Out
+    <SafeAreaView edges={['top']} style={styles.container}>
+      <View style={styles.wrapper}>
+        <View style={styles.userTxtWrapper}>
+          <Text style={[styles.userText, { fontSize: 12 }]}>Hi, Dinesh</Text>
+          <Text style={[styles.userText, { fontSize: 16 }]}>
+            Welcome to <Text style={styles.boldText}>LuckyWheel</Text>
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+
+        <View style={styles.rightWrapper}>
+      <TouchableOpacity onPress={handleAddFunds}>
+        <View style={styles.walletRow}>
+          <Text style={styles.walletIcon}>💳</Text>
+          <Text style={styles.walletText}>${walletAmt}    +</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+
+
+          <TouchableOpacity onPress={handleSignOut} style={styles.btnWrapper}>
+            <Text style={styles.btnText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
     </SafeAreaView>
   );
 };
@@ -51,41 +65,74 @@ const Header = () => {
 export default Header;
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.black, 
+  container: {
+    backgroundColor: "#1a1a2e",
+    zIndex: 10,
   },
   wrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
-    height: 70,
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingHorizontal: 20,
-  },
-  userInfoWrapper: { 
-    flexDirection: "row", 
-    alignItems: "center", 
+    paddingVertical: 12,
   },
   userTxtWrapper: {
-    marginTop:-40,
-    marginLeft:-20,
+    flexDirection: "column",
+    marginTop: 2,
   },
   userText: {
     color: Colors.white,
   },
   boldText: {
-    fontWeight:'700',
+    fontWeight: "700",
+    color: "#00b894",
   },
+  rightWrapper: {
+    flexDirection: "column",
+    alignItems: "flex-end",
+  },
+  
+  walletRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#00b894",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  
+  walletIcon: {
+    fontSize: 16,
+    color: "#fff",
+    marginRight: 6,
+  },
+  
+  walletText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  
+  addFundsButton: {
+    marginBottom: 8,
+  },
+  
+  addFundsText: {
+    color: "#00b894",
+    fontSize: 12,
+    textDecorationLine: "underline",
+  },
+  
   btnWrapper: {
     borderColor: "#666",
     borderWidth: 1,
-    padding: 8,
-    borderRadius: 10,
-    marginTop: -20,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
   },
-  btnText: { 
-    color: Colors.white, 
+  btnText: {
+    color: Colors.white,
     fontSize: 12,
-    marginTop: -20,
   },
 });

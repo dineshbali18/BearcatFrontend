@@ -12,30 +12,37 @@ import { colors, spacingY } from "@/constants/theme";
 
 function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
   const tabbarIcons: any = {
-    index: (isFocused: boolean) => (
+    home: (isFocused: boolean) => (
       <Icons.House
-        size={verticalScale(30)}
+        size={verticalScale(26)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
       />
     ),
-    statistics: (isFocused: boolean) => (
-      <Icons.ChartBar
-        size={verticalScale(30)}
+    bets: (isFocused: boolean) => (
+      <Icons.ArrowsLeftRight
+        size={verticalScale(26)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
       />
     ),
-    wallet: (isFocused: boolean) => (
-      <Icons.Wallet
-        size={verticalScale(30)}
+    winners: (isFocused: boolean) => (
+      <Icons.Trophy
+        size={verticalScale(26)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
       />
     ),
     profile: (isFocused: boolean) => (
       <Icons.User
-        size={verticalScale(30)}
+        size={verticalScale(26)}
+        weight={isFocused ? "fill" : "regular"}
+        color={isFocused ? colors.primary : colors.neutral400}
+      />
+    ),
+    help: (isFocused: boolean) => (
+      <Icons.Question
+        size={verticalScale(26)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
       />
@@ -77,7 +84,7 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
         return (
           <TouchableOpacity
             key={route.name}
-            testID={`tab-${route.name}`} // ✅ This line enables Maestro to find the tab
+            testID={`tab-${route.name}`}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
@@ -85,7 +92,17 @@ function CustomTabs({ state, descriptors, navigation }: BottomTabBarProps) {
             onLongPress={onLongPress}
             style={styles.tabbarItem}
           >
-            {tabbarIcons[route.name] && tabbarIcons[route.name](isFocused)}
+            <View style={styles.iconWithLabel}>
+              {tabbarIcons[route.name]?.(isFocused)}
+              <Text
+                style={[
+                  styles.label,
+                  { color: isFocused ? colors.primary : colors.neutral400 },
+                ]}
+              >
+                {label.charAt(0).toUpperCase() + label.slice(1)}
+              </Text>
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -97,7 +114,7 @@ const styles = StyleSheet.create({
   tabbar: {
     flexDirection: "row",
     width: "100%",
-    height: Platform.OS == "ios" ? verticalScale(73) : verticalScale(55),
+    height: Platform.OS === "ios" ? verticalScale(73) : verticalScale(60),
     backgroundColor: colors.neutral800,
     justifyContent: "space-around",
     alignItems: "center",
@@ -105,9 +122,19 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   tabbarItem: {
-    marginBottom: Platform.OS == "ios" ? spacingY._10 : spacingY._5,
+    marginBottom: Platform.OS === "ios" ? spacingY._10 : spacingY._5,
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
+  },
+  iconWithLabel: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  label: {
+    fontSize: scale(10),
+    marginTop: verticalScale(2),
+    fontWeight: "500",
   },
 });
 

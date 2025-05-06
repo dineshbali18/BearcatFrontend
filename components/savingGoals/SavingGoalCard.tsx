@@ -15,7 +15,7 @@ const SavingGoals = ({expenses,setExpenses,fetchExpenses}) => {
   const [isManageModalVisible, setManageModalVisible] = useState(false);
   const [isSavingGoalExpenseVisibel, setIsSavingGoalExpenseVisible] = useState(false);
   const userState = useSelector((state) => state.user);
-  const userId = userState.user.id;
+  const userId = 12345;
   const GoalID = useRef(0);
 
   useEffect(() => {

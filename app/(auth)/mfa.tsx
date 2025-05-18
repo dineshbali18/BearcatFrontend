@@ -17,7 +17,7 @@ const MFAScreen = () => {
     }
 
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/api/user/verifyotp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, Otp: otp }),
@@ -30,7 +30,7 @@ const MFAScreen = () => {
         Alert.alert("✅ Success", "OTP Verified Successfully!", [
           {
             text: "OK",
-            onPress: () => router.replace("/(tabs)"),
+            onPress: () => router.replace("/(tabs)/home"),
           },
         ]);
       } else {

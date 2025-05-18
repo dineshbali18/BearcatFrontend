@@ -43,7 +43,7 @@ const SignUp = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/register`, {
+      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

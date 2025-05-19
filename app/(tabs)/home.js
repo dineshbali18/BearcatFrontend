@@ -4,7 +4,7 @@ import {
   TouchableOpacity, Alert, TextInput, Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getwinner, placeBet, getHomeData } from '../../helper/Home';
+import { getwinner, placeBet, getHomeData, getWalletAmount } from '../../helper/Home';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import Header from '../../components/Header';
@@ -39,6 +39,7 @@ const LotteryWheel = () => {
   const [bettingOpen, setBettingOpen] = useState(false);
   const [winnerName, setWinnerName] = useState('');
   const [isAnimatingWinner, setIsAnimatingWinner] = useState(false);
+  const [headerRefreshKey, setHeaderRefreshKey] = useState(0);
 
   const spinInterval = useRef(null);
   const winnerTimeout = useRef(null);
@@ -228,6 +229,7 @@ const LotteryWheel = () => {
     setPhase('winner');
     setBettingOpen(false);
     animateWinner();
+    setHeaderRefreshKey(prev => prev + 1);
   };
   const animateWinner = () => {
     setIsAnimatingWinner(true);
@@ -284,10 +286,19 @@ const LotteryWheel = () => {
 
   useEffect(() => {
     fetchAndCacheHomeData();
+    getAmount();
     return () => {
       clearIntervals();
     };
   }, []);
+
+  const getAmount = async()=>{
+    const data = await getWalletAmount();
+    console.log("!!!!!",data)
+    setWalletAmount(data?.wallet_balance)
+  }
+
+
 
   const stopSpinning = () => {
     if (spinInterval.current) clearInterval(spinInterval.current);
@@ -304,7 +315,7 @@ const LotteryWheel = () => {
     if (!betAmount || isNaN(betAmount)) return Alert.alert('Error', 'Please enter a valid bet amount');
     
     const amount = parseFloat(betAmount);
-    if (amount <= 0) return Alert.alert('Error', 'Bet amount must be greater than 0');
+    if (amount <= 30) return Alert.alert('Error', 'Bet amount must be greater than 30');
     if (amount > walletAmt) return Alert.alert('Error', 'Insufficient funds');
 
     try {
@@ -319,6 +330,7 @@ const LotteryWheel = () => {
       if (response.status == 1) {
         Alert.alert('Success', `Your bet of $${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`);
         fetchAndCacheHomeData();
+        setHeaderRefreshKey(headerRefreshKey+1);
       } else {
         Alert.alert('Error', response.message || 'Failed to place bet');
       }
@@ -335,7 +347,7 @@ const LotteryWheel = () => {
 
   const getCountdownLabel = () => {
     if (phase === 'spinning') {
-      return bettingOpen ? 'Bets closing in' : 'Drawing in';
+      return bettingOpen ? 'Bets closing in' : 'Winner Processing';
     }
     return '';
   };
@@ -346,7 +358,7 @@ const LotteryWheel = () => {
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <Header />
+        <Header refreshTrigger={headerRefreshKey} />
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           <Animatable.Text 
             ref={titleRef}
@@ -506,7 +518,7 @@ const LotteryWheel = () => {
               <View style={styles.betSection}>
                 <Text style={styles.sectionTitle}>Bet Amount</Text>
                 <View style={styles.betInputWrapper}>
-                  <Text style={styles.currencySymbol}>$</Text>
+                  <Text style={styles.currencySymbol}>₹</Text>
                   <TextInput
                     style={styles.betInput}
                     value={betAmount}

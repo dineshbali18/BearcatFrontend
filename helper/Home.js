@@ -1,6 +1,6 @@
 import {API} from '../backend';
 
-const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImRpbmVzaGJhbGk0NEBnbWFpbC5jb20iLCJleHAiOjE3NDkxMjYyMDZ9.m3D77bX8E0voh3YAIjXMNCsivvdl0-r3RuTVXNZarNQ';
+const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImRpbmVzaGJhbGk0NEBnbWFpbC5jb20iLCJleHAiOjE3NTAyMTM3Njl9.LPR1frK7AV9-q-mS16GuBGPjduHC35W0fQfs05mbrww';
 
 export const getwinner=(lotteryId)=>{
   return fetch(`${API}/v1/lottery/winner`, {
@@ -94,10 +94,12 @@ export const getWalletAmount=() => {
       'Access-Control-Allow-Origin': '*',
       'Authorization': `${token}`
     },
-  }).then((response) => {
+  }).then(async (response) => {
     //console logging response can give a Error in log so try to comment the code that is actually printing response
-    // console.log(response);
-    console.log("000000",response)
+    // console.log(response.data.json());
+    // console.log("000000123456",response.json())
+//     const data = await response.json();
+// console.log("Parsed data:", data);
     return response.json();
   })
       .catch((err) => {

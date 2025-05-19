@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { getWalletAmount } from "@/helper/Home";
 import Colors from "@/constants/Colors";
 
-const Header = () => {
+const Header = ({ refreshTrigger }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [walletAmt, setWalletAmt] = useState(0);
@@ -32,7 +32,7 @@ const Header = () => {
 
   useEffect(() => {
     fetchWalletBalance();
-  }, []);
+  }, [refreshTrigger]);
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>

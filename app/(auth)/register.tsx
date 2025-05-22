@@ -4,6 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
+  Dimensions,
+  Image,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -14,11 +16,11 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
-import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
+const { width, height } = Dimensions.get("window");
 
 const SignUp = () => {
   const router = useRouter();
@@ -39,35 +41,34 @@ const SignUp = () => {
       return;
     }
 
-    console.log("PPPP",phoneNumberRef.current)
-
     setLoading(true);
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/user/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailRef.current,
-          password: passwordRef.current,
-          username: nameRef.current,
-          phoneNum: phoneNumberRef.current,
-        }),
-      });
+      const response = await fetch(
+        `${Constants.expoConfig?.extra?.REACT_APP_API}:3000/user/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailRef.current,
+            password: passwordRef.current,
+            username: nameRef.current,
+            phoneNum: phoneNumberRef.current,
+          }),
+        }
+      );
 
       const res = await response.json();
-      console.log("RESSS::::",res)
-      console.log(res.status)
       setLoading(false);
 
       if (res.error != undefined) {
-
         Alert.alert("Register", res.error);
       } else {
-        // Store user data locally using AsyncStorage
-       // await AsyncStorage.setItem("userData", JSON.stringify(res.user));
         Alert.alert("Register", "Registration successful!");
-        // Optionally, navigate to another screen:
-        router.replace(`/(auth)/mfa_register?email=${encodeURIComponent(emailRef.current)}`);
+        router.replace(
+          `/(auth)/mfa_register?email=${encodeURIComponent(
+            emailRef.current
+          )}`
+        );
       }
     } catch (error) {
       Alert.alert("Register", "An error occurred during registration.");
@@ -78,68 +79,72 @@ const SignUp = () => {
   return (
     <ScreenWrapper>
       <StatusBar style="light" />
+
+      {/* <Image
+        source={require("../../images/auth_bg.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+        blurRadius={2}
+      /> */}
+
       <View style={styles.container}>
         <BackButton iconSize={28} />
 
-        {/* Welcome */}
-        <View style={{ gap: 5, marginTop: spacingY._20 }}>
-          <Typo size={30} fontWeight={"800"}>
-            Let's
-          </Typo>
-          <Typo size={30} fontWeight={"800"}>
-            Get Started
-          </Typo>
-        </View>
+        {/* Animated Title */}
+        <Animated.View entering={FadeInDown.duration(600)} style={styles.headingWrapper}>
+          <Text style={styles.gradientHeader}>Let’s</Text>
+          <Text style={styles.gradientHeader}>Get Started</Text>
+        </Animated.View>
 
         {/* Form */}
         <View style={styles.form}>
-          <Typo size={16} color={colors.textLighter}>
-            Create an account to track your expenses
-          </Typo>
-          <Input
-  testID="nameInput"
-  icon={<Icons.User size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-  placeholder="Enter your name"
-  onChangeText={(value) => (nameRef.current = value)}
-/>
+          <Text style={styles.subtitleText}>Create an account to track your expenses</Text>
 
-<Input
-  testID="emailInput"
-  icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-  placeholder="Enter your email"
-  onChangeText={(value) => (emailRef.current = value)}
-/>
+          <Animated.View entering={FadeInDown.delay(100)}>
+            <Input
+              icon={<Icons.User size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+              placeholder="Enter your name"
+              onChangeText={(value) => (nameRef.current = value)}
+            />
+          </Animated.View>
 
-<Input
-  testID="phoneInput"
-  icon={<Icons.Phone size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-  placeholder="Enter your phone number"
-  onChangeText={(value) => (phoneNumberRef.current = value)}
-/>
+          <Animated.View entering={FadeInDown.delay(200)}>
+            <Input
+              icon={<Icons.At size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+              placeholder="Enter your email"
+              onChangeText={(value) => (emailRef.current = value)}
+            />
+          </Animated.View>
 
-<Input
-  testID="passwordInput"
-  icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
-  placeholder="Enter your password"
-  secureTextEntry
-  onChangeText={(value) => (passwordRef.current = value)}
-/>
+          <Animated.View entering={FadeInDown.delay(300)}>
+            <Input
+              icon={<Icons.Phone size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+              placeholder="Enter your phone number"
+              onChangeText={(value) => (phoneNumberRef.current = value)}
+            />
+          </Animated.View>
 
-<Button testID="signUpButton" loading={loading} onPress={onSubmit}>
-  <Typo fontWeight={"700"} color={colors.black} size={21}>
-    Sign Up
-  </Typo>
-</Button>
+          <Animated.View entering={FadeInDown.delay(400)}>
+            <Input
+              icon={<Icons.Lock size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+              placeholder="Enter your password"
+              secureTextEntry
+              onChangeText={(value) => (passwordRef.current = value)}
+            />
+          </Animated.View>
 
+          <Animated.View entering={FadeInDown.delay(500)}>
+            <Button testID="signUpButton" loading={loading} onPress={onSubmit} style={styles.buttonStyle}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </Button>
+          </Animated.View>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Typo size={15}>Already have an account?</Typo>
-          <Pressable onPress={() => router.navigate("/(auth)/login")}>
-            <Typo size={15} fontWeight={"700"} color={colors.primary}>
-              Login
-            </Typo>
+          <Text style={styles.footerText}>Already have an account?</Text>
+          <Pressable onPress={() => router.navigate("/(auth)/login")}> 
+            <Text style={styles.linkText}>Login</Text>
           </Pressable>
         </View>
       </View>
@@ -155,28 +160,66 @@ const styles = StyleSheet.create({
     gap: spacingY._30,
     paddingHorizontal: spacingX._20,
   },
-  welcomeText: {
-    fontSize: verticalScale(20),
-    fontWeight: "bold",
-    color: colors.text,
+  backgroundImage: {
+    position: "absolute",
+    width: width,
+    height: height,
+    top: 0,
+    left: 0,
+    zIndex: -1,
+    opacity: 0.6,
+  },
+  headingWrapper: {
+    gap: 4,
+    marginTop: spacingY._20,
+  },
+  gradientHeader: {
+    fontSize: 32,
+    fontWeight: "900",
+    fontFamily: "Poppins",
+    letterSpacing: 1,
+    color: "#FF8DF4",
+    textShadowColor: "#FEC8FF",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 5,
+  },
+  subtitleText: {
+    color: "#D4C2FF",
+    fontSize: 15,
+    fontFamily: "JosefinSans-SemiBold",
   },
   form: {
     gap: spacingY._20,
   },
-  forgotPassword: {
-    textAlign: "right",
-    fontWeight: "500",
-    color: colors.text,
+  buttonStyle: {
+    backgroundColor: "#A259FF",
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    fontFamily: "Poppins",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
+    marginTop: 20,
   },
   footerText: {
-    textAlign: "center",
-    color: colors.text,
-    fontSize: verticalScale(15),
+    color: "#D4C2FF",
+    fontSize: 15,
+    fontFamily: "JosefinSans-SemiBold",
+  },
+  linkText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#FF8DF4",
+    textDecorationLine: "underline",
   },
 });

@@ -1,15 +1,27 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Dimensions,
+  Image,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import Constants from 'expo-constants';
+import Animated, { FadeInDown } from "react-native-reanimated";
+
+const { width, height } = Dimensions.get("window");
 
 const ResetPasswordScreen = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Reset Password
+  const [step, setStep] = useState(1);
   const [isVerified, setIsVerified] = useState(false);
 
   const handleSendOtp = async () => {
@@ -17,36 +29,22 @@ const ResetPasswordScreen = () => {
       Alert.alert("❌ Error", "Please enter a valid email.");
       return;
     }
-
     try {
-      // First request: generate OTP
       const generateOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/generateotp`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       const generateOtpData = await generateOtpResponse.json();
-      console.log("!!!!!!!!",generateOtpData.message)
-      if (generateOtpData.message !== "OTP updated successfully." && generateOtpData.message !== "OTP generated and saved successfully." && generateOtpData.message !== "OTP generated or updated successfully.") {
-        throw new Error("Failed to generate OTP.");
-      }
-      
+      if (!generateOtpData.message?.includes("OTP")) throw new Error("Failed to generate OTP.");
 
-      // Second request: send OTP
       const sendOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/sendotp`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       const sendOtpData = await sendOtpResponse.json();
-      console.log(sendOtpData)
-      if (sendOtpData.message !== "OTP sent successfully.") {
-        throw new Error("Failed to send OTP.");
-      }
+      if (sendOtpData.message !== "OTP sent successfully.") throw new Error("Failed to send OTP.");
 
       Alert.alert("📩 OTP Sent", "Check your email for the OTP.");
       setStep(2);
@@ -56,31 +54,24 @@ const ResetPasswordScreen = () => {
   };
 
   const handleVerifyOtp = async () => {
-    if (otp === "") {
+    if (!otp) {
       Alert.alert("❌ Error", "Please enter the OTP.");
       return;
     }
-
     try {
-      // Third request: verify OTP
       const verifyOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, Otp: otp }),
       });
       const verifyOtpData = await verifyOtpResponse.json();
-      console.log("VVVVV",verifyOtpData)
-      if (verifyOtpData.message != "OTP verified successfully.") {
-        throw new Error("Invalid OTP. Please try again.");
-      }
+      if (verifyOtpData.message !== "OTP verified successfully.") throw new Error("Invalid OTP. Please try again.");
 
       Alert.alert("✅ Success", "OTP verified successfully.");
       setIsVerified(true);
       setStep(3);
     } catch (error) {
-      Alert.alert("❌ Error", "Error in verified ");
+      Alert.alert("❌ Error", "Error verifying OTP.");
     }
   };
 
@@ -89,22 +80,14 @@ const ResetPasswordScreen = () => {
       Alert.alert("❌ Error", "Password must be at least 6 characters.");
       return;
     }
-
     try {
-      // Final request: update password
-      console.log("QQQQQQ")
       const resetPasswordResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email:email, password:password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
       const resetPasswordData = await resetPasswordResponse.json();
-      console.log("RRRRRREEEE",resetPasswordData)
-      if (resetPasswordData.message !== "User details updated successfully") {
-        throw new Error("Failed to reset password.");
-      }
+      if (resetPasswordData.message !== "User details updated successfully") throw new Error("Failed to reset password.");
 
       Alert.alert("✅ Success", "Password reset successful! Redirecting...");
       router.replace("../login");
@@ -123,128 +106,75 @@ const ResetPasswordScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1E1E1E", padding: 20 }}>
-      
-      {/* Close Button */}
-      <TouchableOpacity onPress={handleClose} style={{ position: "absolute", top: 40, right: 20 }}>
+    <View style={styles.screen}>
+      {/* <Image source={require("../../images/auth_bg.png")} style={styles.backgroundImage} resizeMode="cover" blurRadius={2} /> */}
+
+      <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
         <AntDesign name="closecircle" size={28} color="#FF4C4C" />
       </TouchableOpacity>
 
-      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#FFD700", marginBottom: 20 }}>
-        🔓 Reset Password
-      </Text>
+      <Animated.View entering={FadeInDown.duration(600)}>
+        <Text style={styles.title}>🔓 Reset Password</Text>
+      </Animated.View>
 
-      {/* Step 1: Email Input */}
-      <View style={{ flexDirection: "row", alignItems: "center", width: "100%", marginBottom: 15 }}>
-        <TextInput
-          style={{
-            flex: 1,
-            padding: 15,
-            backgroundColor: "#333845",
-            borderRadius: 10,
-            color: step > 1 ? "#B0B0B0" : "#FFF",
-            fontSize: 16,
-          }}
-          placeholder="📧 Enter your email"
-          placeholderTextColor="#888"
-          value={email}
-          onChangeText={setEmail}
-          editable={step === 1}
-        />
-        {step > 1 && <Feather name="check-circle" size={24} color="#4CAF50" style={{ marginLeft: 10 }} />}
-      </View>
-
-      {/* Send OTP Button (Only in Step 1) */}
-      {step === 1 && (
-        <TouchableOpacity
-          onPress={handleSendOtp}
-          style={{
-            backgroundColor: "#4CAF50",
-            padding: 15,
-            borderRadius: 10,
-            width: "100%",
-            alignItems: "center",
-            marginBottom: 15,
-          }}
-        >
-          <Text style={{ color: "#FFF", fontSize: 18, fontWeight: "bold" }}>📨 Send OTP</Text>
-        </TouchableOpacity>
-      )}
-
-      {/* Step 2: OTP Input */}
-      {step >= 2 && (
-        <View style={{ flexDirection: "row", alignItems: "center", width: "100%", marginBottom: 15 }}>
+      <Animated.View entering={FadeInDown.delay(100)}>
+        <View style={styles.inputWrapper}>
           <TextInput
-            style={{
-              flex: 1,
-              padding: 15,
-              backgroundColor: "#333845",
-              borderRadius: 10,
-              color: isVerified ? "#B0B0B0" : "#FFF",
-              fontSize: 18,
-              textAlign: "center",
-              letterSpacing: 4,
-            }}
-            placeholder="🔢 Enter OTP"
+            style={[styles.input, { color: step > 1 ? "#B0B0B0" : "#FFF" }]}
+            placeholder="📧 Enter your email"
             placeholderTextColor="#888"
-            value={otp}
-            onChangeText={setOtp}
-            editable={!isVerified}
+            value={email}
+            onChangeText={setEmail}
+            editable={step === 1}
           />
-          {isVerified && <Feather name="check-circle" size={24} color="#4CAF50" style={{ marginLeft: 10 }} />}
+          {step > 1 && <Feather name="check-circle" size={24} color="#4CAF50" style={{ marginLeft: 10 }} />}
         </View>
-      )}
+      </Animated.View>
 
-      {/* Verify OTP Button (Only in Step 2) */}
-      {step === 2 && !isVerified && (
-        <TouchableOpacity
-          onPress={handleVerifyOtp}
-          style={{
-            backgroundColor: "#FFA500",
-            padding: 15,
-            borderRadius: 10,
-            width: "100%",
-            alignItems: "center",
-            marginBottom: 15,
-          }}
-        >
-          <Text style={{ color: "#FFF", fontSize: 18, fontWeight: "bold" }}>✅ Verify OTP</Text>
+      {step === 1 && (
+        <TouchableOpacity onPress={handleSendOtp} style={styles.primaryButton}>
+          <Text style={styles.buttonText}>📨 Send OTP</Text>
         </TouchableOpacity>
       )}
 
-      {/* Step 3: New Password Input */}
-      {step === 3 && (
-        <TextInput
-          style={{
-            width: "100%",
-            padding: 15,
-            backgroundColor: "#444B5A",
-            borderRadius: 10,
-            color: "#FFF",
-            fontSize: 16,
-            marginBottom: 15,
-          }}
-          placeholder="🔑 Enter new password"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+      {step >= 2 && (
+        <Animated.View entering={FadeInDown.delay(200)}>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={[styles.input, { textAlign: "center", letterSpacing: 4, color: isVerified ? "#B0B0B0" : "#FFF" }]}
+              placeholder="🔢 Enter OTP"
+              placeholderTextColor="#888"
+              value={otp}
+              onChangeText={setOtp}
+              editable={!isVerified}
+            />
+            {isVerified && <Feather name="check-circle" size={24} color="#4CAF50" style={{ marginLeft: 10 }} />}
+          </View>
+        </Animated.View>
       )}
 
-      {/* Reset Password Button (Only in Step 3) */}
+      {step === 2 && !isVerified && (
+        <TouchableOpacity onPress={handleVerifyOtp} style={styles.secondaryButton}>
+          <Text style={styles.buttonText}>✅ Verify OTP</Text>
+        </TouchableOpacity>
+      )}
+
       {step === 3 && (
-        <TouchableOpacity
-          onPress={handleResetPassword}
-          style={{
-            backgroundColor: "#4CAF50",
-            padding: 15,
-            borderRadius: 10,
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "#FFF", fontSize: 18, fontWeight: "bold" }}>🔄 Reset Password</Text>
+        <Animated.View entering={FadeInDown.delay(300)}>
+          <TextInput
+            style={styles.input}
+            placeholder="🔑 Enter new password"
+            placeholderTextColor="#888"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </Animated.View>
+      )}
+
+      {step === 3 && (
+        <TouchableOpacity onPress={handleResetPassword} style={styles.primaryButton}>
+          <Text style={styles.buttonText}>🔄 Reset Password</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -252,3 +182,73 @@ const ResetPasswordScreen = () => {
 };
 
 export default ResetPasswordScreen;
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1E1E1E",
+    padding: 20,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width,
+    height,
+    top: 0,
+    left: 0,
+    zIndex: -1,
+    opacity: 0.6,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#FF8DF4",
+    textShadowColor: "#FEC8FF",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+    fontFamily: "Poppins",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    padding: 15,
+    backgroundColor: "#333845",
+    borderRadius: 10,
+    fontSize: 16,
+  },
+  primaryButton: {
+    backgroundColor: "#A259FF",
+    padding: 15,
+    borderRadius: 30,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  secondaryButton: {
+    backgroundColor: "#FFA500",
+    padding: 15,
+    borderRadius: 30,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "800",
+    fontFamily: "Poppins",
+  },
+});

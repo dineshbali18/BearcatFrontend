@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions, Image } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useSelector } from "react-redux"; // Assuming Redux for user data
+import { useSelector } from "react-redux";
 import Constants from 'expo-constants';
-const MFARegisterScreen = () => {
-  const { email } = useLocalSearchParams(); // Get the email passed from previous screen
-  const router = useRouter();
-  const [otp, setOtp] = useState(""); // State for OTP input
-  const user = useSelector((state) => state.user.user); // Get the user data from Redux store
+import Animated, { FadeInDown } from "react-native-reanimated";
 
-  // Function to handle OTP verification
+const { width, height } = Dimensions.get("window");
+
+const MFARegisterScreen = () => {
+  const { email } = useLocalSearchParams();
+  const router = useRouter();
+  const [otp, setOtp] = useState("");
+  const user = useSelector((state) => state.user.user);
+
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
       Alert.alert("❌ Error", "Please enter a valid 6-digit OTP.");
@@ -17,32 +20,28 @@ const MFARegisterScreen = () => {
     }
 
     try {
-      // Send OTP verification request to backend
       const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/api/user/verifyotp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email, // Email from the local search params
-          Otp: otp, // OTP entered by the user
+          email: email,
+          Otp: otp,
         }),
       });
 
       const result = await response.json();
-      console.log("QQQQQQQQQQ",result)
 
-      if (result.message == "OTP verified successfully." && result.error == undefined) {
-        // If OTP is verified successfully, navigate to home
+      if (result.message === "OTP verified successfully." && result.error === undefined) {
         Alert.alert("✅ Success", "OTP Verified Successfully!", [
           {
             text: "OK",
-            onPress: () => router.replace("/(auth)/login"), // Navigate to home screen (replace with your home screen path)
+            onPress: () => router.replace("/(auth)/login"),
           },
         ]);
       } else {
-        // Handle error if OTP is incorrect
-        Alert.alert("❌ Error", result.error|| "Invalid OTP. Please try again.");
+        Alert.alert("❌ Error", result.error || "Invalid OTP. Please try again.");
       }
     } catch (error) {
       console.error("OTP Verification error:", error);
@@ -51,62 +50,113 @@ const MFARegisterScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1E1E1E", padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#FFD700", marginBottom: 20 }}>
-        🔐 Two-Factor Authentication
-      </Text>
+    <View style={styles.screen}>
+      {/* <Image
+        source={require("../../images/auth_bg.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+        blurRadius={2}
+      /> */}
 
-      {/* Email (Non-editable) */}
-      <TextInput
-        style={{
-          width: "100%",
-          padding: 15,
-          backgroundColor: "#333845",
-          borderRadius: 10,
-          color: "#B0B0B0",
-          fontSize: 16,
-          marginBottom: 15,
-        }}
-        value={email}
-        editable={false}
-      />
+      <Animated.View entering={FadeInDown.duration(600)} style={styles.titleContainer}>
+        <Text style={styles.title}>🔐 Two-Factor Authentication</Text>
+      </Animated.View>
 
-      {/* OTP Input */}
-      <TextInput
-        style={{
-          width: "100%",
-          padding: 15,
-          backgroundColor: "#444B5A",
-          borderRadius: 10,
-          color: "#FFFFFF",
-          fontSize: 18,
-          textAlign: "center",
-          letterSpacing: 4,
-        }}
-        placeholder="Enter 6-digit OTP"
-        placeholderTextColor="#888"
-        keyboardType="numeric"
-        maxLength={6}
-        value={otp}
-        onChangeText={setOtp}
-      />
+      <Animated.View entering={FadeInDown.delay(100)}>
+        <TextInput
+          style={styles.emailInput}
+          value={email}
+          editable={false}
+        />
+      </Animated.View>
 
-      {/* Verify Button */}
-      <TouchableOpacity
-        onPress={handleVerifyOTP}
-        style={{
-          marginTop: 20,
-          backgroundColor: "#4CAF50",
-          padding: 15,
-          borderRadius: 10,
-          width: "100%",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "#FFF", fontSize: 18, fontWeight: "bold" }}>✅ Verify OTP</Text>
-      </TouchableOpacity>
+      <Animated.View entering={FadeInDown.delay(200)}>
+        <TextInput
+          style={styles.otpInput}
+          placeholder="Enter 6-digit OTP"
+          placeholderTextColor="#888"
+          keyboardType="numeric"
+          maxLength={6}
+          value={otp}
+          onChangeText={setOtp}
+        />
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(300)}>
+        <TouchableOpacity
+          onPress={handleVerifyOTP}
+          style={styles.verifyButton}
+        >
+          <Text style={styles.verifyButtonText}>✅ Verify OTP</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };
 
 export default MFARegisterScreen;
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1E1E1E",
+    padding: 20,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width,
+    height,
+    top: 0,
+    left: 0,
+    zIndex: -1,
+    opacity: 0.6,
+  },
+  titleContainer: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#FF8DF4",
+    textShadowColor: "#FEC8FF",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+    fontFamily: "Poppins",
+    textAlign: "center",
+  },
+  emailInput: {
+    width: "100%",
+    padding: 15,
+    backgroundColor: "#333845",
+    borderRadius: 10,
+    color: "#B0B0B0",
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  otpInput: {
+    width: "100%",
+    padding: 15,
+    backgroundColor: "#444B5A",
+    borderRadius: 10,
+    color: "#FFFFFF",
+    fontSize: 18,
+    textAlign: "center",
+    letterSpacing: 4,
+  },
+  verifyButton: {
+    marginTop: 20,
+    backgroundColor: "#A259FF",
+    padding: 15,
+    borderRadius: 30,
+    width: "100%",
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "800",
+    fontFamily: "Poppins",
+  },
+});

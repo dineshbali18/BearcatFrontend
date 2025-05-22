@@ -1,124 +1,285 @@
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
-import React from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  Animated,
+  Platform,
+  Image,
+} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { StatusBar } from "expo-status-bar";
-import { verticalScale } from "@/utils/styling";
-import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import Button from "@/components/Button";
+import { LinearGradient } from "expo-linear-gradient";
+import LottieView from "lottie-react-native";
+import AnimatedText from "react-native-reanimated";
+import { BlurView } from "expo-blur";
+
+import {
+  FadeInDown,
+  FadeIn,
+  FadeInUp,
+} from "react-native-reanimated";
+
+const { width, height } = Dimensions.get("window");
 
 const WelcomePage = () => {
   const router = useRouter();
-  
+  const [showBackgroundImage, setShowBackgroundImage] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const coinPositions = [20, 100, 180, 250, 330, 420];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBackgroundImage(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <ScreenWrapper>
+    <ScreenWrapper style={styles.screen}>
       <StatusBar style="light" />
-      <View style={styles.container}>
-        <View>
-        <TouchableOpacity
-  onPress={() => router.push("/(auth)/login")}
-  style={styles.loginButton}
-  testID="signInButton"
->
-  <Text style={[styles.signInText, { fontWeight: "500" }]}>Sign in</Text>
-</TouchableOpacity>
 
-          <Animated.Image
-            entering={FadeIn.duration(500)}
-            source={require("../../assets/images/welcome.png")}
-            style={styles.welcomeImage}
-            resizeMode="contain"
-          />
-        </View>
+      {/* Gradient Background */}
+      <LinearGradient
+        colors={["#1a002b", "#0f001f", "#000000"]}
+        style={styles.gradientOverlay}
+      />
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Animated.View
-            entering={FadeInDown.duration(1000).springify().damping(12)}
-            style={{ alignItems: "center" }}
-          >
-            <Text style={[styles.footerText, { fontSize: 30, fontWeight: "800" }]}>
-              Always take control
-            </Text>
-            <Text style={[styles.footerText, { fontSize: 30, fontWeight: "800" }]}>
-              of your finances
-            </Text>
-          </Animated.View>
+      {/* Coin Rain Animation */}
+      {coinPositions.map((left, index) => (
+        <LottieView
+          key={index}
+          source={require("../../assets/lottie/coin_loop.json")}
+          autoPlay
+          loop
+          style={[
+            styles.coinAnimation,
+            {
+              left,
+              width: 60,
+              height: height,
+              opacity: 0.8 - index * 0.1,
+              top: -index * 20,
+            },
+          ]}
+        />
+      ))}
 
-          <Animated.View
-            entering={FadeInDown.duration(1000).delay(100).springify().damping(12)}
-            style={{ alignItems: "center", gap: 2 }}
-          >
-            <Text style={[styles.footerText, { fontSize: 17, color: colors.textLighter }]}>
-              Finances must be arranged to set a better
-            </Text>
-            <Text style={[styles.footerText, { fontSize: 17, color: colors.textLighter }]}>
-              lifestyle in future
-            </Text>
-          </Animated.View>
+      {/* Background Image Fade-in */}
+      {showBackgroundImage && (
+        <Animated.Image
+          source={require("../../images/w.png")}
+          style={[
+            styles.backgroundImage,
+            {
+              opacity: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 0.6],
+              }),
+            },
+          ]}
+          resizeMode="cover"
+        />
+      )}
 
-          <Animated.View
-            entering={FadeInDown.duration(1000).delay(200).springify().damping(12)}
-            style={styles.buttonContainer}
-          >
-            <Button
-  onPress={() => router.push("/(auth)/register")}
-  testID="getStartedButton"
->
-  <Text style={[styles.buttonText, { fontSize: 22, fontWeight: "600" }]}>
-    Get Started
-  </Text>
-</Button>
-          </Animated.View>
-        </View>
+      {/* Title Section */}
+      
+      <View style={styles.titleContainer}>
+        <AnimatedText.Text
+          entering={FadeInDown.duration(500)}
+          style={styles.welcomeLabel}
+        >
+          💫 Welcome to
+        </AnimatedText.Text>
+
+        <AnimatedText.Text
+          entering={FadeInDown.duration(800).delay(200).springify()}
+          style={styles.brandName}
+        >
+          Jack Pick
+        </AnimatedText.Text>
+
+        <AnimatedText.Text
+          entering={FadeInDown.duration(800).delay(400)}
+          style={styles.subtitle}
+        >
+          Spin big. Win bigger.
+        </AnimatedText.Text>
       </View>
+
+      {/* CTA Gradient Button */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() => router.push("/(auth)/register")}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={["#A259FF", "#FF6EC7"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.getStartedButton}
+          >
+            <Text style={styles.getStartedText}>Get Started</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      {/* Sign In Button */}
+      <TouchableOpacity
+      onPress={() => router.push("/(auth)/login")}
+      activeOpacity={0.9}
+      style={styles.signInWrapper}
+    >
+      <LinearGradient
+        colors={["#A259FF", "#FF6EC7"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.signInButton}
+      >
+        <Text style={styles.signInText}>Sign In</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+
     </ScreenWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: "space-between",
-    paddingTop: spacingY._7,
-  },
-  welcomeImage: {
-    width: "100%",
-    height: verticalScale(300),
-    alignSelf: "center",
-    marginTop: verticalScale(100),
-  },
-  loginButton: {
-    alignSelf: "flex-end",
-    marginRight: spacingX._20,
-  },
-  signInText: {
-    color: colors.text,
-  },
-  footer: {
-    backgroundColor: colors.neutral900,
+    backgroundColor: "#0b0015",
     alignItems: "center",
-    paddingTop: verticalScale(30),
-    paddingBottom: verticalScale(45),
-    gap: spacingY._20,
-    shadowColor: "white",
-    shadowOffset: { width: 0, height: -10 },
-    elevation: 10,
-    shadowRadius: 25,
-    shadowOpacity: 0.15,
+    justifyContent: "space-between",
+    paddingTop: 40,
+    paddingBottom: 60,
+    overflow: "hidden",
   },
-  footerText: {
-    color: colors.text,
+  gradientOverlay: {
+    position: "absolute",
+    width,
+    height,
+    top: 0,
+    left: 0,
+    zIndex: -2,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width,
+    height,
+    top: 0,
+    left: 0,
+    zIndex: -1,
+  },
+  coinAnimation: {
+    position: "absolute",
+    zIndex: 0,
+  },
+  titleContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: height * 0.63,
+    paddingHorizontal: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.25)",  // translucent behind text
+    borderRadius: 20,
+    paddingVertical: 8,
+  },
+  
+  welcomeLabel: {
+    color: "#FFD56B", // golden amber
+    fontSize: 16,
+    fontWeight: "600",
+    textShadowColor: "#FCE68C",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+    fontFamily: "JosefinSans-SemiBold",
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  
+  brandName: {
+    color: "#FF8DF4",
+    fontSize: 42,
+    fontWeight: "900",
+    letterSpacing: 2,
+    fontFamily: "Poppins",
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  
+  subtitle: {
+    color: "#D4C2FF", // soft violet-silver
+    fontSize: 15,
+    fontWeight: "500",
+    textShadowColor: "#CBAEFF",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+    fontFamily: "JosefinSans-SemiBold",
     textAlign: "center",
   },
+  
   buttonContainer: {
     width: "100%",
-    paddingHorizontal: spacingX._25,
+    paddingHorizontal: 25,
+    marginBottom: 40,
+    alignItems: "center",
   },
-  buttonText: {
-    color: colors.neutral900,
+  getStartedButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: "#A259FF",
+    shadowColor: "#FFB6C1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 6,
   },
+  getStartedText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    fontFamily: "Poppins",
+    textAlign: "center",
+  },
+  signInWrapper: {
+    position: "absolute",
+    top: 45,
+    right: 30,
+  },
+  
+  signInButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: "#A259FF",
+    shadowColor: "#FFB6C1",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.7,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  
+  signInText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    fontFamily: "Poppins",
+    textAlign: "center",
+  },
+  
 });
 
 export default WelcomePage;

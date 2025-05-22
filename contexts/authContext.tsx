@@ -19,10 +19,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
       if (token!=null && token != undefined) {
-        router.replace("/(tabs)");
+        router.replace("/(tabs)/home");
       } else {
-        // router.replace("/(auth)/welcome");
-        router.replace("/(tabs)/home")
+        router.replace("/(auth)/welcome");
+        // router.replace("/(tabs)/home")
       }
     },[]);
 

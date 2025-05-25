@@ -2,9 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 // Initial state
 const initialState = {
-  user: null,
+  emailID: null,
   token: null,
-  message: null,
+  userID: null,
 };
 
 // Create slice
@@ -13,14 +13,14 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.user = action.payload.user;
+      state.emailID = action.payload.email_id;
       state.token = action.payload.token;
-      state.message = action.payload.message;
+      state.userID = action.payload.user_id;
     },
     clearUser: (state) => {
-      state.user = null;
+      state.emailID = null;
       state.token = null;
-      state.message = null;
+      state.userID = null;
     },
   },
 });

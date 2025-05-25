@@ -11,7 +11,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/userSlice";
+import { setUser } from "@/store/slices/userSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
@@ -38,41 +38,46 @@ const Login = () => {
       Alert.alert("Login", "Please fill all the fields!");
       return;
     }
-
+  
     setLoading(true);
+  
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/v1/user/signin`, {
+      const response = await fetch(`http://api.jack-pick.online:3000/v1/user/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: emailRef.current,
-          password: passwordRef.current,
+          email: emailRef.current.trim().toLowerCase(),
+          password: passwordRef.current.trim(),
         }),
       });
-
-      const res = await response.json();
-      setLoading(false);
-
-      if (res.error) {
-        Alert.alert("Login", res.error);
-      } else {
-        dispatch(setUser({
-          user: res.user,
-          token: res.token,
-          message: res.message,
-        }));
-
-        await AsyncStorage.setItem("userData", JSON.stringify(res.user));
-
+  
+      const resData = await response.json();
+      console.log("Login Response:", response.status, resData);
+  
+      if (response.status === 200) {
+        const userData = {
+          emailID: resData.email_id,
+          userID: resData.user_id,
+          token: resData.token,
+        };
+  
+        dispatch(setUser(userData));
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
+  
         Alert.alert("Login", "Login successful!");
-        router.replace(`/(auth)/mfa?email=${encodeURIComponent(emailRef.current)}`);
+        router.replace("../(tabs)/home");
+      } else {
+        Alert.alert("Login Failed", resData.errorDescription || "Invalid credentials");
       }
     } catch (error) {
+      Alert.alert("Login Error", "A network error occurred.");
+      console.error("Login error:", error);
+    } finally {
       setLoading(false);
-      Alert.alert("Login", "An error occurred during login.");
-      console.log("Login error:", error);
     }
   };
+  
+  
 
   return (
     <ScreenWrapper>

@@ -1,162 +1,272 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions, Image } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useSelector } from "react-redux";
-import Constants from 'expo-constants';
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  ActivityIndicator
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import { StatusBar } from "expo-status-bar";
+import { useRouter } from "expo-router";
+import BackButton from "@/components/BackButton";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import { verticalScale } from "@/utils/styling";
+import { colors, spacingX, spacingY } from "@/constants/theme";
+import * as Icons from "phosphor-react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useDispatch, useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
-const MFARegisterScreen = () => {
-  const { email } = useLocalSearchParams();
+const MfaRegister = () => {
   const router = useRouter();
   const [otp, setOtp] = useState("");
-  const user = useSelector((state) => state.user.user);
+  const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [resendLoading, setResendLoading] = useState(false);
+  const tempUser = useSelector((state) => state.tempUser);
 
-  const handleVerifyOTP = async () => {
-    if (otp.length !== 6) {
-      Alert.alert("❌ Error", "Please enter a valid 6-digit OTP.");
+  // Countdown timer for resend OTP
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      Alert.alert("Invalid OTP", "Please enter a 6-digit OTP code");
+      return;
+    }
+  
+    setLoading(true);
+  
+    // Reusable retry helper
+    const retry = async (fn, label) => {
+      let attempt = 0;
+      let lastError = null;
+      while (attempt < 3) {
+        const result = await fn();
+        if (result.success) return { success: true };
+        lastError = result.error;
+        attempt++;
+      }
+      return { success: false, error: `${label} failed: ${lastError || "Unknown error"}` };
+    };
+  
+    // Step 1: Verify OTP
+    const verifyOtp = async () => {
+      try {
+        const res = await fetch("http://api.otp.jack-pick.online:3001/api/user/verifyotp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: tempUser.email, Otp: otp }),
+        });
+        const result = await res.json();
+        return { success: res.ok && !result.error, error: result.error };
+      } catch {
+        return { success: false, error: "Network error" };
+      }
+    };
+  
+    const verifyResult = await retry(verifyOtp, "OTP verification");
+  console.log("888888888888")
+    if (!verifyResult.success) {
+      setLoading(false);
+      Alert.alert("❌ Error", verifyResult.error);
       return;
     }
 
+    console.log("99999999")
+  
+    // Step 2: Register User
+    const registerUser = async () => {
+      try {
+        const res = await fetch("http://api.jack-pick.online:3000/v1/user/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: tempUser.username,
+            email: tempUser.email,
+            password: tempUser.password,
+            phone_number: tempUser.phoneNum,
+          }),
+        });
+        const isSuccess = res.status >= 200 && res.status < 300;
+
+        const result = isSuccess ? {} : await res.json();
+
+        return {
+          success: isSuccess,
+          error: result?.error || (!isSuccess && "Registration failed"),
+        };
+      } catch {
+        return { success: false, error: "Network error" };
+      }
+    };
+  
+    const registerResult = await retry(registerUser, "Registration");
+  
+    setLoading(false);
+  
+    if (!registerResult.success) {
+      Alert.alert("❌ Error", registerResult.error);
+      return;
+    }
+  
+    Alert.alert("✅ Success", "Account created successfully!");
+    router.replace("../(auth)/login");
+  };
+  
+
+  const handleResendOtp = async () => {
+    if (countdown > 0) return;
+
+    setResendLoading(true);
     try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/api/user/verifyotp`, {
+      const response = await fetch("http://api.otp.jack-pick.online:3001/api/user/sendotp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          Otp: otp,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: tempUser.email }),
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (result.message === "OTP verified successfully." && result.error === undefined) {
-        Alert.alert("✅ Success", "OTP Verified Successfully!", [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(auth)/login"),
-          },
-        ]);
+      if (response.ok) {
+        setCountdown(60);
+        Alert.alert("Success", "New OTP sent to your email");
       } else {
-        Alert.alert("❌ Error", result.error || "Invalid OTP. Please try again.");
+        Alert.alert("Error", data.error || "Failed to send OTP");
       }
     } catch (error) {
-      console.error("OTP Verification error:", error);
-      Alert.alert("❌ Error", "An error occurred during OTP verification.");
+      Alert.alert("Error", "Network error. Please try again.");
+    } finally {
+      setResendLoading(false);
     }
   };
 
   return (
-    <View style={styles.screen}>
-      {/* <Image
-        source={require("../../images/auth_bg.png")}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-        blurRadius={2}
-      /> */}
+    <ScreenWrapper>
+      <StatusBar style="light" />
+      <View style={styles.container}>
+        <BackButton iconSize={28} onPress={() => router.back()} />
 
-      <Animated.View entering={FadeInDown.duration(600)} style={styles.titleContainer}>
-        <Text style={styles.title}>🔐 Two-Factor Authentication</Text>
-      </Animated.View>
+        <Animated.View entering={FadeInDown.duration(600)} style={styles.headingWrapper}>
+          <Text style={styles.gradientHeader}>Verify</Text>
+          <Text style={styles.gradientHeader}>Your Email</Text>
+        </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(100)}>
-        <TextInput
-          style={styles.emailInput}
-          value={email}
-          editable={false}
-        />
-      </Animated.View>
+        <View style={styles.form}>
+          <Text style={styles.subtitleText}>
+            We've sent a 6-digit code to {tempUser?.email || "your email"}
+          </Text>
 
-      <Animated.View entering={FadeInDown.delay(200)}>
-        <TextInput
-          style={styles.otpInput}
-          placeholder="Enter 6-digit OTP"
-          placeholderTextColor="#888"
-          keyboardType="numeric"
-          maxLength={6}
-          value={otp}
-          onChangeText={setOtp}
-        />
-      </Animated.View>
+          <Animated.View entering={FadeInDown.delay(100)}>
+            <Input
+              icon={<Icons.Key size={verticalScale(26)} color={colors.neutral300} weight="fill" />}
+              placeholder="Enter OTP"
+              keyboardType="number-pad"
+              maxLength={6}
+              value={otp}
+              onChangeText={setOtp}
+            />
+          </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(300)}>
-        <TouchableOpacity
-          onPress={handleVerifyOTP}
-          style={styles.verifyButton}
-        >
-          <Text style={styles.verifyButtonText}>✅ Verify OTP</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
+          <Animated.View entering={FadeInDown.delay(200)}>
+            <Button 
+              testID="verifyButton" 
+              loading={loading} 
+              onPress={handleVerifyOtp}
+              style={styles.buttonStyle}
+            >
+              <Text style={styles.buttonText}>Verify</Text>
+            </Button>
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(300)} style={styles.resendContainer}>
+            {countdown > 0 ? (
+              <Text style={styles.resendText}>
+                Resend code in {countdown}s
+              </Text>
+            ) : (
+              <Pressable 
+                onPress={handleResendOtp}
+                disabled={resendLoading}
+              >
+                {resendLoading ? (
+                  <ActivityIndicator color={colors.primary} />
+                ) : (
+                  <Text style={styles.resendLinkText}>Resend OTP</Text>
+                )}
+              </Pressable>
+            )}
+          </Animated.View>
+        </View>
+      </View>
+    </ScreenWrapper>
   );
 };
 
-export default MFARegisterScreen;
+export default MfaRegister;
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#1E1E1E",
-    padding: 20,
+    gap: spacingY._30,
+    paddingHorizontal: spacingX._20,
   },
-  backgroundImage: {
-    position: "absolute",
-    width,
-    height,
-    top: 0,
-    left: 0,
-    zIndex: -1,
-    opacity: 0.6,
+  headingWrapper: {
+    gap: 4,
+    marginTop: spacingY._20,
   },
-  titleContainer: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
+  gradientHeader: {
+    fontSize: 32,
     fontWeight: "900",
+    fontFamily: "Poppins",
+    letterSpacing: 1,
     color: "#FF8DF4",
     textShadowColor: "#FEC8FF",
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-    fontFamily: "Poppins",
-    textAlign: "center",
+    textShadowRadius: 5,
   },
-  emailInput: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#333845",
-    borderRadius: 10,
-    color: "#B0B0B0",
-    fontSize: 16,
-    marginBottom: 15,
+  subtitleText: {
+    color: "#D4C2FF",
+    fontSize: 15,
+    fontFamily: "JosefinSans-SemiBold",
+    marginBottom: spacingY._20,
   },
-  otpInput: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#444B5A",
-    borderRadius: 10,
-    color: "#FFFFFF",
-    fontSize: 18,
-    textAlign: "center",
-    letterSpacing: 4,
+  form: {
+    gap: spacingY._20,
   },
-  verifyButton: {
-    marginTop: 20,
+  buttonStyle: {
     backgroundColor: "#A259FF",
-    padding: 15,
+    paddingVertical: 14,
     borderRadius: 30,
-    width: "100%",
     alignItems: "center",
   },
-  verifyButtonText: {
-    color: "#FFF",
+  buttonText: {
+    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "800",
+    letterSpacing: 0.5,
     fontFamily: "Poppins",
+  },
+  resendContainer: {
+    alignItems: "center",
+    marginTop: spacingY._10,
+  },
+  resendText: {
+    color: colors.neutral300,
+    fontFamily: "JosefinSans-Regular",
+  },
+  resendLinkText: {
+    color: "#FF8DF4",
+    fontFamily: "JosefinSans-SemiBold",
+    textDecorationLine: "underline",
   },
 });

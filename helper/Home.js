@@ -1,143 +1,125 @@
-import {API} from '../backend';
+import { useSelector } from "react-redux";
+import { API } from "../backend";
+// import { useSelector } from "react-redux";
+// ✅ Custom hook to get the token from Redux
+// const token = useSelector((state)=>state.user.token)
 
-const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImRpbmVzaGJhbGk0NEBnbWFpbC5jb20iLCJleHAiOjE3NTAyMTM3Njl9.LPR1frK7AV9-q-mS16GuBGPjduHC35W0fQfs05mbrww';
-
-export const getwinner=(lotteryId)=>{
-  return fetch(`${API}/v1/lottery/winner`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token}`,
-    },
-    body: JSON.stringify({lottery_id: lotteryId}),
-  }).then((response) => {
-    // console.log(response);
-    return response.json();
-  })
-      .catch((err) => {
-        console.log(err);
-      }); ;
-};
-
-export const getLotteryID = () => {
-  return fetch(`${API}/v1/last/lottery/id`, {
-    mode: 'cors',
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  }).then((response) => {
-    //console logging response can give a Error in log so try to comment the code that is actually printing response
-    // console.log(response);
-    return response.json();
-  })
-      .catch((err) => {
-        console.log('Error', err);
-      }); ;
-};
-
-export const addMoneyAPICall=(userID, amount)=>{
-  // user id gets automatically fetched from backend
-  // usign the token we are passing update the token
-  // as needed ...
-
-  console.log('Token:0', token);
-  console.log('UserID', userID);
-  console.log('Amount', amount);
-  return fetch(`${API}/v1/user/add/money/transaction`, {
-    method: 'post',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token}`,
-    },
-    body: JSON.stringify({'amount_deposited': amount, 'amount_withdrawl': 0}),
-  }).then((res)=>{
-    return res.json();
-  }).catch((err)=> {
-    console.log(err);
-  });
-};
-
-export const getUserBets=(token) => {
-  return fetch(`${API}/v1/user/bets`, {
-    method: 'get',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token}`,
-    },
-    body: JSON.stringify(token),
-  });
-};
-
-export const placeBet=(bidData) => {
-  return fetch(`${API}/v1/place/bet`, {
-    method: 'post',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `${token}`,
-    },
-    body: JSON.stringify(bidData),
-  }).then((res)=>{
-    return res.json();
-  }).catch((err)=> {
-    console.log(err);
-  });
-}
-
-export const getWalletAmount=() => {
-  return fetch(`${API}/v1/user/wallet/balance`, {
-    mode: 'cors',
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Authorization': `${token}`
-    },
-  }).then(async (response) => {
-    //console logging response can give a Error in log so try to comment the code that is actually printing response
-    // console.log(response.data.json());
-    // console.log("000000123456",response.json())
-//     const data = await response.json();
-// console.log("Parsed data:", data);
-    return response.json();
-  })
-      .catch((err) => {
-        console.log('Error', err);
-      }); ;
-}
-
-
-export const getHomeData = async () => {
+// 🧩 WINNER
+export const getWinner = async (lotteryId, token) => {
   try {
-    const response = await fetch(`${API}/v1/user/home-data`, {
-      method: 'GET',
+    const res = await fetch(`${API}/v1/lottery/winner`, {
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `${token}`,
+        Accept: "application/json",
+        Authorization: token,
       },
+      body: JSON.stringify({ lottery_id: lotteryId }),
     });
-
-    const data = await response.json();
-    return data;
+    return await res.json();
   } catch (err) {
-    console.log('Error fetching home data:', err);
-    return null;
+    console.log("getWinner error:", err);
   }
 };
 
+// 🧩 LAST LOTTERY ID
+export const getLotteryID = async () => {
+  try {
+    const res = await fetch(`${API}/v1/last/lottery/id`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("getLotteryID error:", err);
+  }
+};
 
-// const response = await fetch(`${API}/v1/user/home-data`, {
-//   method: 'GET',
-//   headers: {
-//     'Authorization': `${token}`,
-//   },
-// }).then((response) => {
-//   //console logging response can give a Error in log so try to comment the code that is actually printing response
-//   // console.log(response);
-//   console.log("000000",response)
-//   return response.json();
-// })
-//     .catch((err) => {
-//       console.log('Error', err);
-//     }); ;
+// 🧩 ADD MONEY
+export const addMoneyAPICall = async (amount, token) => {
+  try {
+    const res = await fetch(`${API}/v1/user/add/money/transaction`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify({
+        amount_deposited: amount,
+        amount_withdrawl: 0,
+      }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("addMoneyAPICall error:", err);
+  }
+};
+
+// 🧩 USER BETS
+export const getUserBets = async (token) => {
+  try {
+    const res = await fetch(`${API}/v1/user/bets`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: token,
+      },
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("getUserBets error:", err);
+  }
+};
+
+// 🧩 PLACE BET
+export const placeBet = async (bidData, token) => {
+  try {
+    const res = await fetch(`${API}/v1/place/bet`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(bidData),
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("placeBet error:", err);
+  }
+};
+
+// 🧩 WALLET BALANCE
+export const getWalletAmount = async (token) => {
+  try {
+    const res = await fetch(`${API}/v1/user/wallet/balance`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: token,
+      },
+    });
+    console.log("TQQQQQQ",token)
+    console.log("XXXXXXX",res)
+    return await res.json();
+  } catch (err) {
+    console.log("getWalletAmount error:", err);
+  }
+};
+
+// 🧩 HOME DATA
+export const getHomeData = async (token) => {
+  try {
+    const res = await fetch(`${API}/v1/user/home-data`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: token,
+      },
+    });
+    return await res.json();
+  } catch (err) {
+    console.log("getHomeData error:", err);
+    return null;
+  }
+};

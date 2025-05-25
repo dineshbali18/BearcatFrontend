@@ -13,6 +13,7 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { getUserBets } from "../../helper/Bets";
+import { useSelector } from "react-redux";
 
 // ✅ Emoji mapping
 const iconMap = {
@@ -30,6 +31,7 @@ const UserBets = () => {
   const router = useRouter();
   const [bets, setBets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const token = useSelector((state)=>state.user.token)
 
   useEffect(() => {
     getUserBets()

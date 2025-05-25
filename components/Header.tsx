@@ -2,12 +2,14 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { clearUser } from "@/store/userSlice";
+import { clearUser } from "@/store/slices/userSlice";
 import { useRouter } from "expo-router";
 import { getWalletAmount } from "@/helper/Home";
 import Colors from "@/constants/Colors";
+import { UseSelector } from "react-redux";
 
 const Header = ({ refreshTrigger }) => {
+  const token = useSelector((state)=>state.user.token)
   const dispatch = useDispatch();
   const router = useRouter();
   const [walletAmt, setWalletAmt] = useState(0);
@@ -18,8 +20,10 @@ const Header = ({ refreshTrigger }) => {
   };
 
   const fetchWalletBalance = async () => {
+
+    console.log("PPPPPPP",token)
     try {
-      const res = await getWalletAmount();
+      const res = await getWalletAmount(token);
       setWalletAmt(res.wallet_balance);
     } catch (err) {
       console.log("Failed to fetch wallet balance", err);

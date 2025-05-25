@@ -8,6 +8,7 @@ import { getwinner, placeBet, getHomeData, getWalletAmount } from '../../helper/
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import Header from '../../components/Header';
+import { useSelector } from 'react-redux';
 
 const { width, height } = Dimensions.get('window');
 const LOTTERY_DURATION = 300000; // 5 minutes in milliseconds
@@ -15,6 +16,8 @@ const BETTING_CLOSE_TIME = 240000; // Close betting at 4:00 (4 minutes)
 const WINNER_CHECK_START = 270000; // Start checking for winner at 4:30 (270 seconds)
 const WINNER_CHECK_INTERVAL = 2000; // Check for winner every 2 seconds
 const SPIN_DURATION = 85;
+
+
 
 const LotteryWheel = () => {
   const images = [
@@ -40,7 +43,8 @@ const LotteryWheel = () => {
   const [winnerName, setWinnerName] = useState('');
   const [isAnimatingWinner, setIsAnimatingWinner] = useState(false);
   const [headerRefreshKey, setHeaderRefreshKey] = useState(0);
-
+  const user_id = useSelector((state)=>state.user.userID)
+  const token = useSelector((state)=>state.user.token)
   const spinInterval = useRef(null);
   const winnerTimeout = useRef(null);
   const countdownInterval = useRef(null);
@@ -74,7 +78,7 @@ const LotteryWheel = () => {
         }
       }
 
-      const live = await getHomeData();
+      const live = await getHomeData(token);
       if (live && live.lottery && live.server_time) {
         await AsyncStorage.setItem('home-data', JSON.stringify(live));
         setLotteryId(live.lottery.lottery_id);
@@ -190,7 +194,7 @@ const LotteryWheel = () => {
     
     const checkWinner = async () => {
       try {
-        const winnerData = await getwinner(lotteryId);
+        const winnerData = await getwinner(lotteryId,token);
         console.log('Winner check response:', winnerData);
         
         // Handle both object and direct number responses
@@ -293,7 +297,7 @@ const LotteryWheel = () => {
   }, []);
 
   const getAmount = async()=>{
-    const data = await getWalletAmount();
+    const data = await getWalletAmount(token);
     console.log("!!!!!",data)
     setWalletAmount(data?.wallet_balance)
   }
@@ -320,12 +324,12 @@ const LotteryWheel = () => {
 
     try {
       const response = await placeBet({
-        user_id: 1,
+        user_id: user_id,
         lottery_id: lotteryId,
         bet_placed_icon: selectedIcon,
         amount: amount,
         api_token: apiToken,
-      });
+      },token);
 
       if (response.status == 1) {
         Alert.alert('Success', `Your bet of $${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`);

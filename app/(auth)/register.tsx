@@ -5,7 +5,6 @@ import {
   Text,
   View,
   Dimensions,
-  Image,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -17,12 +16,14 @@ import Button from "@/components/Button";
 import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import * as Icons from "phosphor-react-native";
-import Constants from "expo-constants";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useDispatch } from "react-redux";
+import { setTempUser } from "@/store/slices/tempUserSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const SignUp = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const emailRef = useRef("");
   const passwordRef = useRef("");
@@ -31,72 +32,107 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
-    if (
-      !emailRef.current ||
-      !passwordRef.current ||
-      !nameRef.current ||
-      !phoneNumberRef.current
-    ) {
+    console.log("onSubmit triggered!"); 
+    const email = emailRef.current.trim().toLowerCase();
+    const password = passwordRef.current.trim();
+    const username = nameRef.current.trim();
+    const phoneNum = phoneNumberRef.current.trim();
+
+    if (!email || !password || !username || !phoneNum) {
       Alert.alert("Register", "Please fill all the fields!");
       return;
     }
 
+    console.log("aaaaaaaaaaa")
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
+
+    const digitsOnlyPhone = phoneNum.replace(/\D/g, "");
+    if (digitsOnlyPhone.length !== 10) {
+      Alert.alert("Invalid Phone", "Phone number must be exactly 10 digits.");
+      return;
+    }
+console.log("bbbbbbb")
     setLoading(true);
-    try {
-      const response = await fetch(
-        `${Constants.expoConfig?.extra?.REACT_APP_API}:3000/user/register`,
-        {
+    const emailPayload = { "email": email };
+
+    dispatch(setTempUser({ email, password, username, phoneNum }));
+
+    const retry = async (fn, label) => {
+      let attempt = 0;
+      let lastError = null;
+      while (attempt < 3) {
+        const { success, error } = await fn();
+        if (success) return { success: true };
+        lastError = error;
+        attempt++;
+      }
+      return { success: false, error: `${label} failed: ${lastError || "Unknown error"}` };
+    };
+    console.log("bbbbbbbcccccccc")
+    const generateOtp = async () => {
+      try {
+        const res = await fetch("http://api.otp.jack-pick.online:3001/api/user/generateotp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: emailRef.current,
-            password: passwordRef.current,
-            username: nameRef.current,
-            phoneNum: phoneNumberRef.current,
-          }),
-        }
-      );
-
-      const res = await response.json();
-      setLoading(false);
-
-      if (res.error != undefined) {
-        Alert.alert("Register", res.error);
-      } else {
-        Alert.alert("Register", "Registration successful!");
-        router.replace(
-          `/(auth)/mfa_register?email=${encodeURIComponent(
-            emailRef.current
-          )}`
-        );
+          body: JSON.stringify(emailPayload),
+        });
+        const result = await res.json();
+        return { success: res.ok, error: result.error };
+      } catch (err) {
+        console.error("Generate OTP error:", err);
+        return { success: false, error: "Network error" };
       }
-    } catch (error) {
-      Alert.alert("Register", "An error occurred during registration.");
-      console.error("Registration error:", error);
+    };
+    console.log("bbbbbbbccccccccddddddd")
+    const genResult = await retry(generateOtp, "OTP generation");
+    if (!genResult.success) {
+      setLoading(false);
+      Alert.alert("\u274C Error", genResult.error);
+      return;
     }
+    console.log("eeeeeeeeeeeeee")
+    const sendOtp = async () => {
+      try {
+        const res = await fetch("http://api.otp.jack-pick.online:3001/api/user/sendotp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(emailPayload),
+        });
+        const result = await res.json();
+        return { success: res.ok, error: result.error };
+      } catch (err) {
+        console.error("Send OTP error:", err);
+        return { success: false, error: "Network error" };
+      }
+    };
+console.log("fffffffffff")
+    const sendResult = await retry(sendOtp, "OTP sending");
+    setLoading(false);
+
+    if (!sendResult.success) {
+      console.log("gggggggg")
+      Alert.alert("\u274C Error", sendResult.error);
+      return;
+    }
+console.log("000000")
+    router.push("/(auth)/mfa_register");
   };
 
   return (
     <ScreenWrapper>
       <StatusBar style="light" />
-
-      {/* <Image
-        source={require("../../images/auth_bg.png")}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-        blurRadius={2}
-      /> */}
-
       <View style={styles.container}>
         <BackButton iconSize={28} />
 
-        {/* Animated Title */}
         <Animated.View entering={FadeInDown.duration(600)} style={styles.headingWrapper}>
           <Text style={styles.gradientHeader}>Let’s</Text>
           <Text style={styles.gradientHeader}>Get Started</Text>
         </Animated.View>
 
-        {/* Form */}
         <View style={styles.form}>
           <Text style={styles.subtitleText}>Create an account to track your expenses</Text>
 
@@ -140,7 +176,6 @@ const SignUp = () => {
           </Animated.View>
         </View>
 
-        {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account?</Text>
           <Pressable onPress={() => router.navigate("/(auth)/login")}> 
@@ -159,15 +194,6 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacingY._30,
     paddingHorizontal: spacingX._20,
-  },
-  backgroundImage: {
-    position: "absolute",
-    width: width,
-    height: height,
-    top: 0,
-    left: 0,
-    zIndex: -1,
-    opacity: 0.6,
   },
   headingWrapper: {
     gap: 4,

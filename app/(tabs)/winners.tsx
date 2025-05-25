@@ -12,6 +12,7 @@ import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { getPaginatedLotteries } from "../../helper/Winners"; // ✅ Helper
+import { useSelector, UseSelector } from "react-redux";
 
 const iconMap = {
   1: "🐯 Tiger",
@@ -26,14 +27,14 @@ const Winners = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
+  const token = useSelector((state)=>state.user.token)
   const LIMIT = 20;
 
   const fetchLotteries = async (nextPage = 1) => {
     if (!hasMore || loading) return;
     setLoading(true);
     try {
-      const data = await getPaginatedLotteries(nextPage, LIMIT);
+      const data = await getPaginatedLotteries(nextPage, LIMIT,token);
       console.log("DDDDD",data)
       if (data.length < LIMIT) setHasMore(false);
 

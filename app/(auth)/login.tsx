@@ -59,6 +59,8 @@ const Login = () => {
           emailID: resData.email_id,
           userID: resData.user_id,
           token: resData.token,
+          name: resData.name,
+          phone_number: resData.phone_number,
         };
   
         dispatch(setUser(userData));

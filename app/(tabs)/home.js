@@ -4,7 +4,7 @@ import {
   TouchableOpacity, Alert, TextInput, Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getwinner, placeBet, getHomeData, getWalletAmount } from '../../helper/Home';
+import { getWinner, placeBet, getHomeData, getWalletAmount } from '../../helper/Home';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import Header from '../../components/Header';
@@ -194,7 +194,7 @@ const LotteryWheel = () => {
     
     const checkWinner = async () => {
       try {
-        const winnerData = await getwinner(lotteryId,token);
+        const winnerData = await getWinner(lotteryId,token);
         console.log('Winner check response:', winnerData);
         
         // Handle both object and direct number responses

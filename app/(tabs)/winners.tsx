@@ -16,8 +16,8 @@ import { useSelector, UseSelector } from "react-redux";
 
 const iconMap = {
   1: "🐯 Tiger",
-  2: "🦁 Lion",
-  3: "🦄 Unicorn",
+  3: "🦁 Lion",
+  2: "🦄 Unicorn",
   [-1]: "⏳ Pending",
 };
 

@@ -34,7 +34,7 @@ const UserBets = () => {
   const token = useSelector((state)=>state.user.token)
 
   useEffect(() => {
-    getUserBets()
+    getUserBets(token)
       .then((data) => {
         const transformed = data.map((item, index) => ({
           lotteryId: index + 1,

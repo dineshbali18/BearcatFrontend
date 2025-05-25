@@ -10,6 +10,10 @@ import { UseSelector } from "react-redux";
 
 const Header = ({ refreshTrigger }) => {
   const token = useSelector((state)=>state.user.token)
+  const name = useSelector((state)=>state.user.name)
+  const user = useSelector((state)=>state.user)
+
+  console.log("IUUUUUUUU",user)
   const dispatch = useDispatch();
   const router = useRouter();
   const [walletAmt, setWalletAmt] = useState(0);
@@ -22,6 +26,7 @@ const Header = ({ refreshTrigger }) => {
   const fetchWalletBalance = async () => {
 
     console.log("PPPPPPP",token)
+    console.log("NAME:::::",name)
     try {
       const res = await getWalletAmount(token);
       setWalletAmt(res.wallet_balance);
@@ -42,7 +47,7 @@ const Header = ({ refreshTrigger }) => {
     <SafeAreaView edges={['top']} style={styles.container}>
       <View style={styles.wrapper}>
         <View style={styles.userTxtWrapper}>
-          <Text style={[styles.userText, { fontSize: 12 }]}>Hi, Dinesh</Text>
+          <Text style={[styles.userText, { fontSize: 12 }]}>Hi, {name}</Text>
           <Text style={[styles.userText, { fontSize: 16 }]}>
             Welcome to <Text style={styles.boldText}>LuckyWheel</Text>
           </Text>

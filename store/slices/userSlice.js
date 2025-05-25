@@ -5,6 +5,8 @@ const initialState = {
   emailID: null,
   token: null,
   userID: null,
+  name: null,
+  phoneNumber: null,
 };
 
 // Create slice
@@ -16,11 +18,15 @@ const userSlice = createSlice({
       state.emailID = action.payload.email_id;
       state.token = action.payload.token;
       state.userID = action.payload.user_id;
+      state.phoneNumber = action.payload.phone_number;
+      state.name = action.payload.name;
     },
     clearUser: (state) => {
       state.emailID = null;
       state.token = null;
       state.userID = null;
+      state.phoneNumber = null;
+      state.name = null;
     },
   },
 });

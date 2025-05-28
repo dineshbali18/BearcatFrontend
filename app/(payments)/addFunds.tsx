@@ -12,7 +12,7 @@ const { width } = Dimensions.get('window');
 
 export default function FundsManager() {
   const [mode, setMode] = useState<'add' | 'verify' | 'withdraw'>('add');
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(100);
   const [upiId, setUpiId] = useState('dineshbali45@ibl');
   const [upiName, setUpiName] = useState('');
   const [upiRef, setUpiRef] = useState('');

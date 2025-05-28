@@ -6,20 +6,25 @@ import QRCode from 'react-native-qrcode-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Icons from "phosphor-react-native";
 import { useRouter } from 'expo-router';
+import { useSelector } from 'react-redux';
 
 const { width } = Dimensions.get('window');
 
 export default function FundsManager() {
   const [mode, setMode] = useState<'add' | 'verify' | 'withdraw'>('add');
-  const [amount, setAmount] = useState('0');
+  const [amount, setAmount] = useState(0);
   const [upiId, setUpiId] = useState('dineshbali45@ibl');
   const [upiName, setUpiName] = useState('');
   const [upiRef, setUpiRef] = useState('');
+  const token = useSelector((state)=>state?.user?.token)
+
   const router = useRouter();
   const showToast = (msg: string) => Alert.alert('Status', msg);
 
+  const userID = useSelector((state)=>state?.user?.userID)
+
   const handleSubmit = async () => {
-    if (!amount.trim() || !upiId.trim() || (mode === 'withdraw' && !upiName.trim())) {
+    if (!amount > 4 || !upiId.trim() || (mode === 'withdraw' && !upiName.trim())) {
       if (mode === 'verify' && (!upiRef.trim() || !amount.trim())) {
         return showToast('Please enter UPI Ref and Amount');
       }
@@ -35,12 +40,31 @@ export default function FundsManager() {
         });
         showToast('Withdraw request sent!');
       } else if (mode === 'verify') {
-        const res = await fetch('https://dummyapi.io/verify-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ upiRef, amount }),
-        });
-        showToast('Verification submitted!');
+        try {
+          const res = await fetch('http://api.jack-pick.online:3000/v1/verify/payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+             'Authorization': token},
+            body: JSON.stringify({ "upi_ref": upiRef, "amount": amount }),
+          });
+
+          console.log("AAAAAAAA",res)
+        
+          if (res.ok) {
+            const data = await res.json();
+            console.log("✅ Payment verification successful:", data);
+            // Show success to user
+            alert("✅ Payment verified successfully!");
+          } else {
+            const err = await res.json();
+            console.error("❌ Verification failed:", err);
+            alert("❌ Payment verification failed. Please try again.");
+          }
+        } catch (error) {
+          console.error("⚠️ Network or server error:", error);
+          alert("⚠️ Something went wrong. Please check your connection and try again.");
+        }        
+        
       } else {
         setMode('verify')
       }
@@ -75,12 +99,12 @@ export default function FundsManager() {
           <>
             <Text style={styles.label}>Amount</Text>
             <TextInput
-              placeholder="0.00"
+              placeholder='0'
               placeholderTextColor="#aaa"
               keyboardType="numeric"
               style={styles.input}
-              value={amount}
-              onChangeText={setAmount}
+              value={amount.toString()}
+              onChangeText={(text) => setAmount(Number(text))}
             />
 
             {/* <Text style={styles.label}>
@@ -124,7 +148,7 @@ export default function FundsManager() {
               
             )}
 
-            {mode === 'add' && amount.trim() && upiId.trim() && (
+            {mode === 'add' && amount>0 && upiId.trim() && (
               <View style={styles.qrWrapper}>
                 <QRCode value={`upi://pay?pa=${upiId}&am=${amount}`} size={180} />
                 <Text style={{color:'white',margin:10,fontWeight:900}}>Make payment using the QR code and click on completed payment</Text>
@@ -146,11 +170,11 @@ export default function FundsManager() {
             <Text style={{color:'white',margin:10,fontWeight:600}}>Check in your Payment App you will find the number with UTR: XXXXXXXXXXXXX</Text>
             <Text style={styles.label}>Amount Paid</Text>
             <TextInput
-              placeholder="0.00"
+              placeholder="0"
               placeholderTextColor="#aaa"
               keyboardType="numeric"
-              value={amount}
-              onChangeText={setAmount}
+              value={amount.toString()}
+              onChangeText={(text) => setAmount(Number(text))}
               style={styles.input}
             />
           </>

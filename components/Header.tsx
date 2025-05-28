@@ -6,14 +6,13 @@ import { clearUser } from "@/store/slices/userSlice";
 import { useRouter } from "expo-router";
 import { getWalletAmount } from "@/helper/Home";
 import Colors from "@/constants/Colors";
-import { UseSelector } from "react-redux";
 
 const Header = ({ refreshTrigger }) => {
   const token = useSelector((state)=>state.user.token)
   const name = useSelector((state)=>state.user.name)
   const user = useSelector((state)=>state.user)
 
-  console.log("IUUUUUUUU",user)
+  // console.log("IUUUUUUUU",user)
   const dispatch = useDispatch();
   const router = useRouter();
   const [walletAmt, setWalletAmt] = useState(0);

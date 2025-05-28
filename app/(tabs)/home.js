@@ -73,9 +73,6 @@ const LotteryWheel = () => {
         const parsed = JSON.parse(cached);
         setLotteryId(parsed.lottery.lottery_id);
         setStartTime(parsed.lottery.starttime);
-        if (parsed.wallet) {
-          setWalletAmount(parsed.wallet.wallet_balance);
-        }
       }
 
       const live = await getHomeData(token);
@@ -83,10 +80,6 @@ const LotteryWheel = () => {
         await AsyncStorage.setItem('home-data', JSON.stringify(live));
         setLotteryId(live.lottery.lottery_id);
         setStartTime(live.lottery.starttime);
-
-        if (live.wallet) {
-          setWalletAmount(live.wallet.wallet_balance);
-        }
 
         const serverTime = new Date(live.server_time).getTime();
         const localTime = Date.now();

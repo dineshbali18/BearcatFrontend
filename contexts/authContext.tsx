@@ -1,70 +1,92 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useCallback } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator, View } from "react-native";
 import { useDispatch } from "react-redux";
-import { ActivityIndicator, View, Text } from "react-native";
 import { setUser } from "@/store/slices/userSlice";
 import { AuthContextType, UserType } from "@/types";
-import { InteractionManager } from "react-native";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
+  const [isAppReady, setIsAppReady] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
 
+  // Check auth state and prepare app
   useEffect(() => {
-    const checkUserData = async () => {
+    const prepareApp = async () => {
       try {
-        const stored = await AsyncStorage.getItem("userData");
-        const parsed = stored ? JSON.parse(stored) : null;
+        const userData = await AsyncStorage.getItem("userData");
+        const parsed = userData ? JSON.parse(userData) : null;
 
         if (parsed?.token) {
           setUserState(parsed);
           dispatch(setUser(parsed));
-          InteractionManager.runAfterInteractions(() => {
-            router.replace("/(tabs)/home");
-          });
-        } else {
-          InteractionManager.runAfterInteractions(() => {
-            router.replace("/(auth)/welcome");
-          });
         }
-      } catch (err) {
-        console.error("Auth check error", err);
-        InteractionManager.runAfterInteractions(() => {
-          router.replace("/(auth)/welcome");
-        });
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
       } finally {
+        setIsAppReady(true);
         setLoading(false);
       }
     };
 
-    checkUserData();
-  }, []);
+    prepareApp();
+  }, [dispatch]);
+
+  // Handle navigation once app is ready
+  useEffect(() => {
+    if (!isAppReady) return;
+
+    if (user?.token) {
+      // Small delay to ensure navigation is mounted
+      const timer = setTimeout(() => {
+        router.replace("/(tabs)/home");
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        router.replace("/(auth)/welcome");
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAppReady, user, router]);
+
+  const login = useCallback(async (userData: UserType) => {
+    await AsyncStorage.setItem("userData", JSON.stringify(userData));
+    setUserState(userData);
+    dispatch(setUser(userData));
+    router.replace("/(tabs)/home");
+  }, [dispatch, router]);
+
+  const logout = useCallback(async () => {
+    await AsyncStorage.removeItem("userData");
+    setUserState(null);
+    dispatch(setUser(null));
+    router.replace("/(auth)/welcome");
+  }, [dispatch, router]);
 
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#A259FF" />
-        <Text style={{ color: "#fff", marginTop: 10 }}>Checking authentication...</Text>
       </View>
     );
   }
 
-  const contextValue: AuthContextType = {
-    user,
-    setUser: setUserState,
-    login: () => Promise.resolve(),         // placeholder
-    register: () => Promise.resolve(),      // placeholder
-    updateUserData: () => {},              // placeholder
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={{ 
+      user, 
+      setUser: setUserState,
+      login,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;

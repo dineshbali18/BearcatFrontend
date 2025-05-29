@@ -74,6 +74,7 @@ export const getUserBets = async (token) => {
 
 // 🧩 PLACE BET
 export const placeBet = async (bidData, token) => {
+  console.log("999999999",bidData)
   try {
     const res = await fetch(`${API}/v1/place/bet`, {
       method: "POST",

@@ -8,6 +8,7 @@ import { getWinner, placeBet, getHomeData, getWalletAmount } from '../../helper/
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import Header from '../../components/Header';
+import CustomAlert from '../../components/customAlerts'
 import { useSelector } from 'react-redux';
 import { BlurView } from 'expo-blur';
 import LottieView from 'lottie-react-native';
@@ -43,6 +44,12 @@ const LotteryWheel = () => {
   const [winnerName, setWinnerName] = useState('');
   const [isAnimatingWinner, setIsAnimatingWinner] = useState(false);
   const [headerRefreshKey, setHeaderRefreshKey] = useState(0);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+const [alertTitle, setAlertTitle] = useState('');
+const [alertMessage, setAlertMessage] = useState('');
+const [alertType, setAlertType] = useState('info');
+
   const user_id = useSelector((state)=>state.user.userID)
   const token = useSelector((state)=>state.user.token)
   const spinInterval = useRef(null);
@@ -53,6 +60,14 @@ const LotteryWheel = () => {
   const winnerAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const titleRef = useRef(null);
+
+
+  const showAlert = (title, message, type = 'info') => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertType(type);
+    setAlertVisible(true);
+  };
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -307,35 +322,87 @@ const LotteryWheel = () => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  // const handlePlaceBet = async () => {
+  //   if (!selectedIcon) return Alert.alert('Error', 'Please select an icon to bet on');
+  //   if (!betAmount || isNaN(betAmount)) return Alert.alert('Error', 'Please enter a valid bet amount');
+    
+  //   const amount = parseFloat(betAmount);
+  //   if (amount <= 29) return Alert.alert('Error', 'Bet amount must be greater than 29');
+  //   if (amount > walletAmt) return Alert.alert('Error', 'Insufficient funds');
+
+  //   try {
+  //     const response = await placeBet({
+  //       user_id: Number(user_id),
+  //       lottery_id: lotteryId,
+  //       bet_placed_icon: selectedIcon,
+  //       amount: amount,
+  //       api_token: apiToken,
+  //     },token);
+
+  //     console.log("00000",response)
+
+  //     if (response.status == 1) {
+  //       Alert.alert('Success', `Your bet of $${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`);
+  //       fetchAndCacheHomeData();
+  //       setHeaderRefreshKey(headerRefreshKey+1);
+  //     } else {
+  //       Alert.alert('Error', response.message || 'Failed to place bet');
+  //     }
+  //   } catch (err) {
+  //     console.error('Bet error:', err);
+  //     Alert.alert('Error', 'Failed to place bet');
+  //   }
+  // };
+
+
   const handlePlaceBet = async () => {
-    if (!selectedIcon) return Alert.alert('Error', 'Please select an icon to bet on');
-    if (!betAmount || isNaN(betAmount)) return Alert.alert('Error', 'Please enter a valid bet amount');
+    if (!selectedIcon) {
+      showAlert('Error', 'Please select an icon to bet on', 'error');
+      return;
+    }
+    
+    if (!betAmount || isNaN(betAmount)) {
+      showAlert('Error', 'Please enter a valid bet amount', 'error');
+      return;
+    }
     
     const amount = parseFloat(betAmount);
-    if (amount <= 30) return Alert.alert('Error', 'Bet amount must be greater than 30');
-    if (amount > walletAmt) return Alert.alert('Error', 'Insufficient funds');
-
+    if (amount <= 29) {
+      showAlert('Error', 'Bet amount must be greater than 29', 'error');
+      return;
+    }
+    
+    if (amount > walletAmt) {
+      showAlert('Error', 'Insufficient funds', 'error');
+      return;
+    }
+  
     try {
       const response = await placeBet({
-        user_id: user_id,
+        user_id: Number(user_id),
         lottery_id: lotteryId,
         bet_placed_icon: selectedIcon,
         amount: amount,
         api_token: apiToken,
-      },token);
-
+      }, token);
+  
       if (response.status == 1) {
-        Alert.alert('Success', `Your bet of $${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`);
+        showAlert(
+          'Success', 
+          `Your bet of ₹${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`,
+          'success'
+        );
         fetchAndCacheHomeData();
-        setHeaderRefreshKey(headerRefreshKey+1);
+        setHeaderRefreshKey(headerRefreshKey + 1);
       } else {
-        Alert.alert('Error', response.message || 'Failed to place bet');
+        showAlert('Error', response.message || 'Failed to place bet', 'error');
       }
     } catch (err) {
       console.error('Bet error:', err);
-      Alert.alert('Error', 'Failed to place bet');
+      showAlert('Error', 'Failed to place bet', 'error');
     }
   };
+  
 
   const formatDateTime = (date) => {
     if (!date) return '';
@@ -580,6 +647,16 @@ const LotteryWheel = () => {
           )}
         </Animated.View>
       </SafeAreaView>
+
+      <CustomAlert
+      visible={alertVisible}
+      title={alertTitle}
+      message={alertMessage}
+      type={alertType}
+      onClose={() => setAlertVisible(false)}
+    />
+    
+
     </LinearGradient>
   );
 };

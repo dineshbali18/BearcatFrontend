@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'expense-tracker-app'
+rootProject.name = 'Jack Pick'
 
 dependencyResolutionManagement {
   versionCatalogs {

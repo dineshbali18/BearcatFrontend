@@ -27,19 +27,21 @@ import { useSelector,useDispatch } from "react-redux";
 import Constants from 'expo-constants';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setUser } from "@/store/slices/userSlice"; 
-
+import { random } from "lodash";
+import { UseSelector } from "react-redux";
+  // const user = useSelector((state)=>state?.user)
 const ProfileModal = () => {
 
   const dispatch = useDispatch()
-  const userCurrentData = useSelector((state)=>state.user)
+  const user = useSelector((state)=>state.user)
 
-  console.log("QQQQQQ",userCurrentData)
+  // console.log("QQQQQQ",userCurrentData)
 
   let [userData, setUserData] = useState<UserDataType>({
-    id: userCurrentData?.user?.id,
-    name: userCurrentData?.user?.username,
-    email: userCurrentData?.user?.email,
-    phoneNumber: userCurrentData?.user?.phoneNumber,
+    id: user.userID,
+    name: user.name,
+    email: user?.emailID,
+    phoneNumber: user?.phoneNumber,
     image: null,
   });
 
@@ -51,74 +53,74 @@ const ProfileModal = () => {
     if (file) setUserData({ ...userData, image: file });
   };
 
-  const onSubmit = async () => {
-    const { name, email, phoneNumber } = userData;
+  // const onSubmit = async () => {
+  //   const { name, email, phoneNumber } = userData;
 
-    console.log("NAMMMAaaaaaa",name)
+  //   console.log("NAMMMAaaaaaa",name)
   
-    // Basic validatio
-    if (!name?.trim()) {
-      Alert.alert("Error", "Please enter your name");
-      return;
-    }
+  //   // Basic validatio
+  //   if (!name?.trim()) {
+  //     Alert.alert("Error", "Please enter your name");
+  //     return;
+  //   }
   
-    if (!email?.trim()) {
-      Alert.alert("Error", "Please enter your email");
-      return;
-    }
+  //   if (!email?.trim()) {
+  //     Alert.alert("Error", "Please enter your email");
+  //     return;
+  //   }
   
-    if (!phoneNumber?.trim()) {
-      Alert.alert("Error", "Please enter your phone number");
-      return;
-    }
-    setLoading(true);
+  //   if (!phoneNumber?.trim()) {
+  //     Alert.alert("Error", "Please enter your phone number");
+  //     return;
+  //   }
+  //   setLoading(true);
   
-    try {
-      const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update/profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userCurrentData?.user?.token}`
-        },
-        body: JSON.stringify({
-          id: userCurrentData?.user?.id, // or whatever your user ID field is
-          username: name.trim(),
-          email: email.trim(),
-          phoneNumber: phoneNumber.trim(),
-        })
-      });
+  //   try {
+  //     const response = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update/profile`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${userCurrentData?.user?.token}`
+  //       },
+  //       body: JSON.stringify({
+  //         id: userCurrentData?.user?.id, // or whatever your user ID field is
+  //         username: name.trim(),
+  //         email: email.trim(),
+  //         phoneNumber: phoneNumber.trim(),
+  //       })
+  //     });
   
-      const data = await response.json();
+  //     const data = await response.json();
   
-      setLoading(false);
+  //     setLoading(false);
 
-      console.log("DDDDDD",data)      
+  //     console.log("DDDDDD",data)      
       
-      if (response.ok) {
-        // Update local user data
-        // updateUser(userCurrentData?.user?.uid);
-         dispatch(setUser({
-                  token: userCurrentData?.token,
-                  user: userData,
-                  msg: userCurrentData.msg
-                }));
-        // await AsyncStorage.setItem("userData", JSON.stringify({
-        //   ...userCurrentData,
-        //   user: userData
-        // }));
-        setUserData(userData)
-        Alert.alert("Success", "Profile updated successfully");
+  //     if (response.ok) {
+  //       // Update local user data
+  //       // updateUser(userCurrentData?.user?.uid);
+  //        dispatch(setUser({
+  //                 token: userCurrentData?.token,
+  //                 user: userData,
+  //                 msg: userCurrentData.msg
+  //               }));
+  //       // await AsyncStorage.setItem("userData", JSON.stringify({
+  //       //   ...userCurrentData,
+  //       //   user: userData
+  //       // }));
+  //       setUserData(userData)
+  //       Alert.alert("Success", "Profile updated successfully");
         
-        router.back();
-      } else {
-        Alert.alert("Error", data.message || "Failed to update profile");
-      }
-    } catch (error) {
-      setLoading(false);
-      console.error("Update error:", error);
-      Alert.alert("Error", "An error occurred while updating your profile");
-    }
-  };
+  //       router.back();
+  //     } else {
+  //       Alert.alert("Error", data.message || "Failed to update profile");
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.error("Update error:", error);
+  //     Alert.alert("Error", "An error occurred while updating your profile");
+  //   }
+  // };
 
   const onPickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -138,7 +140,7 @@ const ProfileModal = () => {
     <ModalWrapper>
       <View style={styles.container}>
         <Header
-          title={"Update Profile"}
+          title={"Profile"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
@@ -187,13 +189,13 @@ const ProfileModal = () => {
           </View>
         </ScrollView>
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Button onPress={onSubmit} style={{ flex: 1 }} loading={loading}>
           <Typo color={colors.black} fontWeight={"700"} size={18}>
             Update
           </Typo>
         </Button>
-      </View>
+      </View> */}
     </ModalWrapper>
   );
 };

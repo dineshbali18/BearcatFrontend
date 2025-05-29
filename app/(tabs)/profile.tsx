@@ -22,13 +22,15 @@ import { accountOptionType } from "@/types";
 // import { auth } from "@/config/firebase";
 import { getProfileImage } from "@/services/imageService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
   const router = useRouter();
+  const user = useSelector((state)=>state?.user)
 
   const accountOptions: accountOptionType[] = [
     {
-      title: "Edit Profile",
+      title: "Profile",
       icon: (
         <Icons.User
           size={verticalScale(26)}
@@ -109,16 +111,16 @@ const Profile = () => {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <Header title="Profile" />
+        {/* <Header title="Profile" /> */}
         <View style={styles.userInfo}>
           {/* Avatar */}
           <View>
-            {/* <Image
+            <Image
               style={styles.avatar}
               source={getProfileImage(user?.image)}
               contentFit="cover"
               transition={100}
-            /> */}
+            />
           </View>
 
           {/* Name and email */}

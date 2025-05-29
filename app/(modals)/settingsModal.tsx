@@ -1,167 +1,159 @@
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    View,
-  } from "react-native";
-  import React, { useState } from "react";
-  import { colors, spacingX, spacingY } from "@/constants/theme";
-  import ModalWrapper from "@/components/ModalWrapper";
-  import Header from "@/components/Header1";
-  import Typo from "@/components/Typo";
-  import Button from "@/components/Button";
-  import { scale, verticalScale } from "@/utils/styling";
-  import BackButton from "@/components/BackButton";
-  
-  const PrivacyModal = () => {
-    return (
-      <ModalWrapper>
-        <View style={styles.container}>
-          <Header
-            title={"Privacy Policy"}
-            leftIcon={<BackButton />}
-            style={{ marginBottom: spacingY._10 }}
-          />
-          
-          <ScrollView contentContainerStyle={styles.content}>
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Introduction
-              </Typo>
-              <Typo style={styles.paragraph}>
-                At Bearcat Finance, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application.
-              </Typo>
+  Alert,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import React from "react";
+import { colors, spacingX, spacingY } from "@/constants/theme";
+import ModalWrapper from "@/components/ModalWrapper";
+import Header from "@/components/Header1";
+import Typo from "@/components/Typo";
+import BackButton from "@/components/BackButton";
+
+const PrivacyModal = () => {
+  return (
+    <ModalWrapper>
+      <View style={styles.container}>
+        <Header
+          title={"Privacy Policy"}
+          leftIcon={<BackButton />}
+          style={{ marginBottom: spacingY._10 }}
+        />
+
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Introduction
+            </Typo>
+            <Typo style={styles.paragraph}>
+              At JackPick Lottery, your privacy is our top priority. This policy explains how we collect, use, and protect your personal data when you use our app to participate in games and manage your wallet.
+            </Typo>
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Information We Collect
+            </Typo>
+            <Typo style={styles.paragraph}>
+              We collect the following information when you register or use our services:
+            </Typo>
+            <View style={styles.list}>
+              <Typo style={styles.listItem}>• Full Name, Email, and Phone Number</Typo>
+              <Typo style={styles.listItem}>• UPI ID and wallet balance details</Typo>
+              <Typo style={styles.listItem}>• Bet history and win/loss results</Typo>
+              <Typo style={styles.listItem}>• IP address and device info</Typo>
+              <Typo style={styles.listItem}>• App usage statistics</Typo>
             </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Information We Collect
-              </Typo>
-              <Typo style={styles.paragraph}>
-                We may collect personal information that you voluntarily provide to us when registering an account, including:
-              </Typo>
-              <View style={styles.list}>
-                <Typo style={styles.listItem}>• Personal identification details (name, email address)</Typo>
-                <Typo style={styles.listItem}>• Financial transaction data</Typo>
-                <Typo style={styles.listItem}>• Budget and savings information</Typo>
-                <Typo style={styles.listItem}>• Device information and usage data</Typo>
-              </View>
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              How We Use Your Information
+            </Typo>
+            <Typo style={styles.paragraph}>
+              Your data helps us deliver a secure and engaging lottery experience:
+            </Typo>
+            <View style={styles.list}>
+              <Typo style={styles.listItem}>• Process bets and declare winners</Typo>
+              <Typo style={styles.listItem}>• Manage wallet and payout history</Typo>
+              <Typo style={styles.listItem}>• Detect and prevent fraud or misuse</Typo>
+              <Typo style={styles.listItem}>• Improve game fairness and speed</Typo>
+              <Typo style={styles.listItem}>• Provide customer support</Typo>
             </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                How We Use Your Information
-              </Typo>
-              <Typo style={styles.paragraph}>
-                We use the information we collect to:
-              </Typo>
-              <View style={styles.list}>
-                <Typo style={styles.listItem}>• Provide and maintain our service</Typo>
-                <Typo style={styles.listItem}>• Improve user experience</Typo>
-                <Typo style={styles.listItem}>• Develop new features and functionality</Typo>
-                <Typo style={styles.listItem}>• Communicate with you about your account</Typo>
-                <Typo style={styles.listItem}>• Ensure security and prevent fraud</Typo>
-              </View>
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Data Security
+            </Typo>
+            <Typo style={styles.paragraph}>
+              All personal and financial data is protected using end-to-end encryption. We store minimal user information and never share data with third parties without consent.
+            </Typo>
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Data Retention
+            </Typo>
+            <Typo style={styles.paragraph}>
+              We retain user data for as long as you maintain an account with us. You may request deletion of your account and related data at any time.
+            </Typo>
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Your Rights
+            </Typo>
+            <Typo style={styles.paragraph}>
+              You can:
+            </Typo>
+            <View style={styles.list}>
+              <Typo style={styles.listItem}>• View or update your personal info</Typo>
+              <Typo style={styles.listItem}>• Request deletion of your data</Typo>
+              <Typo style={styles.listItem}>• Opt-out of marketing messages</Typo>
+              <Typo style={styles.listItem}>• Contact support for privacy concerns</Typo>
             </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Data Security
-              </Typo>
-              <Typo style={styles.paragraph}>
-                We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.
-              </Typo>
-              <Typo style={styles.paragraph}>
-                All financial data is encrypted both in transit and at rest using industry-standard protocols.
-              </Typo>
-            </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Data Retention
-              </Typo>
-              <Typo style={styles.paragraph}>
-                We retain your personal data only for as long as necessary to provide you with our services and for legitimate business purposes. You may request deletion of your data at any time through the app settings.
-              </Typo>
-            </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Your Rights
-              </Typo>
-              <Typo style={styles.paragraph}>
-                You have the right to:
-              </Typo>
-              <View style={styles.list}>
-                <Typo style={styles.listItem}>• Access your personal data</Typo>
-                <Typo style={styles.listItem}>• Request correction of inaccurate data</Typo>
-                <Typo style={styles.listItem}>• Request deletion of your data</Typo>
-                <Typo style={styles.listItem}>• Object to processing of your data</Typo>
-                <Typo style={styles.listItem}>• Request restriction of processing</Typo>
-                <Typo style={styles.listItem}>• Request data portability</Typo>
-              </View>
-            </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Changes to This Policy
-              </Typo>
-              <Typo style={styles.paragraph}>
-                We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
-              </Typo>
-            </View>
-  
-            <View style={styles.section}>
-              <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
-                Contact Us
-              </Typo>
-              <Typo style={styles.paragraph}>
-                If you have any questions about this Privacy Policy, please contact us at privacy@bearcatfinance.com.
-              </Typo>
-              <Typo style={[styles.paragraph, styles.noteText]}>
-                Last updated: {new Date().toLocaleDateString()}
-              </Typo>
-            </View>
-          </ScrollView>
-        </View>
-      </ModalWrapper>
-    );
-  };
-  
-  export default PrivacyModal;
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingHorizontal: spacingY._20,
-    },
-    content: {
-      paddingVertical: spacingY._10,
-    },
-    section: {
-      marginBottom: spacingY._24,
-    },
-    sectionTitle: {
-      marginBottom: spacingY._12,
-      color: colors.neutral100,
-    },
-    paragraph: {
-      color: colors.neutral200,
-      lineHeight: 22,
-      marginBottom: spacingY._12,
-    },
-    list: {
-      marginBottom: spacingY._12,
-      paddingLeft: spacingX._16,
-    },
-    listItem: {
-      color: colors.neutral200,
-      marginBottom: spacingY._6,
-      lineHeight: 20,
-    },
-    noteText: {
-      color: colors.neutral300,
-      fontStyle: 'italic',
-      fontSize: 14,
-    },
-  });
+          </View>
+
+          <View style={styles.section}>
+            <Typo size={16} fontWeight="600" style={styles.sectionTitle}>
+              Changes to This Policy
+            </Typo>
+            <Typo style={styles.paragraph}>
+              We may update this Privacy Policy to reflect changes in law or our practices. You will be notified of updates through in-app alerts.
+            </Typo>
+          </View>
+
+          <View style={styles.section}>
+
+            <Typo style={styles.paragraph}>
+              For privacy-related questions, contact us at help via telegram or reach out on our Telegram channel.
+            </Typo>
+            <Typo style={[styles.paragraph, styles.noteText]}>
+              Last updated: {new Date().toLocaleDateString()}
+            </Typo>
+          </View>
+        </ScrollView>
+      </View>
+    </ModalWrapper>
+  );
+};
+
+export default PrivacyModal;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: spacingY._20,
+  },
+  content: {
+    paddingVertical: spacingY._10,
+  },
+  section: {
+    marginBottom: spacingY._24,
+  },
+  sectionTitle: {
+    marginBottom: spacingY._12,
+    color: colors.neutral100,
+  },
+  paragraph: {
+    color: colors.neutral200,
+    lineHeight: 22,
+    marginBottom: spacingY._12,
+  },
+  list: {
+    marginBottom: spacingY._12,
+    paddingLeft: spacingX._16,
+  },
+  listItem: {
+    color: colors.neutral200,
+    marginBottom: spacingY._6,
+    lineHeight: 20,
+  },
+  noteText: {
+    color: colors.neutral300,
+    fontStyle: "italic",
+    fontSize: 14,
+  },
+});

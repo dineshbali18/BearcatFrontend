@@ -12,6 +12,9 @@ const SupportScreen = () => {
       <Text style={styles.description}>
         Tap the button below to chat with our support team on Telegram.
       </Text>
+      <Text style={styles.note}>
+        ⏱️ For issues like payment failures or technical problems, our team typically responds within 2–24 hours.
+      </Text>
 
       <TouchableOpacity style={styles.telegramButton} onPress={openTelegramSupport}>
         <Text style={styles.telegramButtonText}>💬 Chat on Telegram</Text>
@@ -39,6 +42,12 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#ccc",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  note: {
+    fontSize: 14,
+    color: "#999",
     textAlign: "center",
     marginBottom: 20,
   },

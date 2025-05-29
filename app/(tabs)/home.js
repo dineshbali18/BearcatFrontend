@@ -33,7 +33,7 @@ const LotteryWheel = () => {
   const [startTime, setStartTime] = useState('');
   const [countdown, setCountdown] = useState(0);
   const [phase, setPhase] = useState('loading');
-  const [betAmount, setBetAmount] = useState('10');
+  const [betAmount, setBetAmount] = useState('30');
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [walletAmt, setWalletAmount] = useState(0);
   const [nextLotteryTime, setNextLotteryTime] = useState(null);

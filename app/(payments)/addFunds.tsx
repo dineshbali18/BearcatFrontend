@@ -24,7 +24,7 @@ export default function FundsManager() {
   const userID = useSelector((state)=>state?.user?.userID)
 
   const handleSubmit = async () => {
-    if (!amount > 4 || !upiId.trim() || (mode === 'withdraw' && !upiName.trim())) {
+    if (!amount > 0 || !upiId.trim() || (mode === 'withdraw' && !upiName.trim())) {
       if (mode === 'verify' && (!upiRef.trim() || !amount.trim())) {
         return showToast('Please enter UPI Ref and Amount');
       }

@@ -1,17 +1,23 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import React from "react";
-import { Router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
 import { CaretLeft } from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
-import { BackButtonProps } from "@/types";
 
-const BackButton = ({ style, iconSize = 26 }: BackButtonProps) => {
-  const router: Router = useRouter();
+export interface BackButtonProps {
+  style?: ViewStyle;
+  iconSize?: number;
+  onPress?: () => void; // ✅ allow external onPress
+}
+
+const BackButton: React.FC<BackButtonProps> = ({ style, iconSize = 26, onPress }) => {
+  const router = useRouter();
+
   return (
     <TouchableOpacity
-      onPress={() => router.back()}
-      style={[styles.button, style && style]}
+      onPress={onPress ?? (() => router.back())} // ✅ fallback to router.back()
+      style={[styles.button, style]}
     >
       <CaretLeft
         size={verticalScale(iconSize)}

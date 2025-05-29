@@ -9,6 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import Header from '../../components/Header';
 import { useSelector } from 'react-redux';
+import { BlurView } from 'expo-blur';
+import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 const LOTTERY_DURATION = 300000; // 5 minutes in milliseconds
@@ -16,8 +18,6 @@ const BETTING_CLOSE_TIME = 240000; // Close betting at 4:00 (4 minutes)
 const WINNER_CHECK_START = 270000; // Start checking for winner at 4:30 (270 seconds)
 const WINNER_CHECK_INTERVAL = 2000; // Check for winner every 2 seconds
 const SPIN_DURATION = 85;
-
-
 
 const LotteryWheel = () => {
   const images = [
@@ -351,9 +351,17 @@ const LotteryWheel = () => {
 
   return (
     <LinearGradient 
-      colors={['#1a1a2e', '#16213e']}
+      colors={['#1a002b', '#0f001f', '#000000']}
       style={styles.container}
     >
+      {/* Coin Animation Background */}
+      <LottieView
+        source={require('../../assets/lottie/coin_loop.json')}
+        autoPlay
+        loop
+        style={styles.coinBackground}
+      />
+
       <SafeAreaView style={{ flex: 1 }}>
         <Header refreshTrigger={headerRefreshKey} />
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
@@ -366,7 +374,7 @@ const LotteryWheel = () => {
             JACK PICK
           </Animatable.Text>
           
-          <View style={styles.infoCard}>
+          <BlurView intensity={0} style={styles.infoCard}>
             <View style={{ flexDirection: 'row', marginBottom: 10 }}>
               <Text style={styles.infoLabel}>Lottery ID:</Text>
               <Text style={styles.infoValue}>{lotteryId}</Text>
@@ -376,7 +384,8 @@ const LotteryWheel = () => {
               <Animatable.View 
                 style={[
                   styles.countdownContainer,
-                  { backgroundColor: bettingOpen ? 'rgba(231, 76, 60, 0.2)' : 'rgba(241, 196, 15, 0.2)' }
+                  // backgroundColor: '',
+                  { backgroundColor: bettingOpen ? 'rgba(26, 0, 43, 0.7)' : 'rgba(255, 110, 199, 0.2)' }
                 ]}
                 animation="pulse"
                 iterationCount="infinite"
@@ -415,7 +424,7 @@ const LotteryWheel = () => {
                 <Text style={styles.loadingText}>Loading lottery...</Text>
               </Animatable.View>
             )}
-          </View>
+          </BlurView>
           
           <View style={styles.wheelContainer}>
             {images.map((img, index) => {
@@ -432,7 +441,7 @@ const LotteryWheel = () => {
               
               const opacity = isActive ? 1 : 0.3;
               const borderWidth = isWinner && isAnimatingWinner ? 4 : (isSelected ? 4 : 0);
-              const borderColor = isWinner && isAnimatingWinner ? '#f9ca24' : (isSelected ? '#00b894' : 'transparent');
+              const borderColor = isWinner && isAnimatingWinner ? '#FF8DF4' : (isSelected ? '#A259FF' : 'transparent');
               
               return (
                 <TouchableOpacity 
@@ -449,7 +458,7 @@ const LotteryWheel = () => {
                         transform: [{ scale }],
                         borderWidth,
                         borderColor,
-                        shadowColor: isWinner ? '#f9ca24' : (isSelected ? '#00b894' : '#000'),
+                        shadowColor: isWinner ? '#FF8DF4' : (isSelected ? '#A259FF' : '#000'),
                         shadowOffset: { width: 0, height: 0 },
                         shadowOpacity: isWinner ? 0.9 : (isSelected ? 0.6 : 0.2),
                         shadowRadius: isWinner ? 20 : (isSelected ? 10 : 5),
@@ -523,7 +532,7 @@ const LotteryWheel = () => {
                     keyboardType="numeric"
                     placeholder="0.00"
                     placeholderTextColor="#aaa"
-                    selectionColor="#00b894"
+                    selectionColor="#A259FF"
                   />
                 </View>
               </View>
@@ -535,7 +544,7 @@ const LotteryWheel = () => {
                 activeOpacity={0.8}
               >
                 <LinearGradient
-                  colors={!selectedIcon || !betAmount ? ['#95a5a6', '#7f8c8d'] : ['#00b894', '#55efc4']}
+                  colors={!selectedIcon || !betAmount ? ['#95a5a6', '#7f8c8d'] : ['#A259FF', '#FF6EC7']}
                   style={styles.gradientButton}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
@@ -580,21 +589,30 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 0,
   },
+  coinBackground: {
+    position: 'absolute',
+    width,
+    height,
+    top: 0,
+    left: 0,
+    opacity: 0.3,
+    zIndex: -1
+  },
   content: {
     flex: 1,
     padding: 5,
   },
   title: {
     fontSize: 32,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     fontWeight: '900',
     textAlign: 'center',
     marginVertical: 0,
-    color: '#fff',
+    color: '#FF8DF4',
     letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: 'rgba(162, 89, 255, 0.5)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 10,
   },
   infoCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -603,18 +621,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 30,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.17)',
+    borderColor: 'rgba(162, 89, 255, 0.3)',
+    overflow: 'hidden',
   },
   infoLabel: {
     fontSize: 14,
-    fontFamily: 'Avenir-Medium',
-    color: '#aaa',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#D4C2FF',
     marginBottom: 1,
     margin: 10,
   },
   infoValue: {
     fontSize: 20,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
     marginBottom: 1,
     margin: 5,
@@ -627,33 +646,33 @@ const styles = StyleSheet.create({
   },
   countdownLabel: {
     fontSize: 14,
-    fontFamily: 'Avenir-Medium',
-    color: '#fff',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#FFD56B',
     marginBottom: 5,
   },
   countdown: {
     fontSize: 24,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
   },
   bettingClosedText: {
     fontSize: 14,
-    fontFamily: 'Avenir-Black',
-    color: '#f9ca24',
+    fontFamily: 'Poppins',
+    color: '#FF6EC7',
     marginTop: 5,
   },
   winnerAnnouncement: {
-    backgroundColor: 'rgba(46, 213, 115, 0.2)',
+    backgroundColor: 'rgba(162, 89, 255, 0.2)',
     borderRadius: 10,
     padding: 12,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: 'rgba(46, 213, 115, 0.3)',
+    borderColor: 'rgba(162, 89, 255, 0.3)',
   },
   winnerText: {
     fontSize: 18,
-    fontFamily: 'Avenir-Black',
-    color: '#2ed573',
+    fontFamily: 'Poppins',
+    color: '#FF8DF4',
     textAlign: 'center',
     letterSpacing: 1,
   },
@@ -662,20 +681,20 @@ const styles = StyleSheet.create({
   },
   nextLotteryLabel: {
     fontSize: 14,
-    fontFamily: 'Avenir-Medium',
-    color: '#aaa',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#D4C2FF',
     marginBottom: 5,
   },
   nextLotteryTime: {
     fontSize: 18,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
     marginBottom: 5,
   },
   nextLotteryCountdown: {
     fontSize: 16,
-    fontFamily: 'Avenir-Medium',
-    color: '#f9ca24',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#FFD56B',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -683,8 +702,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    fontFamily: 'Avenir-Medium',
-    color: '#3498db',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#A259FF',
   },
   wheelContainer: {
     flexDirection: 'row',
@@ -711,13 +730,13 @@ const styles = StyleSheet.create({
   winnerBadge: {
     position: 'absolute',
     top: -10,
-    backgroundColor: '#f9ca24',
+    backgroundColor: '#FF8DF4',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: '#fff',
-    shadowColor: '#f9ca24',
+    shadowColor: '#FF8DF4',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
@@ -725,20 +744,20 @@ const styles = StyleSheet.create({
   },
   winnerBadgeText: {
     fontSize: 12,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#000',
     letterSpacing: 1,
   },
   selectedBadge: {
     position: 'absolute',
     bottom: -10,
-    backgroundColor: '#00b894',
+    backgroundColor: '#A259FF',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: '#fff',
-    shadowColor: '#00b894',
+    shadowColor: '#A259FF',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
@@ -746,60 +765,60 @@ const styles = StyleSheet.create({
   },
   selectedBadgeText: {
     fontSize: 12,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
     letterSpacing: 1,
   },
   betContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(26, 0, 43, 0.7)',
     borderRadius: 16,
     padding: 20,
     marginTop: 10,
     marginHorizontal: 25,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(162, 89, 255, 0.3)',
   },
   betClosedContainer: {
-    backgroundColor: 'rgba(241, 196, 15, 0.1)',
+    backgroundColor: 'rgba(162, 89, 255, 0.2)',
     borderRadius: 16,
     padding: 20,
     marginTop: 10,
     marginHorizontal: 25,
     borderWidth: 1,
-    borderColor: 'rgba(241, 196, 15, 0.3)',
+    borderColor: 'rgba(255, 110, 199, 0.3)',
     alignItems: 'center',
   },
   betClosedText: {
     fontSize: 18,
-    fontFamily: 'Avenir-Black',
-    color: '#f9ca24',
+    fontFamily: 'Poppins',
+    color: '#FF6EC7',
     textAlign: 'center',
     marginBottom: 5,
   },
   betClosedSubtext: {
     fontSize: 14,
-    fontFamily: 'Avenir-Medium',
-    color: '#fff',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#D4C2FF',
     textAlign: 'center',
   },
   betTitle: {
     fontSize: 20,
-    fontFamily: 'Avenir-Black',
-    color: '#fff',
+    fontFamily: 'Poppins',
+    color: '#FF8DF4',
     textAlign: 'center',
     marginBottom: 20,
     letterSpacing: 1,
-    fontWeight: 800,
+    fontWeight: '800',
   },
   betSection: {
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 14,
-    fontFamily: 'Avenir-Medium',
-    color: '#aaa',
+    fontFamily: 'JosefinSans-SemiBold',
+    color: '#FFD56B',
     marginBottom: 10,
-    fontWeight: 900,
+    fontWeight: '600',
   },
   iconButtonsContainer: {
     flexDirection: 'row',
@@ -809,15 +828,15 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(162, 89, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
   },
   selectedIconButton: {
-    borderColor: '#00b894',
-    backgroundColor: 'rgba(0, 184, 148, 0.2)',
+    borderColor: '#A259FF',
+    backgroundColor: 'rgba(162, 89, 255, 0.2)',
     transform: [{ scale: 1.1 }],
   },
   disabledIconButton: {
@@ -835,30 +854,30 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#00b894',
+    backgroundColor: '#A259FF',
     borderWidth: 2,
     borderColor: '#fff',
   },
   betInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(162, 89, 255, 0.1)',
     borderRadius: 10,
     paddingHorizontal: 15,
     height: 50,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(162, 89, 255, 0.3)',
   },
   currencySymbol: {
     fontSize: 20,
-    fontFamily: 'Avenir-Black',
-    color: '#fff',
+    fontFamily: 'Poppins',
+    color: '#FFD56B',
     marginRight: 10,
   },
   betInput: {
     flex: 1,
     fontSize: 18,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
     height: '100%',
   },
@@ -874,10 +893,10 @@ const styles = StyleSheet.create({
   },
   betButtonText: {
     fontSize: 16,
-    fontFamily: 'Avenir-Black',
+    fontFamily: 'Poppins',
     color: '#fff',
     letterSpacing: 1,
-    fontWeight: 900,
+    fontWeight: '800',
   },
   disabledButton: {
     opacity: 0.7,

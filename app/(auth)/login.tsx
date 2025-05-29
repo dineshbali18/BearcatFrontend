@@ -6,7 +6,6 @@ import {
   Text,
   View,
   Dimensions,
-  Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
@@ -17,11 +16,9 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import Typo from "@/components/Typo";
 import * as Icons from "phosphor-react-native";
-import { scale, verticalScale } from "@/utils/styling";
+import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
-import Constants from "expo-constants";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
@@ -38,11 +35,11 @@ const Login = () => {
       Alert.alert("Login", "Please fill all the fields!");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
-      const response = await fetch(`http://api.jack-pick.online:3000/v1/user/signin`, {
+      const response = await fetch("http://api.jack-pick.online:3000/v1/user/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -50,22 +47,22 @@ const Login = () => {
           password: passwordRef.current.trim(),
         }),
       });
-  
+
       const resData = await response.json();
       console.log("Login Response:", response.status, resData);
-  
+
       if (response.status === 200) {
         const userData = {
-          emailID: resData.email_id,
-          userID: resData.user_id,
+          email_id: resData.email_id,
+          user_id: resData.user_id,
           token: resData.token,
           name: resData.name,
           phone_number: resData.phone_number,
         };
-  
+
         dispatch(setUser(userData));
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
-  
+
         Alert.alert("Login", "Login successful!");
         router.replace("../(tabs)/home");
       } else {
@@ -78,22 +75,13 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <ScreenWrapper>
       <StatusBar style="light" />
 
-      {/* <Image
-        source={require("../../images/auth_bg.png")}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-        blurRadius={2}
-      /> */}
-
       <View style={styles.container}>
-        <BackButton iconSize={28} />
+        <BackButton iconSize={28} onPress={() => router.replace("/(auth)/welcome")} />
 
         <Animated.View entering={FadeInDown.duration(600)} style={styles.headingWrapper}>
           <Text style={styles.gradientHeader}>Hey,</Text>
@@ -133,7 +121,7 @@ const Login = () => {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account?</Text>
-          <Pressable onPress={() => router.navigate("/(auth)/register")}> 
+          <Pressable onPress={() => router.navigate("/(auth)/register")}>
             <Text style={styles.linkText}>Sign up</Text>
           </Pressable>
         </View>
@@ -149,15 +137,6 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacingY._30,
     paddingHorizontal: spacingX._20,
-  },
-  backgroundImage: {
-    position: "absolute",
-    width: width,
-    height: height,
-    top: 0,
-    left: 0,
-    zIndex: -1,
-    opacity: 0.6,
   },
   headingWrapper: {
     gap: 4,

@@ -7,6 +7,8 @@ import { useRouter } from "expo-router";
 import { getWalletAmount } from "@/helper/Home";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Header = ({ refreshTrigger }) => {
   const token = useSelector((state)=>state.user.token)
@@ -16,8 +18,9 @@ const Header = ({ refreshTrigger }) => {
   const router = useRouter();
   const [walletAmt, setWalletAmt] = useState(0);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     dispatch(clearUser());
+    await AsyncStorage.clear();
     router.replace({ pathname: "/(auth)/login" });
   };
 

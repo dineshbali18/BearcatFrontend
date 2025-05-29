@@ -37,7 +37,7 @@ const UserBets = () => {
     getUserBets(token)
       .then((data) => {
         const transformed = data.map((item, index) => ({
-          lotteryId: index + 1,
+          lotteryId: item.lottery_id,
           iconName: iconMap[item.bet_placed_icon] || "Unknown",
           amount: item.amount,
           placedAt: item.lottery_happended_at,

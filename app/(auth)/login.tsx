@@ -16,6 +16,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import BackButton from "@/components/BackButton";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
+import CustomAlert from "@/components/customAlerts";
 import * as Icons from "phosphor-react-native";
 import { verticalScale } from "@/utils/styling";
 import { colors, spacingX, spacingY } from "@/constants/theme";
@@ -29,13 +30,23 @@ const Login = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('info');
+
+  const showAlert = (title, message, type = 'info') => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertType(type);
+    setAlertVisible(true);
+  };
 
   const onSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
-      Alert.alert("Login", "Please fill all the fields!");
+      showAlert("Login", "Please fill all the fields!", "error");
       return;
     }
-
     setLoading(true);
 
     try {
@@ -63,13 +74,13 @@ const Login = () => {
         dispatch(setUser(userData));
         await AsyncStorage.setItem("userData", JSON.stringify(userData));
 
-        Alert.alert("Login", "Login successful!");
+        showAlert("Success", "Login successful!", "success");
         router.replace("../(tabs)/home");
       } else {
-        Alert.alert("Login Failed", resData.errorDescription || "Invalid credentials");
+        showAlert("Login Failed", resData.errorDescription || "Invalid credentials", "error");
       }
     } catch (error) {
-      Alert.alert("Login Error", "A network error occurred.");
+      showAlert("Error", "A network error occurred", "error");
       console.error("Login error:", error);
     } finally {
       setLoading(false);
@@ -126,6 +137,13 @@ const Login = () => {
           </Pressable>
         </View>
       </View>
+      <CustomAlert
+      visible={alertVisible}
+      title={alertTitle}
+      message={alertMessage}
+      type={alertType}
+      onClose={() => setAlertVisible(false)}
+    />
     </ScreenWrapper>
   );
 };

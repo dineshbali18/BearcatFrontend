@@ -1,6 +1,6 @@
 import {API} from '../backend';
 
-export const getUserBets=() => {
+export const getUserBets=(token) => {
   return fetch(`${API}/v1/user/bets`, {
     mode: 'cors',
     method: 'GET',

@@ -19,7 +19,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.dineshbali18.expensetrackerapp",
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "jsengine": "hermes"
     },
     "web": {
       "bundler": "metro",

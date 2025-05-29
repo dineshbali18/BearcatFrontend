@@ -60,8 +60,8 @@ const Header = ({ refreshTrigger }) => {
                 end={{ x: 1, y: 1 }}
                 style={styles.walletRow}
               >
-                <Text style={styles.walletIcon}>💎</Text>
-                <Text style={styles.walletText}>${walletAmt}    +</Text>
+                <Text style={styles.walletIcon}>💳</Text>
+                <Text style={styles.walletText}>₹{walletAmt}    +</Text>
               </LinearGradient>
             </TouchableOpacity>
 

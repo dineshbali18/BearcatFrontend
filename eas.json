@@ -3,11 +3,17 @@
     "development": {
       "android": {
         "buildType": "apk"
+      },
+      "experimental": {
+        "splitApks": true
       }
     },
     "production": {
       "android": {
         "buildType": "app-bundle"
+      },
+      "experimental": {
+        "splitApks": true
       }
     }
   }

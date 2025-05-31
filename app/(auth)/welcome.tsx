@@ -88,7 +88,7 @@ const WelcomePage = () => {
           ]}
           resizeMode="cover"
         />
-      )}
+      )} 
 
       {/* Title Section */}
       

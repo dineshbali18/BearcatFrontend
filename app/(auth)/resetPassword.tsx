@@ -30,7 +30,7 @@ const ResetPasswordScreen = () => {
       return;
     }
     try {
-      const generateOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/generateotp`, {
+      const generateOtpResponse = await fetch(`http://api.otp.jack-pick.online:3001/api/user/generateotp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -38,7 +38,7 @@ const ResetPasswordScreen = () => {
       const generateOtpData = await generateOtpResponse.json();
       if (!generateOtpData.message?.includes("OTP")) throw new Error("Failed to generate OTP.");
 
-      const sendOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/sendotp`, {
+      const sendOtpResponse = await fetch(`http://api.otp.jack-pick.online:3001/api/user/sendotp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -59,7 +59,7 @@ const ResetPasswordScreen = () => {
       return;
     }
     try {
-      const verifyOtpResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3000/api/user/verifyotp`, {
+      const verifyOtpResponse = await fetch(`http://api.otp.jack-pick.online:3001/api/user/verifyotp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, Otp: otp }),
@@ -81,7 +81,7 @@ const ResetPasswordScreen = () => {
       return;
     }
     try {
-      const resetPasswordResponse = await fetch(`${Constants.expoConfig?.extra?.REACT_APP_API}:3002/user/update`, {
+      const resetPasswordResponse = await fetch(`http://api.otp.jack-pick.online:3000/user/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

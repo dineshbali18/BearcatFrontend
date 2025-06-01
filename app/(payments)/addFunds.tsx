@@ -14,7 +14,9 @@ export default function FundsManager() {
   const [mode, setMode] = useState<'add' | 'verify' | 'withdraw'>('add');
   const [amount, setAmount] = useState(100);
   const [upiId, setUpiId] = useState('dineshbali45@ibl');
-  const [upiName, setUpiName] = useState('');
+  const [accountHolderName, setAccountHolderName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [withdrawUpiId, setWithdrawUpiId] = useState('');
   const [upiRef, setUpiRef] = useState('');
   const token = useSelector((state)=>state?.user?.token)
 
@@ -24,36 +26,47 @@ export default function FundsManager() {
   const userID = useSelector((state)=>state?.user?.userID)
 
   const handleSubmit = async () => {
-    if (!amount > 0 || !upiId.trim() || (mode === 'withdraw' && !upiName.trim())) {
+    if (!amount > 0 || !upiId.trim() || (mode === 'withdraw' && (!accountHolderName.trim() || !phoneNumber.trim() || !withdrawUpiId.trim()))) {
       if (mode === 'verify' && (!upiRef.trim() || !amount.trim())) {
         return showToast('Please enter UPI Ref and Amount');
       }
       return showToast('Please fill in all required fields.');
     }
-
     try {
       if (mode === 'withdraw') {
-        const res = await fetch('https://dummyapi.io/withdraw', {
+        const res = await fetch('http://api.jack-pick.online:3000/v1/user/withdraw-request', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ upiId, upiName, amount }),
+          headers: { 'Content-Type': 'application/json', 'Authorization': token  },
+          body: JSON.stringify({ 
+            "upi_id": withdrawUpiId, 
+            "name": accountHolderName, 
+            "phone_number":phoneNumber,
+            "amount":amount 
+          }),
         });
-        showToast('Withdraw request sent!');
+        if (res.ok) {
+          const data = await res.json();
+          console.log("✅ withdraw request successful:", data);
+          showToast('Withdraw request sent!');
+        } else {
+          const err = await res.json();
+          console.error("❌ Verification failed:", err);
+          showToast("❌ Payment verification failed. Please try again.");
+        }
       } else if (mode === 'verify') {
         try {
           const res = await fetch('http://api.jack-pick.online:3000/v1/verify/payment', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-             'Authorization': token},
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
             body: JSON.stringify({ "upi_ref": upiRef, "amount": amount }),
           });
 
-          console.log("AAAAAAAA",res)
-        
           if (res.ok) {
             const data = await res.json();
             console.log("✅ Payment verification successful:", data);
-            // Show success to user
             alert("✅ Payment verified successfully!");
           } else {
             const err = await res.json();
@@ -64,20 +77,20 @@ export default function FundsManager() {
           console.error("⚠️ Network or server error:", error);
           alert("⚠️ Something went wrong. Please check your connection and try again.");
         }        
-        
       } else {
         setMode('verify')
       }
     } catch (err) {
+      console.log("7777777",err)
       showToast('Network error. Try again.');
     }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-        <TouchableOpacity style={styles.backIconWrapper} onPress={() => router.replace('/(tabs)/home')}>
-    <Icons.ArrowLeft color="#fff" size={24} />
-  </TouchableOpacity>
+      <TouchableOpacity style={styles.backIconWrapper} onPress={() => router.replace('/(tabs)/home')}>
+        <Icons.ArrowLeft color="#fff" size={24} />
+      </TouchableOpacity>
       <Text style={styles.title}>
         {mode === 'add' ? 'ADD FUNDS' : mode === 'withdraw' ? 'WITHDRAW FUNDS' : 'VERIFY PAYMENT'}
       </Text>
@@ -107,45 +120,34 @@ export default function FundsManager() {
               onChangeText={(text) => setAmount(Number(text))}
             />
 
-            {/* <Text style={styles.label}>
-              {mode === 'add' ? 'Your UPI ID' : 'Recipient UPI ID'}
-            </Text>
-            <TextInput
-              placeholder="example@upi"
-              placeholderTextColor="#aaa"
-              value={upiId}
-              onChangeText={setUpiId}
-              style={styles.input}
-            /> */}
-
             {mode === 'withdraw' && (
               <>
                 <Text style={styles.label}>Account Holder Name</Text>
                 <TextInput
                   placeholder="Your Name"
                   placeholderTextColor="#aaa"
-                  value={upiName}
-                  onChangeText={setUpiName}
+                  value={accountHolderName}
+                  onChangeText={setAccountHolderName}
                   style={styles.input}
                 />
                 <Text style={styles.label}>Phone Number</Text>
                 <TextInput
                   placeholder="Your Phone Number"
                   placeholderTextColor="#aaa"
-                  value={upiName}
-                  onChangeText={setUpiName}
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  keyboardType="phone-pad"
                   style={styles.input}
                 />
-                <Text style={styles.label}>Upi id</Text>
+                <Text style={styles.label}>UPI ID</Text>
                 <TextInput
-                  placeholder="Your Upi Id"
+                  placeholder="Your UPI ID"
                   placeholderTextColor="#aaa"
-                  value={upiName}
-                  onChangeText={setUpiName}
+                  value={withdrawUpiId}
+                  onChangeText={setWithdrawUpiId}
                   style={styles.input}
                 />
               </>
-              
             )}
 
             {mode === 'add' && amount>0 && upiId.trim() && (

@@ -12,6 +12,7 @@ import CustomAlert from '../../components/customAlerts'
 import { useSelector } from 'react-redux';
 import { BlurView } from 'expo-blur';
 import LottieView from 'lottie-react-native';
+import useServerTime from '../../hooks/useServerTime';
 
 const { width, height } = Dimensions.get('window');
 const LOTTERY_DURATION = 300000; // 5 minutes in milliseconds
@@ -38,7 +39,7 @@ const LotteryWheel = () => {
   const [walletAmt, setWalletAmount] = useState(0);
   const [nextLotteryTime, setNextLotteryTime] = useState(null);
   const [timeUntilNextLottery, setTimeUntilNextLottery] = useState(0);
-  const [serverOffset, setServerOffset] = useState(0);
+  const { getServerTime, updateOffset } = useServerTime();
   const [apiToken] = useState('your_api_token');
   const [bettingOpen, setBettingOpen] = useState(false);
   const [winnerName, setWinnerName] = useState('');
@@ -96,18 +97,15 @@ const [alertType, setAlertType] = useState('info');
         setLotteryId(live.lottery.lottery_id);
         setStartTime(live.lottery.starttime);
 
-        const serverTime = new Date(live.server_time).getTime();
-        const localTime = Date.now();
-        const offset = serverTime - localTime;
-        setServerOffset(offset);
+        updateOffset(new Date(live.server_time).getTime());
 
         const actualWinner = typeof live.lottery.winner === 'number' ? live.lottery.winner : -1;
 
         if (actualWinner === -1) {
-          startLottery(live.lottery, offset);
+          startLottery(live.lottery);
         } else if (actualWinner > 0) {
           handleWinner(actualWinner);
-          calculateNextLotteryTime(live.lottery.starttime, offset);
+          calculateNextLotteryTime(live.lottery.starttime);
         } else {
           console.warn("Unexpected winner value in live data:", live.lottery.winner);
         }
@@ -120,7 +118,7 @@ const [alertType, setAlertType] = useState('info');
     }
   };
 
-  const startLottery = (lotteryData, offset = serverOffset) => {
+  const startLottery = (lotteryData) => {
     // Reset all states for new lottery
     setWinnerIndex(-1);
     setWinnerName('');
@@ -130,7 +128,7 @@ const [alertType, setAlertType] = useState('info');
     clearIntervals();
 
     const startTimestamp = new Date(lotteryData.starttime).getTime();
-    const now = Date.now() + offset;
+    const now = getServerTime();
     const bettingCloseTime = startTimestamp + BETTING_CLOSE_TIME;
     const winnerCheckTime = startTimestamp + WINNER_CHECK_START;
     const drawTime = startTimestamp + LOTTERY_DURATION;
@@ -163,7 +161,7 @@ const [alertType, setAlertType] = useState('info');
           if (bettingOpen) {
             // Betting just closed
             setBettingOpen(false);
-            const timeUntilDraw = Math.max(0, Math.floor((drawTime - (Date.now() + offset)) / 1000));
+            const timeUntilDraw = Math.max(0, Math.floor((drawTime - getServerTime()) / 1000));
             return timeUntilDraw;
           } else {
             // Draw time reached
@@ -192,7 +190,7 @@ const [alertType, setAlertType] = useState('info');
     }
 
     // Calculate next lottery time
-    calculateNextLotteryTime(lotteryData.starttime, offset);
+    calculateNextLotteryTime(lotteryData.starttime);
   };
 
   const startCheckingWinner = (lotteryId) => {
@@ -264,10 +262,10 @@ const [alertType, setAlertType] = useState('info');
     ).start();
   };
 
-  const calculateNextLotteryTime = (startTime, offset = serverOffset) => {
+  const calculateNextLotteryTime = (startTime) => {
     const startTimestamp = new Date(startTime).getTime();
     const nextLotteryTimestamp = startTimestamp + LOTTERY_DURATION;
-    const now = Date.now() + offset;
+    const now = getServerTime();
     const timeUntilNext = nextLotteryTimestamp - now;
 
     setNextLotteryTime(new Date(nextLotteryTimestamp));
@@ -393,7 +391,7 @@ const [alertType, setAlertType] = useState('info');
           'success'
         );
         fetchAndCacheHomeData();
-        setHeaderRefreshKey(headerRefreshKey + 1);
+        setHeaderRefreshKey(prev => prev + 1);
       } else {
         showAlert('Error', response.message || 'Failed to place bet', 'error');
       }

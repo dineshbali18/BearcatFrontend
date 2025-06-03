@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "@/store/slices/userSlice";
@@ -75,7 +75,7 @@ const Header = ({ refreshTrigger }) => {
   );
 };
 
-export default Header;
+export default memo(Header);
 
 const styles = StyleSheet.create({
   container: {

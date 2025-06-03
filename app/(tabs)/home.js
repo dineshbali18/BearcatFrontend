@@ -114,6 +114,7 @@ const [alertType, setAlertType] = useState('info');
       }
     } catch (error) {
       console.error('Error fetching home data:', error);
+      showAlert('Network Error', error.message || 'Failed to fetch home data', 'error');
       setTimeout(fetchAndCacheHomeData, 2000);
     }
   };
@@ -218,6 +219,7 @@ const [alertType, setAlertType] = useState('info');
         }
       } catch (error) {
         console.error('Error checking winner:', error);
+        showAlert('Network Error', error.message || 'Failed to check winner', 'error');
       }
     };
     
@@ -303,9 +305,14 @@ const [alertType, setAlertType] = useState('info');
   }, []);
 
   const getAmount = async()=>{
-    const data = await getWalletAmount(token);
-    console.log("!!!!!",data)
-    setWalletAmount(data?.wallet_balance)
+    try {
+      const data = await getWalletAmount(token);
+      console.log("!!!!!", data);
+      setWalletAmount(data?.wallet_balance);
+    } catch (err) {
+      console.error('Wallet error:', err);
+      showAlert('Error', err.message || 'Failed to fetch wallet', 'error');
+    }
   }
 
 
@@ -397,7 +404,7 @@ const [alertType, setAlertType] = useState('info');
       }
     } catch (err) {
       console.error('Bet error:', err);
-      showAlert('Error', 'Failed to place bet', 'error');
+      showAlert('Error', err.message || 'Failed to place bet', 'error');
     }
   };
   

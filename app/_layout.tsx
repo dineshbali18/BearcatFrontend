@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Provider } from 'react-redux';
 import store from '@/store'
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // SplashScreen.preventAutoHideAsync();
@@ -42,8 +43,10 @@ function StackLayout() {
 export default function RootLayout() {
   return (
     <Provider store={store}> {/* Wrap with Redux Provider */}
-      <AuthProvider> 
-        <StackLayout />
+      <AuthProvider>
+        <ErrorBoundary>
+          <StackLayout />
+        </ErrorBoundary>
       </AuthProvider>
     </Provider>
   );

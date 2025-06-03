@@ -16,10 +16,8 @@ import useServerTime from '../../hooks/useServerTime';
 
 const { width, height } = Dimensions.get('window');
 const LOTTERY_DURATION = 300000; // 5 minutes in milliseconds
-// Betting closes 30 seconds before the draw
-const BETTING_CLOSE_TIME = 270000; // 4 minutes 30 seconds in milliseconds
-// Start checking the winner right at the draw time
-const WINNER_CHECK_START = 300000; // 5 minutes in milliseconds
+const BETTING_CLOSE_TIME = 240000; // Close betting at 4:00 (4 minutes)
+const WINNER_CHECK_START = 270000; // Start checking for winner at 4:30 (270 seconds)
 const WINNER_CHECK_INTERVAL = 2000; // Check for winner every 2 seconds
 const SPIN_DURATION = 85;
 
@@ -49,9 +47,9 @@ const LotteryWheel = () => {
   const [headerRefreshKey, setHeaderRefreshKey] = useState(0);
 
   const [alertVisible, setAlertVisible] = useState(false);
-const [alertTitle, setAlertTitle] = useState('');
-const [alertMessage, setAlertMessage] = useState('');
-const [alertType, setAlertType] = useState('info');
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('info');
 
   const user_id = useSelector((state)=>state.user.userID)
   const token = useSelector((state)=>state.user.token)

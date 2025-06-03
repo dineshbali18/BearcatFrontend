@@ -23,8 +23,9 @@ const iconMap = {
 };
 
 const getResult = (winner) => {
+  console.log("hhhhh",winner)
   if (winner === -1 || winner === null || winner === undefined) return "pending";
-  return winner === 1 ? "won" : "lost";
+  return winner == 1 ? "won" : "lost";
 };
 
 const UserBets = () => {

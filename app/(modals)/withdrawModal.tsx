@@ -6,129 +6,118 @@ import {
   View,
   SafeAreaView,
   ActivityIndicator,
-  RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "@/components/Typo";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import { getUserBets } from "../../helper/Bets";
+import { getUserWithdrawRequests } from "../../helper/Bets";
 import { useSelector } from "react-redux";
+import { ArrowLeft } from "phosphor-react-native";
 
-const iconMap = {
-  1: "🐯 Tiger",
-  3: "🦁 Lion",
-  2: "🦄 Unicorn",
-};
-
-const getResult = (winner) => {
-  if (winner === -1 || winner === null || winner === undefined) return "pending";
-  return winner === 1 ? "won" : "lost";
+const transformStatus = (status) => {
+  const normalized = status?.toUpperCase();
+  if (normalized === "PENDING") return "pending";
+  if (normalized === "COMPLETED" || normalized === "SUCCESS") return "won";
+  return "lost";
 };
 
 const UserBets = () => {
   const router = useRouter();
   const token = useSelector((state) => state.user.token);
-
   const [bets, setBets] = useState([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const limit = 10;
 
-  const fetchBets = async (startOffset = 0, append = false) => {
-    try {
-      const data = await getUserBets(token, startOffset);
-      const transformed = data.map((item) => ({
-        lotteryId: item.lottery_id,
-        iconName: iconMap[item.bet_placed_icon] || "Unknown",
-        amount: item.amount,
-        placedAt: item.lottery_happended_at,
-        result: getResult(item.winner),
-      }));
+  const fetchData = (initial = false) => {
+    if (!hasMore && !initial) return;
+    if (!initial) setLoadingMore(true);
 
-      if (append) {
+    getUserWithdrawRequests(token, offset)
+      .then((data) => {
+        if (!data || data.length === 0) {
+          setHasMore(false);
+          setLoading(false);
+          setLoadingMore(false);
+          return;
+        }
+
+        const transformed = data.map((item) => ({
+          name: item.name,
+          upiId: item.upi_id,
+          amount: item.amount,
+          createdAt: item.created_at,
+          status: transformStatus(item.status),
+        }));
+
         setBets((prev) => [...prev, ...transformed]);
-      } else {
-        setBets(transformed);
-      }
-
-      setHasMore(transformed.length === limit);
-    } catch (err) {
-      console.log("Fetch error:", err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+        setOffset((prev) => prev + data.length);
+        setLoading(false);
+        setLoadingMore(false);
+      })
+      .catch((err) => {
+        console.log("Failed to fetch withdrawal requests:", err);
+        setLoading(false);
+        setLoadingMore(false);
+      });
   };
 
   useEffect(() => {
-    fetchBets(0);
+    fetchData(true);
   }, []);
 
-  const handleLoadMore = () => {
-    if (!loading && hasMore) {
-      const nextOffset = offset + limit;
-      setOffset(nextOffset);
-      fetchBets(nextOffset, true);
+  const fetchMoreData = () => {
+    if (!loading && !loadingMore && hasMore) {
+      fetchData();
     }
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setOffset(0);
-    fetchBets(0, false);
   };
 
   return (
     <ScreenWrapper style={{ backgroundColor: colors.black }}>
       <SafeAreaView style={styles.safe}>
         <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
+            <ArrowLeft size={22} color="#fff" weight="bold" />
+          </TouchableOpacity>
           <Typo size={20} fontWeight="700" style={styles.headerText}>
-            My Bets
+            Withdrawal Requests
           </Typo>
         </View>
 
-        {loading && !refreshing ? (
+        {loading ? (
           <ActivityIndicator size="large" color="#fff" />
         ) : (
           <FlatList
             data={bets}
             keyExtractor={(item, index) => `bet-${index}`}
             contentContainerStyle={styles.listContainer}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-                tintColor="#fff"
-              />
+            onEndReached={fetchMoreData}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loadingMore ? <ActivityIndicator color="#fff" /> : null
             }
             renderItem={({ item }) => (
-              <View style={[styles.betCard, styles[item.result]]}>
+              <View style={[styles.betCard, styles[item.status]]}>
                 <View style={styles.rowBetween}>
                   <View style={styles.leftSection}>
-                    <Text style={styles.lottery}>#{item.lotteryId}</Text>
-                    <Text style={styles.info}>{item.iconName}</Text>
+                    <Text style={styles.lottery}>{item.name}</Text>
+                    <Text style={styles.info}>{item.upiId}</Text>
                     <Text style={styles.info}>₹{item.amount}</Text>
                   </View>
                   <View style={styles.rightSection}>
-                    <Text style={[styles.result, styles[item.result + "Text"]]}>
-                      {item.result.toUpperCase()}
+                    <Text style={[styles.result, styles[item.status + "Text"]]}>
+                      {item.status.toUpperCase()}
                     </Text>
                     <Text style={styles.timestamp}>
-                      {new Date(item.placedAt).toLocaleString()}
+                      {new Date(item.createdAt).toLocaleString()}
                     </Text>
                   </View>
                 </View>
               </View>
             )}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.7}
-            ListFooterComponent={
-              hasMore && <ActivityIndicator size="small" color="#fff" />
-            }
           />
         )}
       </SafeAreaView>
@@ -145,6 +134,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacingY._20,
     paddingTop: spacingY._10,
+  },
+  backIcon: {
+    marginRight: 10,
+    padding: 6,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 8,
   },
   headerText: {
     color: "#fff",
@@ -169,7 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   result: {
-    color: "#fab1a0",
     marginTop: 4,
     fontWeight: "600",
   },
@@ -190,6 +184,9 @@ const styles = StyleSheet.create({
     borderLeftColor: "#f9ca24",
     borderLeftWidth: 4,
   },
+  wonText: { color: "#00b894" },
+  lostText: { color: "#d63031" },
+  pendingText: { color: "#f9ca24" },
   rowBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -201,7 +198,4 @@ const styles = StyleSheet.create({
   rightSection: {
     alignItems: "flex-end",
   },
-  wonText: { color: "#00b894" },
-  lostText: { color: "#d63031" },
-  pendingText: { color: "#f9ca24" },
 });

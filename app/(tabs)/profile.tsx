@@ -42,6 +42,30 @@ const Profile = () => {
       bgColor: "#6366f1",
     },
     {
+      title: "Withdraw Requests",
+      icon: (
+        <Icons.HandWithdraw
+          size={verticalScale(26)}
+          color={colors.white}
+          weight="fill"
+        />
+      ),
+      routeName: "/(modals)/withdrawModal",
+      bgColor: "#6366f1",
+    },
+    {
+      title: "Deposit",
+      icon: (
+        <Icons.HandWithdraw
+          size={verticalScale(26)}
+          color={colors.white}
+          weight="fill"
+        />
+      ),
+      routeName: "/(payments)/addFunds",
+      bgColor: "#6366f1",
+    },
+    {
       title: "Settings",
       icon: (
         <Icons.GearSix

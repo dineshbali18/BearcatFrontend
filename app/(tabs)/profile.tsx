@@ -20,7 +20,7 @@ import { accountOptionType } from "@/types";
 // Removed Firebase imports
 // import { signOut } from "firebase/auth";
 // import { auth } from "@/config/firebase";
-import { getProfileImage } from "@/services/imageService";
+// import { getProfileImage } from "@/services/imageService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 
@@ -138,14 +138,14 @@ const Profile = () => {
         {/* <Header title="Profile" /> */}
         <View style={styles.userInfo}>
           {/* Avatar */}
-          <View>
+          {/* <View>
             <Image
               style={styles.avatar}
               source={getProfileImage(user?.image)}
               contentFit="cover"
               transition={100}
             />
-          </View>
+          </View> */}
 
           {/* Name and email */}
         

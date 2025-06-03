@@ -7,7 +7,7 @@ import { Image } from "expo-image";
 import { scale, verticalScale } from "@/utils/styling";
 import * as ImagePicker from "expo-image-picker";
 import Typo from "./Typo";
-import { getFilePath } from "@/services/imageService";
+// import { getFilePath } from "@/services/imageService";
 
 const ImageUpload = ({
   file = null,

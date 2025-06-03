@@ -19,7 +19,7 @@ import { Image } from "expo-image";
 import { scale, verticalScale } from "@/utils/styling";
 import * as Icons from "phosphor-react-native";
 import * as ImagePicker from "expo-image-picker";
-import { getProfileImage } from "@/services/imageService";
+// import { getProfileImage } from "@/services/imageService";
 // import { updateUser } from "@/services/userService";
 import { useRouter } from "expo-router";
 import BackButton from "@/components/BackButton";

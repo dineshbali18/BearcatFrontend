@@ -16,7 +16,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import ImageUpload from "@/components/ImageUpload";
 import { scale, verticalScale } from "@/utils/styling";
-import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
+// import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { WalletType } from "@/types";
 import BackButton from "@/components/BackButton";

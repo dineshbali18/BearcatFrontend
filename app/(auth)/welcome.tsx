@@ -39,7 +39,7 @@ const WelcomePage = () => {
         duration: 800,
         useNativeDriver: true,
       }).start();
-    }, 3000);
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 

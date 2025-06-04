@@ -11,7 +11,8 @@ import Header from '../../components/Header';
 import CustomAlert from '../../components/customAlerts'
 import { useSelector } from 'react-redux';
 import { BlurView } from 'expo-blur';
-// import LottieView from 'lottie-react-native';
+import LottieView from 'lottie-react-native';
+// import { DotLottieView } from '@lottiefiles/dotlottie-react-native';
 import useServerTime from '../../hooks/useServerTime';
 import { AppState } from 'react-native';
 
@@ -496,6 +497,40 @@ const [alertType, setAlertType] = useState('info');
               <Animatable.View animation="fadeIn">
                 <View style={styles.winnerAnnouncement}>
                   <Text style={styles.winnerText}>WINNER: {winnerName.toUpperCase()}!</Text>
+                </View>
+                <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
+                  <View style={{ width: 200, height: 200, position: 'relative' }}>
+                    
+                    {/* 🧨 Lottie Blast on Top */}
+                    <LottieView
+                      source={require('../../assets/animations/Animation_blast.json')}
+                      autoPlay
+                      loop={true}
+                      style={{
+                        width: 200,
+                        height: 200,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        zIndex: 1,
+                      }}
+                    />
+
+                    {/* 🖼️ Image underneath */}
+                    <Image
+                      source={images[winnerIndex].source} // replace with your image
+                      style={{
+                        width: 200,
+                        height: 200,
+                        borderRadius: 100,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        zIndex: 0,
+                      }}
+                      resizeMode="cover"
+                    />
+                  </View>
                 </View>
                 <View style={styles.nextLotteryInfo}>
                   <Text style={styles.nextLotteryLabel}>Next lottery:</Text>

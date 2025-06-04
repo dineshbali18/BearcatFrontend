@@ -47,9 +47,9 @@ const LotteryWheel = () => {
   const [headerRefreshKey, setHeaderRefreshKey] = useState(0);
 
   const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('info');
+const [alertTitle, setAlertTitle] = useState('');
+const [alertMessage, setAlertMessage] = useState('');
+const [alertType, setAlertType] = useState('info');
 
   const user_id = useSelector((state)=>state.user.userID)
   const token = useSelector((state)=>state.user.token)
@@ -159,18 +159,17 @@ const LotteryWheel = () => {
         const newCount = prev - 1;
         if (newCount <= 0) {
           if (bettingOpen) {
-            // Betting just closed
             setBettingOpen(false);
-            const timeUntilDraw = Math.max(0, Math.floor((drawTime - getServerTime()) / 1000));
-            return timeUntilDraw;
+            const timeUntilWinnerCheck = Math.max(0, Math.floor((winnerCheckTime - getServerTime()) / 1000));
+            return timeUntilWinnerCheck;
           } else {
-            // Draw time reached
             clearInterval(countdownInterval.current);
             return 0;
           }
         }
         return newCount;
       });
+      
     }, 1000);
 
     // Start spinning

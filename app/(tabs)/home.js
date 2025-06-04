@@ -79,7 +79,7 @@ const [alertType, setAlertType] = useState('info');
   
   const handleAppStateChange = (nextAppState) => {
     if (nextAppState === 'active') {
-      console.log('App is back in foreground, refreshing...');
+      // //console.log('App is back in foreground, refreshing...');
       clearIntervals(); // Stop old timers
       fetchAndCacheHomeData(); // Re-fetch latest lottery state
       getAmount(); // Update wallet
@@ -223,7 +223,7 @@ const [alertType, setAlertType] = useState('info');
     const checkWinner = async () => {
       try {
         const winnerData = await getWinner(lotteryId,token);
-        console.log('Winner check response:', winnerData);
+        // //console.log('Winner check response:', winnerData);
         
         // Handle both object and direct number responses
         const winner = winnerData?.winner || winnerData;
@@ -234,7 +234,7 @@ const [alertType, setAlertType] = useState('info');
           handleWinner(winner);
         } else if (winner === -1 || winner === null || winner === undefined) {
           // Winner not yet available
-          console.log('Winner not yet determined...');
+          // //console.log('Winner not yet determined...');
         } else {
           console.warn('Unexpected winner data format:', winnerData);
         }
@@ -326,7 +326,7 @@ const [alertType, setAlertType] = useState('info');
 
   const getAmount = async()=>{
     const data = await getWalletAmount(token);
-    console.log("!!!!!",data)
+    // //console.log("!!!!!",data)
     setWalletAmount(data?.wallet_balance)
   }
 
@@ -359,7 +359,7 @@ const [alertType, setAlertType] = useState('info');
   //       api_token: apiToken,
   //     },token);
 
-  //     console.log("00000",response)
+  //     //console.log("00000",response)
 
   //     if (response.status == 1) {
   //       Alert.alert('Success', `Your bet of $${amount} on ${images.find(img => img.id === selectedIcon).name} has been placed!`);
@@ -499,38 +499,39 @@ const [alertType, setAlertType] = useState('info');
                   <Text style={styles.winnerText}>WINNER: {winnerName.toUpperCase()}!</Text>
                 </View>
                 <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
-                  <View style={{ width: 200, height: 200, position: 'relative' }}>
-                    
-                    {/* 🧨 Lottie Blast on Top */}
-                    <LottieView
-                      source={require('../../assets/animations/Animation_blast.json')}
-                      autoPlay
-                      loop={true}
-                      style={{
-                        width: 200,
-                        height: 200,
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        zIndex: 1,
-                      }}
-                    />
+                <View style={{ width: 100, height: 100, position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+                  {/* 🔥 Blast animation on top */}
+                  <LottieView
+                    source={require('../../assets/animations/Animation_blast.json')}
+                    autoPlay
+                    loop={true}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      zIndex: 1,
+                    }}
+                  />
 
-                    {/* 🖼️ Image underneath */}
-                    <Image
-                      source={images[winnerIndex].source} // replace with your image
-                      style={{
-                        width: 200,
-                        height: 200,
-                        borderRadius: 100,
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        zIndex: 0,
-                      }}
-                      resizeMode="cover"
-                    />
-                  </View>
+                  {/* 🖼️ Winner image underneath */}
+                  <Image
+                    source={images[winnerIndex]?.source}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50, 
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      zIndex: 0,
+                      borderWidth: 5,
+                      borderColor: '#A259FF4',
+                    }}
+                    resizeMode="cover"
+                  />
+                </View>
                 </View>
                 <View style={styles.nextLotteryInfo}>
                   <Text style={styles.nextLotteryLabel}>Next lottery:</Text>

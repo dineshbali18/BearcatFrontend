@@ -46,11 +46,11 @@ export default function FundsManager() {
         });
         if (res.ok) {
           const data = await res.json();
-          console.log("✅ withdraw request successful:", data);
+          // //console.log("✅ withdraw request successful:", data);
           showToast('Withdraw request sent!');
         } else {
           const err = await res.json();
-          console.error("❌ Verification failed:", err);
+          // console.error("❌ Verification failed:", err);
           showToast("❌ Payment verification failed. Please try again.");
         }
       } else if (mode === 'verify') {
@@ -66,22 +66,22 @@ export default function FundsManager() {
 
           if (res.ok) {
             const data = await res.json();
-            console.log("✅ Payment verification successful:", data);
+            // //console.log("✅ Payment verification successful:", data);
             alert("✅ Payment verified successfully!");
           } else {
             const err = await res.json();
-            console.error("❌ Verification failed:", err);
+            // console.error("❌ Verification failed:", err);
             alert("❌ Payment verification failed. Please try again.");
           }
         } catch (error) {
-          console.error("⚠️ Network or server error:", error);
+          // console.error("⚠️ Network or server error:", error);
           alert("⚠️ Something went wrong. Please check your connection and try again.");
         }        
       } else {
         setMode('verify')
       }
     } catch (err) {
-      console.log("7777777",err)
+      // //console.log("7777777",err)
       showToast('Network error. Try again.');
     }
   };

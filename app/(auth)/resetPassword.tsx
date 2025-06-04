@@ -86,10 +86,9 @@ const ResetPasswordScreen = () => {
           body: JSON.stringify({ email, password, otp }),
         }
       );
-      console.log("[[[[[[[",JSON.stringify({ email, password, otp }))
-      console.log("000000",resetPasswordResponse)
+
       const resetPasswordData = await resetPasswordResponse.json();
-      console.log("0000006666",resetPasswordData)
+
       if (resetPasswordData.message !== "User updated successfully")
         throw new Error("Failed to reset password.");
 

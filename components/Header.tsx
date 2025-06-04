@@ -29,7 +29,7 @@ const Header = ({ refreshTrigger }) => {
       const res = await getWalletAmount(token);
       setWalletAmt(res.wallet_balance);
     } catch (err) {
-      console.log("Failed to fetch wallet balance", err);
+      //console.log("Failed to fetch wallet balance", err);
     }
   };
 
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 //   const name = useSelector((state)=>state.user.name)
 //   const user = useSelector((state)=>state.user)
 
-//   console.log("IUUUUUUUU",user)
+//   //console.log("IUUUUUUUU",user)
 //   const dispatch = useDispatch();
 //   const router = useRouter();
 //   const [walletAmt, setWalletAmt] = useState(0);
@@ -177,13 +177,13 @@ const styles = StyleSheet.create({
 
 //   const fetchWalletBalance = async () => {
 
-//     console.log("PPPPPPP",token)
-//     console.log("NAME:::::",name)
+//     //console.log("PPPPPPP",token)
+//     //console.log("NAME:::::",name)
 //     try {
 //       const res = await getWalletAmount(token);
 //       setWalletAmt(res.wallet_balance);
 //     } catch (err) {
-//       console.log("Failed to fetch wallet balance", err);
+//       //console.log("Failed to fetch wallet balance", err);
 //     }
 //   };
 

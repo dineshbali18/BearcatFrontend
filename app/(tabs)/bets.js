@@ -23,7 +23,7 @@ const iconMap = {
 };
 
 const getResult = (winner) => {
-  console.log("hhhhh",winner)
+  // //console.log("hhhhh",winner)
   if (winner === -1 || winner === null || winner === undefined) return "pending";
   return winner == 1 ? "won" : "lost";
 };
@@ -58,7 +58,7 @@ const UserBets = () => {
 
       setHasMore(transformed.length === limit);
     } catch (err) {
-      console.log("Fetch error:", err);
+      // //console.log("Fetch error:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);

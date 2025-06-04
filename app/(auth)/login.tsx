@@ -60,7 +60,6 @@ const Login = () => {
       });
 
       const resData = await response.json();
-      console.log("Login Response:", response.status, resData);
 
       if (response.status === 200) {
         const userData = {

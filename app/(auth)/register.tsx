@@ -32,7 +32,6 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
-    console.log("onSubmit triggered!"); 
     const email = emailRef.current.trim().toLowerCase();
     const password = passwordRef.current.trim();
     const username = nameRef.current.trim();
@@ -42,8 +41,6 @@ const SignUp = () => {
       Alert.alert("Register", "Please fill all the fields!");
       return;
     }
-
-    console.log("aaaaaaaaaaa")
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Alert.alert("Invalid Email", "Please enter a valid email address.");
@@ -55,7 +52,6 @@ const SignUp = () => {
       Alert.alert("Invalid Phone", "Phone number must be exactly 10 digits.");
       return;
     }
-console.log("bbbbbbb")
     setLoading(true);
     const emailPayload = { "email": email };
 
@@ -72,7 +68,7 @@ console.log("bbbbbbb")
       }
       return { success: false, error: `${label} failed: ${lastError || "Unknown error"}` };
     };
-    console.log("bbbbbbbcccccccc")
+
     const generateOtp = async () => {
       try {
         const res = await fetch("http://api.otp.jack-pick.online:3001/api/user/generateotp", {
@@ -87,14 +83,14 @@ console.log("bbbbbbb")
         return { success: false, error: "Network error" };
       }
     };
-    console.log("bbbbbbbccccccccddddddd")
+
     const genResult = await retry(generateOtp, "OTP generation");
     if (!genResult.success) {
       setLoading(false);
       Alert.alert("\u274C Error", genResult.error);
       return;
     }
-    console.log("eeeeeeeeeeeeee")
+
     const sendOtp = async () => {
       try {
         const res = await fetch("http://api.otp.jack-pick.online:3001/api/user/sendotp", {
@@ -109,16 +105,16 @@ console.log("bbbbbbb")
         return { success: false, error: "Network error" };
       }
     };
-console.log("fffffffffff")
+
     const sendResult = await retry(sendOtp, "OTP sending");
     setLoading(false);
 
     if (!sendResult.success) {
-      console.log("gggggggg")
+
       Alert.alert("\u274C Error", sendResult.error);
       return;
     }
-console.log("000000")
+
     router.push("/(auth)/mfa_register");
   };
 

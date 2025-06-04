@@ -17,7 +17,7 @@ export const getWinner = async (lotteryId, token) => {
     });
     return await res.json();
   } catch (err) {
-    console.log("getWinner error:", err);
+    // //console.log("getWinner error:", err);
   }
 };
 
@@ -32,7 +32,7 @@ export const getLotteryID = async () => {
     });
     return await res.json();
   } catch (err) {
-    console.log("getLotteryID error:", err);
+    // //console.log("getLotteryID error:", err);
   }
 };
 
@@ -52,7 +52,7 @@ export const addMoneyAPICall = async (amount, token) => {
     });
     return await res.json();
   } catch (err) {
-    console.log("addMoneyAPICall error:", err);
+    // console.log("addMoneyAPICall error:", err);
   }
 };
 
@@ -68,13 +68,13 @@ export const getUserBets = async (token) => {
     });
     return await res.json();
   } catch (err) {
-    console.log("getUserBets error:", err);
+    //console.log("getUserBets error:", err);
   }
 };
 
 // 🧩 PLACE BET
 export const placeBet = async (bidData, token) => {
-  console.log("999999999",bidData)
+  //console.log("999999999",bidData)
   try {
     const res = await fetch(`${API}/v1/place/bet`, {
       method: "POST",
@@ -86,7 +86,7 @@ export const placeBet = async (bidData, token) => {
     });
     return await res.json();
   } catch (err) {
-    console.log("placeBet error:", err);
+    //console.log("placeBet error:", err);
   }
 };
 
@@ -100,11 +100,11 @@ export const getWalletAmount = async (token) => {
         Authorization: token,
       },
     });
-    console.log("TQQQQQQ",token)
-    console.log("XXXXXXX",res)
+    //console.log("TQQQQQQ",token)
+    //console.log("XXXXXXX",res)
     return await res.json();
   } catch (err) {
-    console.log("getWalletAmount error:", err);
+    //console.log("getWalletAmount error:", err);
   }
 };
 
@@ -120,7 +120,7 @@ export const getHomeData = async (token) => {
     });
     return await res.json();
   } catch (err) {
-    console.log("getHomeData error:", err);
+    //console.log("getHomeData error:", err);
     return null;
   }
 };

@@ -19,7 +19,7 @@ import { Feather } from "@expo/vector-icons";
 
 const UserBudgets = ({ incomeList }: { incomeList: IncomeType[] }) => {
   const renderItem: ListRenderItem<IncomeType> = ({ item }) => {
-    console.log("Itemmmmmm:::", item);
+    //console.log("Itemmmmmm:::", item);
     
     // Select the correct icon source based on item name
     let iconSource = DollarIcon;

@@ -15,7 +15,7 @@ export const getUserBets = (token, offset = 0) => {
   })
     .then((response) => response.json())
     .catch((err) => {
-      console.log('Error fetching bets:', err);
+      //console.log('Error fetching bets:', err);
     });
 };
 
@@ -34,7 +34,7 @@ export const getUserWithdrawRequests = (token, offset = 0) => {
   })
     .then((response) => response.json())
     .catch((err) => {
-      console.log('Error fetching withdraw requests:', err);
+      //console.log('Error fetching withdraw requests:', err);
     });
 };
 
@@ -52,12 +52,12 @@ export const getUserWithdrawRequests = (token, offset = 0) => {
 //     },
 //   }).then((response) => {
 //     //console logging response can give a Error in log so try to comment the code that is actually printing response
-//     // console.log(response);
-//     console.log("000000",response)
+//     // //console.log(response);
+//     //console.log("000000",response)
 //     return response.json();
 //   })
 //       .catch((err) => {
-//         console.log('Error', err);
+//         //console.log('Error', err);
 //       }); ;
 // }
 
@@ -72,11 +72,11 @@ export const getUserWithdrawRequests = (token, offset = 0) => {
 //     },
 //   }).then((response) => {
 //     //console logging response can give a Error in log so try to comment the code that is actually printing response
-//     // console.log(response);
-//     console.log("000000",response)
+//     // //console.log(response);
+//     //console.log("000000",response)
 //     return response.json();
 //   })
 //       .catch((err) => {
-//         console.log('Error', err);
+//         //console.log('Error', err);
 //       }); ;
 // }

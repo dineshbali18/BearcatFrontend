@@ -59,7 +59,7 @@ const UserBets = () => {
         setLoadingMore(false);
       })
       .catch((err) => {
-        console.log("Failed to fetch withdrawal requests:", err);
+        // //console.log("Failed to fetch withdrawal requests:", err);
         setLoading(false);
         setLoadingMore(false);
       });

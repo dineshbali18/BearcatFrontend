@@ -35,7 +35,7 @@ const Winners = () => {
     setLoading(true);
     try {
       const data = await getPaginatedLotteries(nextPage, LIMIT,token);
-      console.log("DDDDD",data)
+      // //console.log("DDDDD",data)
       if (data.length < LIMIT) setHasMore(false);
 
       const formatted = data.map((item, index) => ({

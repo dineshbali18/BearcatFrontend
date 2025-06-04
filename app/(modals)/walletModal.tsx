@@ -66,7 +66,7 @@ const WalletModal = () => {
 
     const res = await createOrUpdateWallet(data);
     setLoading(false);
-    console.log("res: ", res);
+    // console.log("res: ", res);
     if (res.success) {
       router.back();
     } else {

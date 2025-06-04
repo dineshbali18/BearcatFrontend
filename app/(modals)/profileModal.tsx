@@ -35,7 +35,7 @@ const ProfileModal = () => {
   const dispatch = useDispatch()
   const user = useSelector((state)=>state.user)
 
-  // console.log("QQQQQQ",userCurrentData)
+
 
   let [userData, setUserData] = useState<UserDataType>({
     id: user.userID,
@@ -49,14 +49,14 @@ const ProfileModal = () => {
   const router = useRouter();
 
   const onSelectImage = (file: any) => {
-    // console.log("file: ", file);
+    // //console.log("file: ", file);
     if (file) setUserData({ ...userData, image: file });
   };
 
   // const onSubmit = async () => {
   //   const { name, email, phoneNumber } = userData;
 
-  //   console.log("NAMMMAaaaaaa",name)
+  //   //console.log("NAMMMAaaaaaa",name)
   
   //   // Basic validatio
   //   if (!name?.trim()) {
@@ -94,7 +94,7 @@ const ProfileModal = () => {
   
   //     setLoading(false);
 
-  //     console.log("DDDDDD",data)      
+  //     //console.log("DDDDDD",data)      
       
   //     if (response.ok) {
   //       // Update local user data

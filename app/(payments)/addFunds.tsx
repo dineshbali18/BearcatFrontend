@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, Alert
 } from 'react-native';
@@ -7,13 +7,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Icons from "phosphor-react-native";
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
+import { getActiveUPIIds } from '@/helper/Winners';
 
 const { width } = Dimensions.get('window');
 
 export default function FundsManager() {
   const [mode, setMode] = useState<'add' | 'verify' | 'withdraw'>('add');
   const [amount, setAmount] = useState(100);
-  const [upiId, setUpiId] = useState('dineshbali45@ibl');
+  const [upiId, setUpiId] = useState(['dineshbali45@ibl']);
   const [accountHolderName, setAccountHolderName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [withdrawUpiId, setWithdrawUpiId] = useState('');
@@ -26,7 +27,7 @@ export default function FundsManager() {
   const userID = useSelector((state)=>state?.user?.userID)
 
   const handleSubmit = async () => {
-    if (!amount > 0 || !upiId.trim() || (mode === 'withdraw' && (!accountHolderName.trim() || !phoneNumber.trim() || !withdrawUpiId.trim()))) {
+    if (!amount > 0 || !upiId[0].trim() || (mode === 'withdraw' && (!accountHolderName.trim() || !phoneNumber.trim() || !withdrawUpiId.trim()))) {
       if (mode === 'verify' && (!upiRef.trim() || !amount.trim())) {
         return showToast('Please enter UPI Ref and Amount');
       }
@@ -85,6 +86,23 @@ export default function FundsManager() {
       showToast('Network error. Try again.');
     }
   };
+
+  useEffect(() => {
+    const fetchUPIIds = async () => {
+      try {
+        const upis = await getActiveUPIIds(token); // if token is required
+        // console.log("AAAAA",upis)
+        if (upis?.length > 0) {
+          setUpiId(upis[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch active UPI IDs:", err);
+      }
+    };
+  
+    fetchUPIIds();
+  }, []);
+  
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -150,9 +168,9 @@ export default function FundsManager() {
               </>
             )}
 
-            {mode === 'add' && amount>0 && upiId.trim() && (
+            {mode === 'add' && amount>0 && upiId[0].trim() && (
               <View style={styles.qrWrapper}>
-                <QRCode value={`upi://pay?pa=${upiId}&am=${amount}`} size={180} />
+                <QRCode value={`upi://pay?pa=${upiId[0]}&am=${amount}`} size={180} />
                 <Text style={{color:'white',margin:10,fontWeight:900}}>Make payment using the QR code and click on completed payment</Text>
               </View>
             )}

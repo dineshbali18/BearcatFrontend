@@ -1,6 +1,0 @@
-appId: com.dineshbali18.expensetrackerapp
----
-- launchApp
-- tapOn:
-    id: "signInButton"
-- assertVisible: "Enter your email"

@@ -11,8 +11,9 @@ import Header from '../../components/Header';
 import CustomAlert from '../../components/customAlerts'
 import { useSelector } from 'react-redux';
 import { BlurView } from 'expo-blur';
-import LottieView from 'lottie-react-native';
+// import LottieView from 'lottie-react-native';
 import useServerTime from '../../hooks/useServerTime';
+import { AppState } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 const LOTTERY_DURATION = 300000; // 5 minutes in milliseconds
@@ -69,6 +70,21 @@ const [alertType, setAlertType] = useState('info');
     setAlertType(type);
     setAlertVisible(true);
   };
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove(); // Clean up listener on unmount
+  }, []);
+  
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') {
+      console.log('App is back in foreground, refreshing...');
+      clearIntervals(); // Stop old timers
+      fetchAndCacheHomeData(); // Re-fetch latest lottery state
+      getAmount(); // Update wallet
+    }
+  };
+  
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -157,20 +173,26 @@ const [alertType, setAlertType] = useState('info');
     countdownInterval.current = setInterval(() => {
       setCountdown(prev => {
         const newCount = prev - 1;
+    
         if (newCount <= 0) {
-          if (bettingOpen) {
+          const now = getServerTime();
+          const timeUntilWinnerCheck = Math.max(0, Math.floor((winnerCheckTime - now) / 1000));
+    
+          if (now < winnerCheckTime) {
+            // Transition from betting to waiting
             setBettingOpen(false);
-            const timeUntilWinnerCheck = Math.max(0, Math.floor((winnerCheckTime - getServerTime()) / 1000));
             return timeUntilWinnerCheck;
           } else {
+            // Done waiting for winner
             clearInterval(countdownInterval.current);
             return 0;
           }
         }
+    
         return newCount;
       });
-      
     }, 1000);
+    
 
     // Start spinning
     spinInterval.current = setInterval(() => {
@@ -419,12 +441,12 @@ const [alertType, setAlertType] = useState('info');
       style={styles.container}
     >
       {/* Coin Animation Background */}
-      <LottieView
+      {/* <LottieView
         source={require('../../assets/lottie/coin_loop.json')}
         autoPlay
         loop
         style={styles.coinBackground}
-      />
+      /> */}
 
       <SafeAreaView style={{ flex: 1 }}>
         <Header refreshTrigger={headerRefreshKey} />

@@ -124,6 +124,14 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+    splits {
+    abi {
+      enable true
+      reset()
+      include "arm64-v8a"
+      universalApk false  // Don't build one big APK
+    }
+  }
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`

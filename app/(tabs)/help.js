@@ -1,9 +1,43 @@
-import React from "react";
-import { Linking, TouchableOpacity, Text, StyleSheet, View } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import { Linking, TouchableOpacity, Text, StyleSheet, View, ActivityIndicator, Alert } from "react-native";
+import { useSelector } from 'react-redux';
 const SupportScreen = () => {
+  const [telegramLink, setTelegramLink] = useState('');
+
+  const token = useSelector((state)=>state.user.token)
+
+  useEffect(() => {
+    fetchTelegramLink();
+  }, []);
+
+  const fetchTelegramLink = async () => {
+    try {
+      // const response = await fetch("http://api.jack-pick.online:3000/v1/user/telegram"); // Replace with your actual API base
+      const response = await fetch("http://api.jack-pick.online:3000/v1/user/telegram", {
+        method: "GET",
+        headers: {
+          "Authorization": `${token}`, // replace with your actual token
+          "Accept": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      if (data.telegram_link && data.telegram_link.startsWith("telegram:")) {
+        const username = data.telegram_link.split(":")[1].trim();
+        setTelegramLink(`https://t.me/${username}`);
+      } else {
+        throw new Error("Invalid format");
+      }
+    } catch (error) {
+      console.error("Failed to load Telegram link", error);
+      Alert.alert("Error", "Unable to load support link.");
+    }
+  };
+
   const openTelegramSupport = () => {
-    Linking.openURL("https://t.me/JackPickSupport");
+    if (telegramLink) {
+      Linking.openURL(telegramLink);
+    }
   };
 
   return (
